@@ -1,0 +1,8 @@
+*.hex
+*.bin
+*.lst
+*.asm
+*.i
+*~
+cfg/*
+
