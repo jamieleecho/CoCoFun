@@ -38,8 +38,8 @@ void qsort2(byte *arr, int low, int high) {
     temp=arr[pivot];
     arr[pivot]=arr[j];
     arr[j]=temp;
-    qsort2(arr, low, (int)(j - 1));
-    qsort2(arr, (int)(j + 1), high);
+    qsort2(arr, low, j - 1);
+    qsort2(arr, j + 1, high);
   }
 }
 
