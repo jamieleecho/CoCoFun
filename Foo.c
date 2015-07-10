@@ -1,3 +1,18 @@
+/*
+  Foo.c
+  
+  This software is for demonstration purposes only. Use at your own risk.
+
+  This program demonstrates many of the CMOC compiler's capabilities.
+  
+  Among other thingsm, this program to play a neat song named "Cadnza" that
+  can be found in William Barden Junior's book "TRS-80 Color Computer
+  and MC-10 Programs". The song was composed by Anthony (Craig) Verbeck.
+  The book is now out of print, but was originally available at Radio Shack
+  (26-3195). See http://williambardenjr.com for more information about
+  the author.
+*/
+
 #include <cmoc.h>
 #include <coco.h>
 
@@ -79,10 +94,168 @@ void anykey() {
 }
 
 
+/**
+ * Data taken almost directly from the Cadnza program.
+ */
+byte data[] = {
+  // Data
+  125, 147, 170, 147,
+  140, 159, 176, 159,
+  147, 170, 185, 170,
+  159, 176, 193, 176,
+  78, 117, 140, 117,
+  89, 125, 147, 125,
+  108, 140, 159, 140,
+  193, 204, 216, 204,
+  
+  // Melody
+  204, 200, 193, 185,
+  159, 170, 176, 185,
+  204, 200, 193, 204,
+  210, 204, 200, 216,
+  218, 216, 210, 204,
+  200, 204, 210, 216,
+  210, 204, 200, 193,
+  204, 200, 193, 185,
+  
+  // C Part
+  176, 147, 125, 108,
+  89, 125, 140, 147,
+  159, 176, 170, 193,
+  185, 200, 210, 216,
+  218, 227, 232, 231,
+  227, 218, 223, 210,
+  204, 193, 185, 176,
+  170, 147, 125, 89,
+  
+  0
+};
+
+
+/** chord data */
+byte cd[8][4];
+
+/** melody */
+byte md[200];
+
+/**
+ * This function sets up the chord and melody
+ * arrays.
+ */
+void readArrays() {
+  int dataIndex = 0;
+  for(int ii=0; ii<8; ii++) {
+    for(int jj=0; jj<4; jj++, dataIndex++) {
+      cd[ii][jj] = data[dataIndex];
+    }
+  }
+  
+  int ii = 0;
+  do {
+    md[ii] = data[dataIndex++];
+  } while(md[ii++] > 0);
+}
+
+/**
+ * Plays a chord.
+ *
+ * @param s[in] speed
+ * @param n[in] number of times to play chord
+ * @param c[in] chord to play on [0, 7]
+ */
+void playChord(int n, byte s, int c) {
+  for(int n1 = 0; n1<n; n1++)
+    for(int n2 = 0; n2<4; n2++)
+      sound(cd[c][n2], s);
+}
+
+/**
+ * Plays a melody and chord
+ * Plays the melody as a first note
+ * Uses the same parameters as playChord with the
+ * addition of nt which is the note of the melody
+ * to start play.
+ *
+ * @param s[in] speed
+ * @param n[in] number of times to play chord
+ * @param c[in] chord to play on [0, 7]
+ * @param nt[in] note in melody to start play on [0, 199]
+ */
+void playMelodyAndChord(int n, byte s, int c, int nt) {
+  if (md[nt] <= 0) return;
+  for(int n1 = 0; n1<n; n1++) {
+    for(int n2 = 0; n2<4; n2++) {
+      sound(md[nt], s); nt++;
+      sound(cd[c][n2], s);
+      if (md[nt] <= 0) return;
+    }
+  }
+}
+
+/** Must be called before cadnza */
+void setupCadnza() {
+  // read arrays
+  readArrays();
+}
+
+
+/** Each loop plays the song once */
+void playCadnza() {
+  // Start playing the song
+  int n = 4;
+  byte s = 4;
+  byte c = 0;
+  playChord(n, s, c);
+  c = 5; playChord(n, s, c);
+  c = 4; n = 2; playChord(n, s, c);
+  sound(78, 4); sound(125, 4);
+  sound(147, 4); sound(159, 4);
+  c = 2; n = 1; playChord(n, s, c);
+  
+  // Counterpoint
+  n = 4;
+  c = 0; s = 2; int nt = 0; playMelodyAndChord(n, s, c, nt);
+  c = 5; nt = 0; playMelodyAndChord(n, s, c, nt);
+  c = 0; nt = 0; playMelodyAndChord(n, s, c, nt);
+  c = 5; nt = 0; playMelodyAndChord(n, s, c, nt);
+  c = 4; n = 2; nt = 7; playMelodyAndChord(n, s, c, nt);
+  sound(78, 2); sound(170, 2);
+  sound(125, 2); sound(193, 2);
+  sound(147, 2); sound(204, 2);
+  sound(159, 2); sound(210, 2);
+  nt = 7; c = 2; n = 1; playMelodyAndChord(n, s, c, nt);
+  s = 1;
+  n = 8; nt = 0; c = 0;
+  playMelodyAndChord(n, s, c, nt);
+  c = 5; playMelodyAndChord(n, s, c, nt);
+  nt = 0;
+  c = 0; playMelodyAndChord(n, s, c, nt);
+  c = 5; playMelodyAndChord(n, s, c, nt);
+  nt = 0;
+  c = 4; playMelodyAndChord(n, s, c, nt);
+  nt = 0;
+  playMelodyAndChord(n, s, c, nt);
+  c = 0; n = 4; nt = 0; playMelodyAndChord(n, s, c, nt);
+  c = 3; n = 2; playMelodyAndChord(n, s, c, nt);
+  c = 4; playMelodyAndChord(n, s, c, nt);
+  c = 0; n = 4; nt = 0; playMelodyAndChord(n, s, c, nt);
+  c = 3; n = 2; playMelodyAndChord(n, s, c, nt);
+  c = 4; playMelodyAndChord(n, s, c, nt);
+  c = 5; playMelodyAndChord(n, s, c, nt);
+  c = 6; playMelodyAndChord(n, s, c, nt);
+  nt = 0;
+  c = 7; n = 8; playMelodyAndChord(n, s, c, nt);
+  nt = 0;
+  s = 8; n = 1; playMelodyAndChord(n, s, c, nt);
+  sound(125, 32);
+}
+
+
 int main() {
   // Do stuff required to initialize CoCo
   initCoCoSupport();
   setHighSpeed(TRUE);
+  setupCadnza();
 
   // Show a title screen
   width(32);
@@ -186,6 +359,14 @@ int main() {
   }
   anykey();
   hscreen(0);
+
+  // All done
+  cls(1);
+  printf("********************************");
+  printf("***    PLAY AWESOME SONGS    ***");
+  printf("********************************\n");
+  setHighSpeed(FALSE);
+  playCadnza();
 
   // All done
   cls(1);
