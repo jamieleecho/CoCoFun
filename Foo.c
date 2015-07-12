@@ -5,7 +5,7 @@
 
   This program demonstrates many of the CMOC compiler's capabilities.
   
-  Among other thingsm, this program to play a neat song named "Cadnza" that
+  Among other things, this program plays a neat song named "Cadnza" that
   can be found in William Barden Junior's book "TRS-80 Color Computer
   and MC-10 Programs". The song was composed by Anthony (Craig) Verbeck.
   The book is now out of print, but was originally available at Radio Shack

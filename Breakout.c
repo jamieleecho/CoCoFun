@@ -791,14 +791,6 @@ byte grafxData[] = {
   0x74
 };
 
-/** We copy grafxData into this memory location which corresponds to
- *  pmode 3 or 4, screen 0
- */
-byte *grafxBuffer = 0xe00;
-
-/** Size of grafxBuffer in bytes */
-byte *grafxBufferSz = 0x1800;
-
 
 /** Video game loop resides here */
 void playBreakout();
@@ -826,9 +818,6 @@ void initBreakout() {
   // Show the graphics screen
   clearAndShowGraphicsScreen();
 
-  // Copy grafx data
-  memcpy(grafxBuffer, grafxData, grafxBufferSz);
-
   // Set final palette
   byte palette[] = {
     127, 118, 110, 102, 89, 80, 79, 120,
@@ -849,6 +838,7 @@ int main() {
 /** Breakout video game */
 void playBreakout() {
   asm {
+                pragma  cescapes
 00100 	        LBRA    DEGIN
 00110 XAXIS	FCB	10
 00120 YAXIS	FCB	10
@@ -856,6 +846,7 @@ void playBreakout() {
 00140 TEMPA	FDB	0
 00150 XCOUNT	FDB	0
 00160 BNK	FCB	0
+SCORFMT	FCC	"\0\0\0\0\0\0\0\0\xff"
 00170 START	LDA	XAXIS
 00180 	CMPA	#159
 00190 	LBHI	END
@@ -955,8 +946,9 @@ void playBreakout() {
 01130 *PADDLE MOVE - 9/23/89
 01140 ATART	LDA	#4
 01150 	STA	XAXIS
-01160 	LDD	#$E00
-01170 	STD	MEMAR
+* Start of paddle graphics memory
+01160 	LEAX	grafxData
+01170 	STX	MEMAR
 01180 	JSR	[$A00A]
 01190 	LDB	YPAD
 01200 	LDA	$15B
@@ -979,11 +971,14 @@ void playBreakout() {
 01370 	INCB
 01380 	BRA	PTPAD
 01390 YPAD	FCB	72
-01400 BTART	LDX	#1024
+01400 BTART	LDX	#SCORFMT
 01410 	LDD	#$7850
 01420 	STD	XAXIS
 01430 BEGIN	LDA	,X+
-01440 	LDY	#$1000
+* Start of graphics for numbers
+* Numbers separated by 49 bytes
+01440 	LEAY	grafxData
+	LEAY    $200,y
 01450 	CMPA	#255
 01460 	BEQ	CEND
 01470 	TSTA
@@ -1057,7 +1052,7 @@ void playBreakout() {
 02150 	PULS	A
 02160 	ANDA	#15
 02170 	EXG	A,B
-02180 	STD	1024
+02180 	STD	SCORFMT
 02190 CEGNA	LDA	RESULT+1
 02200 	STA	SCORE+1
 02210 	PSHS	A
@@ -1071,7 +1066,7 @@ void playBreakout() {
 02290 	PULS	A
 02300 	ANDA	#15
 02310 	EXG	A,B
-02320 	STD	1026
+02320 	STD	SCORFMT+2
 02330 CEGNB	LDA	RESULT+2
 02340 	STA	SCORE+2
 02350 	PSHS	A
@@ -1084,7 +1079,7 @@ void playBreakout() {
 02420 	PULS	A
 02430 	ANDA	#15
 02440 	EXG	A,B
-02450 	STD	1028
+02450 	STD	SCORFMT+4
 02460 	LDA	#255
 02470 	STA	1030
 02480 	JSR	BTART
@@ -1094,13 +1089,12 @@ void playBreakout() {
 02520 XX	FCB	20
 02530 YY	FCB	16
 02540 DEGIN	LDD	#0
-02550 	CLR	65497
 02560 	ORCC	#80
 02570 	STD	SCORE
 02580 	STD	SCORE+2
-02590 	STD	1024
-02600 	STD	1026
-02610 	STD	1028
+02590 	STD	SCORFMT
+02600 	STD	SCORFMT+2
+02610 	STD	SCORFMT+4
 02620 	LDA	#4
 02630 	STA	NMEN
 02640 HERE	LDA	#20
@@ -1114,26 +1108,31 @@ void playBreakout() {
 02720 	LDA	#50
 02730 	LDB	#2
 02740 	STD	XAXIS
-02750 	LDD	#$1300
-02760 	STD	MEMAR
+* Start of graphics for bars
+02750 	LEAX	grafxData
+        LEAX    $500,x
+02760 	STX	MEMAR
+        pshs    x
 02770 	JSR	START
 02780 	LDA	#65
 02790 	LDB	#2
 02800 	STD	XAXIS
-02810 	LDD	#$1300
-02820 	STD	MEMAR
+        puls    x
+        STX     MEMAR
+        pshs    x
 02830 	JSR	START
 02840 	LDB	#2
 02850 	LDA	#80
 02860 	STD	XAXIS
-02870 	LDD	#$1300
-02880 	STD	MEMAR
+        puls    x
+        STX     MEMAR
+        pshs    x
 02890 	JSR	START
 02900 	LDB	#2
 02910 	LDA	#95
 02920 	STD	XAXIS
-02930 	LDD	#$1300
-02940 	STD	MEMAR
+        puls    x
+        STX     MEMAR
 02950 	JSR	START
 02960 	LDA	#255
 02970 	STA	1030
@@ -1158,10 +1157,10 @@ void playBreakout() {
 03220 	PULS	U
 03230 	LDA	NMEN
 03240 	LDB	#255
-03250 	STD	1024
+03250 	STD	SCORFMT
 03260 	LDD	#$786F
 03270 	STD	XAXIS
-03280 	LDX	#1024
+03280 	LDX	#SCORFMT
 03290 	JSR	BEGIN
 03300 REJIN	LDA	#30
 03310 	LDB	#3
@@ -1170,7 +1169,8 @@ void playBreakout() {
 03340 	STD	SLPX
 03350 	STD	FLGX
 03360 REGIN	JSR	ATART
-03370 	LDX	#$E82
+03370 	LEAX	grafxData
+        LEAX    $82,x
 03380 	STX	MEMAR
 03390 GLGL	LDA	FLGX
 03400 	TSTA
@@ -1265,13 +1265,14 @@ void playBreakout() {
 04290 MISS	DEC	NMEN
 04300 	LDA	NMEN
 04310 	LDB	#$FF
-04320 	STD	1024
-04330 	LDX	#1024
+04320 	STD	SCORFMT
+04330 	LDX	#SCORFMT
 04340 	LDD	#$786F
 04350 	STD	XAXIS
 04360 	JSR	BEGIN
-04370 	LDD	#$2000
-04380 	STD	MEMAR
+04370 	LEAY	grafxData
+        LEAY    $1200,y
+04380 	STY	MEMAR
 04390 	LDD	XX
 04400 	STD	XAXIS
 04410 	JSR	START
@@ -1345,8 +1346,9 @@ void playBreakout() {
 05250 CLRBLK	LDB	#255
 05260 	PSHS	X
 05270 	STB	,X
-05280 	LDY	#$2000
-05290 	STY	MEMAR
+        LEAY	grafxData
+        LEAY    $1200,y
+04380 	STY	MEMAR
 05300 	TFR	A,B
 05310 	LDA	#50
 05320 	STD	XAXIS
@@ -1427,7 +1429,8 @@ void playBreakout() {
 06070 CLRBL1	LDB	#255
 06080 	PSHS	X
 06090 	STB	,X
-06100 	LDY	#$2000
+        LEAY	grafxData
+        LEAY    $1200,y
 06110 	STY	MEMAR
 06120 	TFR	A,B
 06130 	LDA	#65
@@ -1514,7 +1517,8 @@ void playBreakout() {
 06940 CLRBL2	LDB	#255
 06950 	PSHS	X
 06960 	STB	,X
-06970 	LDY	#$2000
+        LEAY	grafxData
+        LEAY    $1200,y
 06980 	STY	MEMAR
 06990 	TFR	A,B
 07000 	LDA	#80

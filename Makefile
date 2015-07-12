@@ -1,8 +1,8 @@
 CFLAGS=-a09=/usr/local/bin/lwasm -I/usr/local/share/cmoc
 BREAKOUT_BAS=AsmGameFiles/Breakout.bas
-BREAKOUT_BIN=AsmGameFiles/Breakout.bin
+BREAKOUT_BIN=Breakout.bin
 
-CoCoFun.dsk : Foo.bin $(BREAKOUT_BAS) $(BREAKOUT_BIN)
+CoCoFun.dsk : Foo.bin Breakout.bin $(BREAKOUT_BAS) $(BREAKOUT_BIN)
 	rm -f $@
 	decb dskini $@
 	decb copy Foo.bin $@,FOO.BIN
@@ -11,9 +11,6 @@ CoCoFun.dsk : Foo.bin $(BREAKOUT_BAS) $(BREAKOUT_BIN)
 	decb attr $@,BREAKOUT.BAS -0
 	decb copy $(BREAKOUT_BIN) $@,BREAKOUT.BIN
 	decb attr $@,BREAKOUT.BIN -2 -b
-
-$(BREAKOUT_BIN) : $(patsubst %.bin,%.asm,$(BREAKOUT_BIN))
-	lwasm -b -o $@ $<
 
 %.bin : %.c
 	cmoc $< $(CFLAGS)
