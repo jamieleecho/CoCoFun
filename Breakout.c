@@ -470,6 +470,7 @@ void playBreakoutBall();
 /** Clear and show the graphics screen. */
 void clearAndShowGraphicsScreen() {
   asm {
+    ldb #2
     JSR	$E69E
   }
 }
@@ -525,7 +526,6 @@ void playBreakoutGame() {
     STD	SCORFMT+4
   }
   numberOfBalls = 9;
-  playNewBreakoutLevel();
   
   // Play breakout until we run out of balls
   while(numberOfBalls > 0) {
@@ -539,7 +539,56 @@ void playNewBreakoutLevel() {
   memcpy(line2BrickYPositions, brickYPositions, brickYPositionsSz);
   memcpy(line3BrickYPositions, brickYPositions, brickYPositionsSz);
   memcpy(line4BrickYPositions, brickYPositions, brickYPositionsSz);
+  clearAndShowGraphicsScreen();
+
   asm {
+	LDA	#20
+	LDB	#2
+	STD	XX
+	CLR	COBOL
+	LDA	#$FF
+	STA	$FF9A
+	LDA	#50
+	LDB	#2
+	STD	XAXIS
+
+* Draw Graphics Bars
+02750 	LEAX	grafxBricksData
+02760 	STX	MEMAR
+        pshs    x
+02770 	JSR	START
+02780 	LDA	#65
+02790 	LDB	#2
+02800 	STD	XAXIS
+        puls    x
+        STX     MEMAR
+        pshs    x
+02830 	JSR	START
+02840 	LDB	#2
+02850 	LDA	#80
+02860 	STD	XAXIS
+        puls    x
+        STX     MEMAR
+        pshs    x
+02890 	JSR	START
+02900 	LDB	#2
+02910 	LDA	#95
+02920 	STD	XAXIS
+        puls    x
+        STX     MEMAR
+02950 	JSR	START
+
+* Draw Score
+02980 	JSR	CTART
+
+* Draw number of balls
+03230 	LDA	numberOfBalls
+03240 	LDB	#255
+03250 	STD	SCORFMT
+03260 	LDD	#$786F
+03270 	STD	XAXIS
+03280 	LDX	#SCORFMT
+03290 	JSR	BEGIN
   }
 }
 
@@ -789,7 +838,7 @@ SCORFMT	FCC	"\0\0\0\0\0\0\0\0\xff"
 02440 	EXG	A,B
 02450 	STD	SCORFMT+4
 02460 	LDA	#255
-02470 	STA	1030
+02470 	STA	SCORFMT+6
 02480 	JSR	BTART
 02490 	RTS
 02500 ADX	FCB	1
@@ -797,73 +846,7 @@ SCORFMT	FCC	"\0\0\0\0\0\0\0\0\xff"
 02520 XX	FCB	20
 02530 YY	FCB	16
 02540 DEGIN
-02640 HERE	LDA	#20
-02650 	LDB	#2
-02660 	STD	XX
-02670 	LDB	#2
-02680 	CLR	COBOL
-02690 	JSR	$E69E
-02700 	LDA	#$FF
-02710 	STA	$FF9A
-02720 	LDA	#50
-02730 	LDB	#2
-02740 	STD	XAXIS
-* Start of graphics for bars
-02750 	LEAX	grafxBricksData
-02760 	STX	MEMAR
-        pshs    x
-02770 	JSR	START
-02780 	LDA	#65
-02790 	LDB	#2
-02800 	STD	XAXIS
-        puls    x
-        STX     MEMAR
-        pshs    x
-02830 	JSR	START
-02840 	LDB	#2
-02850 	LDA	#80
-02860 	STD	XAXIS
-        puls    x
-        STX     MEMAR
-        pshs    x
-02890 	JSR	START
-02900 	LDB	#2
-02910 	LDA	#95
-02920 	STD	XAXIS
-        puls    x
-        STX     MEMAR
-02950 	JSR	START
-02960 	LDA	#255
-02970 	STA	1030
-02980 	JSR	BTART
-03050 	PSHS	U
-03060 	LEAY	line1BrickYPositions
-03070 	LEAX	brickYPositions
-        LEAX	17,x
-        stx     TMPYPOS
-        LEAX	brickYPositions
-03080 	LEAU	line2BrickYPositions
-03090 ROT1	LDA	,X+
-03100 	STA	,Y+
-03110 	STA	,U+
-03120 	CMPX	TMPYPOS
-03130 	BNE	ROT1
-03140 	LEAY	line3BrickYPositions
-03150 	LEAU	line4BrickYPositions
-03160 	LEAX	brickYPositions
-03170 ROL	LDA	,X+
-03180 	STA	,Y+
-03190 	STA	,U+
-03200 	CMPX	TMPYPOS
-03210 	BNE	ROL
-03220 	PULS	U
-03230 	LDA	numberOfBalls
-03240 	LDB	#255
-03250 	STD	SCORFMT
-03260 	LDD	#$786F
-03270 	STD	XAXIS
-03280 	LDX	#SCORFMT
-03290 	JSR	BEGIN
+HERE	LBSR _playNewBreakoutLevel
 03300 REJIN	LDA	#30
 03310 	LDB	#3
 03320 	STD	XX
