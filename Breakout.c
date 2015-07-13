@@ -431,8 +431,40 @@ byte grafxBlankData[] = {
 };
 
 
+/** Positions of all bricks. This array is nevery modified */
+#define brickYPositionsSz 17
+byte brickYPositions[brickYPositionsSz] = {
+  2, 13, 24, 35, 46, 57, 68, 79, 90,
+  101, 112, 123, 134, 145, 156, 167,
+  178
+};
+    
+/** Positions of first line of bricks. Either position or 255 if brick is missing */
+byte line1BrickYPositions[brickYPositionsSz];
+
+/** Positions of first line of bricks. Either position or 255 if brick is missing */
+byte line2BrickYPositions[brickYPositionsSz];
+
+/** Positions of first line of bricks. Either position or 255 if brick is missing */
+byte line3BrickYPositions[brickYPositionsSz];
+
+/** Positions of first line of bricks. Either position or 255 if brick is missing */
+byte line4BrickYPositions[brickYPositionsSz];
+
+/** current number of balls */
+char numberOfBalls;
+
 /** Video game loop resides here */
 void playBreakout();
+
+/** Video game loop for one game of breakout */
+void playBreakoutGame();
+
+/** Set up data structures for a new breakout level */
+void playNewBreakoutLevel();
+
+/** Video game loop for one ball of breakout */
+void playBreakoutBall();
 
 
 /** Clear and show the graphics screen. */
@@ -474,8 +506,46 @@ int main() {
 }
 
 
-/** Breakout video game */
 void playBreakout() {
+  while(1) {
+    playBreakoutGame();
+  }
+}
+
+
+void playBreakoutGame() {
+  // Initialize men, etc
+  asm {
+    ORCC #80
+    LDD	#0
+    STD	SCORE
+    STD	SCORE+2
+    STD	SCORFMT
+    STD	SCORFMT+2
+    STD	SCORFMT+4
+  }
+  numberOfBalls = 9;
+  playNewBreakoutLevel();
+  
+  // Play breakout until we run out of balls
+  while(numberOfBalls > 0) {
+    playBreakoutBall();
+  }
+}
+
+
+void playNewBreakoutLevel() {
+  memcpy(line1BrickYPositions, brickYPositions, brickYPositionsSz);
+  memcpy(line2BrickYPositions, brickYPositions, brickYPositionsSz);
+  memcpy(line3BrickYPositions, brickYPositions, brickYPositionsSz);
+  memcpy(line4BrickYPositions, brickYPositions, brickYPositionsSz);
+  asm {
+  }
+}
+
+
+/** Breakout video game */
+void playBreakoutBall() {
   asm {
                 pragma  cescapes
 00100 	        LBRA    DEGIN
@@ -726,15 +796,7 @@ SCORFMT	FCC	"\0\0\0\0\0\0\0\0\xff"
 02510 ADY	FCB	1
 02520 XX	FCB	20
 02530 YY	FCB	16
-02540 DEGIN	LDD	#0
-02560 	ORCC	#80
-02570 	STD	SCORE
-02580 	STD	SCORE+2
-02590 	STD	SCORFMT
-02600 	STD	SCORFMT+2
-02610 	STD	SCORFMT+4
-02620 	LDA	#4
-02630 	STA	NMEN
+02540 DEGIN
 02640 HERE	LDA	#20
 02650 	LDB	#2
 02660 	STD	XX
@@ -775,24 +837,27 @@ SCORFMT	FCC	"\0\0\0\0\0\0\0\0\xff"
 02970 	STA	1030
 02980 	JSR	BTART
 03050 	PSHS	U
-03060 	LDY	#LINE1
-03070 	LDX	#BPOS
-03080 	LDU	#LINE2
+03060 	LEAY	line1BrickYPositions
+03070 	LEAX	brickYPositions
+        LEAX	17,x
+        stx     TMPYPOS
+        LEAX	brickYPositions
+03080 	LEAU	line2BrickYPositions
 03090 ROT1	LDA	,X+
 03100 	STA	,Y+
 03110 	STA	,U+
-03120 	CMPX	#BPD+1
+03120 	CMPX	TMPYPOS
 03130 	BNE	ROT1
-03140 	LDY	#LINE3
-03150 	LDU	#LINE4
-03160 	LDX	#BPOS
+03140 	LEAY	line3BrickYPositions
+03150 	LEAU	line4BrickYPositions
+03160 	LEAX	brickYPositions
 03170 ROL	LDA	,X+
 03180 	STA	,Y+
 03190 	STA	,U+
-03200 	CMPX	#BPD+1
+03200 	CMPX	TMPYPOS
 03210 	BNE	ROL
 03220 	PULS	U
-03230 	LDA	NMEN
+03230 	LDA	numberOfBalls
 03240 	LDB	#255
 03250 	STD	SCORFMT
 03260 	LDD	#$786F
@@ -898,8 +963,10 @@ SCORFMT	FCC	"\0\0\0\0\0\0\0\0\xff"
 04260 	JSR	$B3ED
 04270 	STB	SLPX
 04280 	BRA	NTX
-04290 MISS	DEC	NMEN
-04300 	LDA	NMEN
+04290 MISS	
+04300 	LDA	numberOfBalls
+        DECA
+        STA     numberOfBalls
 04310 	LDB	#$FF
 04320 	STD	SCORFMT
 04330 	LDX	#SCORFMT
@@ -911,11 +978,10 @@ SCORFMT	FCC	"\0\0\0\0\0\0\0\0\xff"
 04390 	LDD	XX
 04400 	STD	XAXIS
 04410 	JSR	START
-04420 	LDA	NMEN
+04420 	LDA	numberOfBalls
 04430 	TSTA
 04440 	BEQ	POLIN
 04450 	LBRA	REJIN
-04460 NMEN	FCB	4
 04630 BPOS	FCB	2
 04640 	FCB	13
 04650 	FCB	24
@@ -936,7 +1002,7 @@ SCORFMT	FCC	"\0\0\0\0\0\0\0\0\xff"
 04800 POLIN	JSR	[$A000]
 04810 	CMPA	#0
 04820 	BEQ	POLIN
-04830 	LBRA	DEGIN
+04830 	LBRA	GAMEOVER
 04840 PAUSE	JSR	[$A000]
 04850 	CMPA	#3
 04860 	BNE	PAUSE
@@ -954,15 +1020,20 @@ SCORFMT	FCC	"\0\0\0\0\0\0\0\0\xff"
 04980 SLPY	FCB	2
 04990 FLGX	FCB	5
 05000 FLGY	FCB	2
+TMPYPOS   FDB     0
 05010 *	END	DEGIN
-05020 FNCK	LDX	#LINE1
+
+FNCK	LEAX	line1BrickYPositions
+        LEAX    17,x
+  stx     TMPYPOS
+        LEAX	line1BrickYPositions
 05030 LDCK	LDA	,X
 05040 	CMPA	YY
 05050 	BEQ	CLRBLK
 05060 	LBLO	FRCK
 05070 GOOP	BHI	RCK
 05080 OVFLW	LEAX	1,X
-05090 	CMPX	#LINA+1
+05090 	CMPX	TMPYPOS
 05100 	BNE	LDCK
 05110 	LBRA	GLOR
 05120 RCK	LDA	YY
@@ -1020,31 +1091,17 @@ SCORFMT	FCC	"\0\0\0\0\0\0\0\0\xff"
 05640 	LBRA	GOOP
 05650 FREEZE	SUBA	#14
 05660 	BRA	CLRBLK
-05670 LINE1	FCB	2
-05680 	FCB	13
-05690 	FCB	24
-05700 	FCB	35
-05710 	FCB	46
-05720 	FCB	57
-05730 	FCB	68
-05740 	FCB	79
-05750 	FCB	90
-05760 	FCB	101
-05770 	FCB	112
-05780 	FCB	123
-05790 	FCB	134
-05800 	FCB	145
-05810 	FCB	156
-05820 	FCB	167
-05830 LINA	FCB	178
-05840 FNCK1	LDX	#LINE2
+FNCK1	LEAX	line2BrickYPositions
+        LEAX    17,x
+  stx     TMPYPOS,PCR
+        LEAX	line2BrickYPositions
 05850 LDCK1	LDA	,X
 05860 	CMPA	YY
 05870 	BEQ	CLRBL1
 05880 	LBLO	FRCK1
 05890 GOOP1	BHI	RCK1
 05900 OVFLW1	LEAX	1,X
-05910 	CMPX	#LINA1+1
+05910 	CMPX	TMPYPOS
 05920 	BNE	LDCK1
 05930 	LBRA	GLOR1
 05940 RCK1	LDA	YY
@@ -1107,31 +1164,17 @@ SCORFMT	FCC	"\0\0\0\0\0\0\0\0\xff"
 06510 	LBRA	GOOP1
 06520 FREEZ1	SUBA	#14
 06530 	BRA	CLRBL1
-06540 LINE2	FCB	2
-06550 	FCB	13
-06560 	FCB	24
-06570 	FCB	35
-06580 	FCB	46
-06590 	FCB	57
-06600 	FCB	68
-06610 	FCB	79
-06620 	FCB	90
-06630 	FCB	101
-06640 	FCB	112
-06650 	FCB	123
-06660 	FCB	134
-06670 	FCB	145
-06680 	FCB	156
-06690 	FCB	167
-06700 LINA1	FCB	178
-06710 FNCK2	LDX	#LINE3
+FNCK2	LEAX	line3BrickYPositions
+        LEAX    17,x
+  stx     TMPYPOS
+        LEAX	line3BrickYPositions
 06720 LDCK2	LDA	,X
 06730 	CMPA	YY
 06740 	BEQ	CLRBL2
 06750 	LBLO	FRCK2
 06760 GOOP2	BHI	RCK2
 06770 OVFLW2	LEAX	1,X
-06780 	CMPX	#LINA2+1
+06780 	CMPX	TMPYPOS
 06790 	BNE	LDCK2
 06800 	LBRA	GLOR1
 06810 RCK2	LDA	YY
@@ -1194,31 +1237,17 @@ SCORFMT	FCC	"\0\0\0\0\0\0\0\0\xff"
 07380 	LBRA	GOOP2
 07390 FREEZ2	SUBA	#14
 07400 	BRA	CLRBL2
-07410 LINE3	FCB	2
-07420 	FCB	13
-07430 	FCB	24
-07440 	FCB	35
-07450 	FCB	46
-07460 	FCB	57
-07470 	FCB	68
-07480 	FCB	79
-07490 	FCB	90
-07500 	FCB	101
-07510 	FCB	112
-07520 	FCB	123
-07530 	FCB	134
-07540 	FCB	145
-07550 	FCB	156
-07560 	FCB	167
-07570 LINA2	FCB	178
-07580 FNCK3	LDX	#LINE4
+FNCK3	LEAX	line4BrickYPositions
+        LEAX    17,x
+  stx     TMPYPOS
+        LEAX	line4BrickYPositions
 07590 LDCK3	LDA	,X
 07600 	CMPA	YY
 07610 	BEQ	CLRBL3
 07620 	LBLO	FRCK3
 07630 GOOP3	BHI	RCK3
 07640 OVFLW3	LEAX	1,X
-07650 	CMPX	#LINA3+1
+07650 	CMPX	TMPYPOS
 07660 	BNE	LDCK3
 07670 	LBRA	GLOR1
 07680 RCK3	LDA	YY
@@ -1281,23 +1310,7 @@ SCORFMT	FCC	"\0\0\0\0\0\0\0\0\xff"
 08250 	LBRA	GOOP3
 08260 FREEZ3	SUBA	#14
 08270 	BRA	CLRBL3
-08280 LINE4	FCB	2
-08290 	FCB	13
-08300 	FCB	24
-08310 	FCB	35
-08320 	FCB	46
-08330 	FCB	57
-08340 	FCB	68
-08350 	FCB	79
-08360 	FCB	90
-08370 	FCB	101
-08380 	FCB	112
-08390 	FCB	123
-08400 	FCB	134
-08410 	FCB	145
-08420 	FCB	156
-08430 	FCB	167
-08440 LINA3	FCB	178
 08450 COBOL	FCB	0
+GAMEOVER
   }
 }
