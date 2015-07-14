@@ -500,9 +500,19 @@ void initBreakout() {
 }
 
 
+/** Force certain functions to be emitted */
+void forceFunctionsToBeEmitted() {
+  if (0) {
+    playNewBreakoutLevel();
+  }
+}
+
+
 int main() {
+  forceFunctionsToBeEmitted();
   initBreakout();
   playBreakout();
+
   return 0;
 }
 
