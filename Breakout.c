@@ -598,7 +598,7 @@ void playNewBreakoutLevel() {
 03260 	LDD	#$786F
 03270 	STD	XAXIS
 03280 	LDX	#SCORFMT
-03290 	LBSR	BEGIN
+03290 	LBSR	BLIT_TEXT
   }
 }
 
@@ -607,7 +607,7 @@ void playNewBreakoutLevel() {
 void playBreakoutBall() {
   asm {
                 pragma  cescapes
-        LBRA    DEGIN
+        LBRA    START
 
 SCORFMT	FCC	"\0\0\0\0\0\0\0\0\xff"
 
@@ -754,11 +754,15 @@ BNK	FCB	0
 01360 	INCB
 01370 	INCB
 01380 	BRA	PTPAD
+
+* Paddle y position
 01390 YPAD	FCB	72
-01400 BTART	LDX	#SCORFMT
+
+* BLIT text located at SCORFMT at score location until 0xff hit
+01400 BLIT_SCORE LDX	#SCORFMT
 01410 	LDD	#$7850
 01420 	STD	XAXIS
-01430 BEGIN	LDA	,X+
+01430 BLIT_TEXT LDA	,X+
 * Start of graphics for numbers
 * Numbers separated by 49 bytes
 01440 	LEAY	grafxNumberData
@@ -798,7 +802,7 @@ BNK	FCB	0
 01780 	INC	XAXIS
 01790 	INC	XAXIS
 01800 	INC	XAXIS
-01810 	LBSR	BEGIN
+01810 	LBSR	BLIT_TEXT
 01820 CEND	RTS
 01830 SCORE	FDB	0
 01840 	FDB	0
@@ -865,7 +869,7 @@ BNK	FCB	0
 02450 	STD	SCORFMT+4
 02460 	LDA	#255
 02470 	STA	SCORFMT+6
-02480 	LBSR	BTART
+02480 	LBSR	BLIT_SCORE
 02490 	RTS
 
 * Ball slope and current point in slope
@@ -883,8 +887,7 @@ BNK	FCB	0
 02530 YY	FCB	16
 
 
-
-02540 DEGIN
+02540 START
 HERE	LBSR _playNewBreakoutLevel
 03300 REJIN	LDA	#30
 03310 	LDB	#3
@@ -988,7 +991,7 @@ HERE	LBSR _playNewBreakoutLevel
 04330 	LDX	#SCORFMT
 04340 	LDD	#$786F
 04350 	STD	XAXIS
-04360 	LBSR	BEGIN
+04360 	LBSR	BLIT_TEXT
 04370 	LEAY	grafxBlankData
 04380 	STY	MEMAR
 04390 	LDD	XX
@@ -1015,8 +1018,6 @@ HERE	LBSR _playNewBreakoutLevel
 04940 RESET	LDD	SLPX
 04950 	STD	FLGX
 04960 	LBRA	GLGL
-
-05010 *	END	DEGIN
 
 FNCK	LEAX	line1BrickYPositions
         LEAX    17,x
