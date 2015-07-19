@@ -43,6 +43,9 @@ byte brickYPositions[brickYPositionsSz] = {
   101, 112, 123, 134, 145, 156, 167,
   178
 };
+
+/** Position of the paddle */
+byte paddlePosition = 72;
     
 /** Positions of first line of bricks. Either position or 255 if brick is missing */
 byte line1BrickYPositions[brickYPositionsSz];
@@ -74,6 +77,9 @@ void playBreakoutBall();
 
 /** Blit graphics to the screen */
 void blitGraphics();
+
+/** Moves the paddle up and down based on the joystick */
+void controlPaddle();
 
 /**
  * Blits graphics located at bitmap to (x, y)
@@ -110,6 +116,26 @@ void clearAndShowGraphicsScreen() {
 }
 
 
+/**
+ * Reads the joystick.
+ *
+ * @param x[out] x position
+ * @param y[out] y position
+ */
+void readJoystick(byte *x, byte *y) {
+  asm {
+    PSHS U
+    JSR	[$A00A]
+    PULS U
+    LDD	$15a
+    ldx x
+    ldy y
+    sta ,x
+    stb ,y
+  }
+}
+
+
 /** Initializes Breakout */
 void initBreakout() {
   // High speed mode
@@ -131,6 +157,7 @@ void forceFunctionsToBeEmitted() {
   if (0) {
     playNewBreakoutLevel();
     blitGraphics();
+    controlPaddle();
   }
 }
 
@@ -334,6 +361,21 @@ void playNewBreakoutLevel() {
 }
 
 
+/** Moves the paddle up and down based on the joystick */
+void controlPaddle() {
+  byte joyX, joyY;
+  readJoystick(&joyX, &joyY);
+  if (joyY < 20) {
+    if (paddlePosition > 2)
+      paddlePosition -= 2;
+  } else if (joyY > 40) {
+    if (paddlePosition < 146)
+      paddlePosition += 2;
+  }
+  blitGraphics2(GrafxDataPaddleData, 4, paddlePosition);
+}
+
+
 /** Breakout video game */
 void playBreakoutBall() {
   asm {
@@ -353,37 +395,6 @@ RAND3 	LDD	#3
  	JSR	$BF1F
  	JSR	$B3ED
 	RTS
-
-*PADDLE MOVE - 9/23/89
-ATART	LDA	#4
-	STA	XAXIS
-* Start of paddle graphics memory
-	LEAX	GrafxDataPaddleData
-	STX	MEMAR
-	JSR	[$A00A]
-	LDB	YPAD
-	LDA	$15B
-	CMPA	#20
-	BLO	PADUP
-	CMPA	#40
-	BHI	PADDN
-PTPAD	STB	YAXIS
-	STB	YPAD
-	LBSR	BLITTER
-	RTS
-PADUP	CMPB	#2
-	BEQ	PTPAD
-	DECB
-	DECB
-	BRA	PTPAD
-PADDN	CMPB	#146
-	BEQ	PTPAD
-	INCB
-	INCB
-	BRA	PTPAD
-
-* Paddle y position
-YPAD	FCB	72
 
 * BLIT text located at SCORFMT at score location until 0xff hit
 BLIT_SCORE LDX	#SCORFMT
@@ -506,7 +517,7 @@ REJIN	LDA	#30
 	LDD	#$0105
 	STD	SLPX
 	STD	FLGX
-REGIN	LBSR	ATART
+REGIN	LBSR	_controlPaddle
 	LEAX	GrafxDataBallData
 	STX	MEMAR
 GLGL	LDA	FLGX
@@ -574,7 +585,7 @@ NXT1	LDA	#-1
 NTX1	LDA	#1
 	STA	ADY
 	LBRA	DUKE
-ZZTP	LDA	YPAD
+ZZTP	LDA	paddlePosition
 	CMPA	#7
 	BHI	BLOB
 	ADDA	#32
