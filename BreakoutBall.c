@@ -12,148 +12,109 @@
 #define _BreakoutBall_c
 
 
-/** Ball X position */
-byte BreakoutBallPositionX = 20;
-
-/** Ball Y position */
-byte BreakoutBallPositionY = 16;
-
-/** Ball increment X amount - either +/-1 */
-byte BreakoutBallIncrementX = 1;
-
-/** Ball increment Y amount - either +/-1 */
-byte BreakoutBallIncrementY = 1;
-
-/** Maximum amount to add to X before resetting BreakoutBallCounterX */
-byte BreakoutBallSlopeX = 5;
-
-/** Maximum amount to add to Y before resetting BreakoutBallCounterY */
-byte BreakoutBallSlopeY = 2;
-
-/** Current position in slope */
-byte BreakoutBallCounterX = 5;
-
-/** Current position in slope */
-byte BreakoutBallCounterY = 2;
+#include "BreakoutBall.h"
+#include "Blitter.h"
 
 
-/**
- * @param value[in] range of random number
- * @return a random value on [1, value]
- */
-int random(int value) {
-  asm {
-    pshs u
-    ldd value
-    jsr $B4F4
-    jsr $BF1F
-    jsr $B3ED
-    std value
-    puls u
-  }
-  return value;
-}
-
-
-/** Resets the BreakoutBall position to the default */
 void BreakoutBallReset() {
-  BreakoutBallPositionX = 30;
-  BreakoutBallPositionY = 3;
-  BreakoutBallIncrementX = -1;
-  BreakoutBallIncrementY = 1;
-  BreakoutBallSlopeX = 1;
-  BreakoutBallSlopeY = 5;
-  BreakoutBallCounterX = BreakoutBallSlopeX;
-  BreakoutBallCounterY = BreakoutBallSlopeY;
+  breakoutBallPositionX = 30;
+  breakoutBallPositionY = 3;
+  breakoutBallIncrementX = -1;
+  breakoutBallIncrementY = 1;
+  breakoutBallSlopeX = 1;
+  breakoutBallSlopeY = 5;
+  breakoutBallCounterX = breakoutBallSlopeX;
+  breakoutBallCounterY = breakoutBallSlopeY;
 }
 
 
-/** Initializes the BreakoutBall position to the default */
 void BreakoutBallInit() {
   BreakoutBallReset();
 }
 
 
-/** Display the current number of balls */
 void BreakoutBallDrawCount() {
   char buffer[2];
-  buffer[0] = numberOfBalls + '0';
+  buffer[0] = breakoutNumberOfBalls + '0';
   buffer[1] = 0;
   blitNumericText(buffer, 0x78, 0x6f);
 }
 
 
-/** Invoked when a ball is missed */
 void BreakoutBallMiss() {
   // Decrease the number of balls
-  numberOfBalls--;
+  breakoutNumberOfBalls--;
   BreakoutBallDrawCount();
   sound(1, 10);
 
   // Erase the displayed ball
-  blitGraphics2(GrafxDataBlankData, BreakoutBallPositionX, BreakoutBallPositionY);
+  blitGraphics2(GrafxDataBlankData, breakoutBallPositionX, breakoutBallPositionY);
 
   // Reset the ball location
   BreakoutBallReset();
 }
 
 
-/**
- * Determines whether the ball is colliding with bricks in lineBrickYPositions.
- * @param lineBrickXPos[in] x position of bricks
- * @param lineBrickYPositions[in/out] Y positions of a line of bricks.
- */
 void BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositions) {
   for(byte ii=0; ii<brickYPositionsSz; ii++) {    
     byte yPosition = lineBrickYPositions[ii];
 
-    if ((BreakoutBallPositionY == yPosition) 
-	|| ((yPosition < BreakoutBallPositionY) && ((yPosition + 14) > BreakoutBallPositionY))
-	|| ((yPosition > BreakoutBallPositionY) && (yPosition < (BreakoutBallPositionY + 11)))) {
+    if ((breakoutBallPositionY == yPosition) 
+	|| ((yPosition < breakoutBallPositionY) && ((yPosition + 14) > breakoutBallPositionY))
+	|| ((yPosition > breakoutBallPositionY) && (yPosition < (breakoutBallPositionY + 11)))) {
       blitGraphics2(GrafxDataBlankData, lineBrickXPos, lineBrickYPositions[ii]);
       lineBrickYPositions[ii] = 0xff;
-      BreakoutBallSlopeX = (byte)random(5);
-      BreakoutBallSlopeY = (byte)random(5);
-      if (BreakoutBallSlopeX & 1)
-	BreakoutBallIncrementX = -1;
-      BreakoutBallCounterX = BreakoutBallSlopeX;
-      BreakoutBallCounterY = BreakoutBallSlopeY;
+      breakoutBallSlopeX = (byte)random(5);
+      breakoutBallSlopeY = (byte)random(5);
+      if (breakoutBallSlopeX & 1)
+	breakoutBallIncrementX = -1;
+      breakoutBallCounterX = breakoutBallSlopeX;
+      breakoutBallCounterY = breakoutBallSlopeY;
       BreakoutScoreIncrement(&breakoutScore, 10);
-      BreakoutDrawScore();
+      BreakoutDrawScore();      
       sound(1, 1);
       sound(20, 1);
+
+      // Remove the brick - if none left, reset the level
+      BricksRemove();
+      if (BricksAllGone()) {
+	blitGraphics2(GrafxDataBlankData, breakoutBallPositionX, breakoutBallPositionY);
+	BricksReset();
+	BreakoutBallReset();	
+	BricksDrawBricks();
+	return;
+      }
     }    
   }
 }
 
 
-/** Controls the BreakoutBall motion */
 void BreakoutBallTick() {
   // Move the ball in the X direction
-  if (BreakoutBallCounterX > 0) {
-    BreakoutBallCounterX--;
-    BreakoutBallPositionX += BreakoutBallIncrementX;
+  if (breakoutBallCounterX > 0) {
+    breakoutBallCounterX--;
+    breakoutBallPositionX += breakoutBallIncrementX;
 
-    if (BreakoutBallPositionX > 110) { 
-      BreakoutBallIncrementX = -1;
-    } else if (BreakoutBallPositionX < 5) {
-      BreakoutBallIncrementX = 1;
+    if (breakoutBallPositionX > 110) { 
+      breakoutBallIncrementX = -1;
+    } else if (breakoutBallPositionX < 5) {
+      breakoutBallIncrementX = 1;
       
       // Check collision with the paddle
-      if (paddlePosition <= 7) {
-	if ((paddlePosition + 32) >= BreakoutBallPositionY) {
-	  BreakoutBallSlopeX = (byte)random(5);
+      if (breakoutPaddlePosition <= 7) {
+	if ((breakoutPaddlePosition + 32) >= breakoutBallPositionY) {
+	  breakoutBallSlopeX = (byte)random(5);
 	  sound(1, 1);
 	} else {
 	  BreakoutBallMiss();
 	  return;
 	}
-      } else if (paddlePosition == BreakoutBallPositionY) {
-	BreakoutBallSlopeX = (byte)random(5);
+      } else if (breakoutPaddlePosition == breakoutBallPositionY) {
+	breakoutBallSlopeX = (byte)random(5);
 	sound(1, 1);
-      } else if ((paddlePosition - 7) < BreakoutBallPositionY) {
-	if ((paddlePosition + 32) >= BreakoutBallPositionY) {
-	  BreakoutBallSlopeX = (byte)random(5);
+      } else if ((breakoutPaddlePosition - 7) < breakoutBallPositionY) {
+	if ((breakoutPaddlePosition + 32) >= breakoutBallPositionY) {
+	  breakoutBallSlopeX = (byte)random(5);
 	  sound(1, 1);
 	}	  
       } else {
@@ -164,33 +125,33 @@ void BreakoutBallTick() {
   }
   
   // Move the ball in the Y direction
-  if (BreakoutBallCounterY > 0) {
-    BreakoutBallCounterY--;
-    BreakoutBallPositionY += BreakoutBallIncrementY;
-    if (BreakoutBallPositionY > 179) {
-      BreakoutBallIncrementY = -1;  
-    } else if (BreakoutBallPositionY < 2) {
-      BreakoutBallIncrementY = +1;  
+  if (breakoutBallCounterY > 0) {
+    breakoutBallCounterY--;
+    breakoutBallPositionY += breakoutBallIncrementY;
+    if (breakoutBallPositionY > 179) {
+      breakoutBallIncrementY = -1;  
+    } else if (breakoutBallPositionY < 2) {
+      breakoutBallIncrementY = +1;  
     }
   }
 
   // Reset the slope counters if needed
-  if ((BreakoutBallCounterX == 0) && (BreakoutBallCounterY == 0)) {
-    BreakoutBallCounterX = BreakoutBallSlopeX;
-    BreakoutBallCounterY = BreakoutBallSlopeY;
+  if ((breakoutBallCounterX == 0) && (breakoutBallCounterY == 0)) {
+    breakoutBallCounterX = breakoutBallSlopeX;
+    breakoutBallCounterY = breakoutBallSlopeY;
   }
 
   // Draw the graphics
-  blitGraphics2(GrafxDataBallData, BreakoutBallPositionX, BreakoutBallPositionY);
+  blitGraphics2(GrafxDataBallData, breakoutBallPositionX, breakoutBallPositionY);
 
   // Check collisions with bricks
-  if ((BreakoutBallPositionX >= 43) && (BreakoutBallPositionX < 50))
+  if ((breakoutBallPositionX >= 43) && (breakoutBallPositionX < 50))
     BreakoutBallCheckBrickCollision(50, line1BrickYPositions);
-  else if ((BreakoutBallPositionX >= 58) && (BreakoutBallPositionX < 65))
+  else if ((breakoutBallPositionX >= 58) && (breakoutBallPositionX < 65))
     BreakoutBallCheckBrickCollision(65, line2BrickYPositions);
-  else if ((BreakoutBallPositionX >= 73) && (BreakoutBallPositionX < 80))
+  else if ((breakoutBallPositionX >= 73) && (breakoutBallPositionX < 80))
     BreakoutBallCheckBrickCollision(80, line3BrickYPositions);
-  else if ((BreakoutBallPositionX >= 88) && (BreakoutBallPositionX < 95))
+  else if ((breakoutBallPositionX >= 88) && (breakoutBallPositionX < 95))
     BreakoutBallCheckBrickCollision(95, line4BrickYPositions);
 }
 
