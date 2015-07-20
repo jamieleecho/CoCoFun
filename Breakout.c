@@ -11,6 +11,7 @@
 #pragma org 0x4000
 #include <cmoc.h>
 #include <legacy.h>
+#include <coco.h>
 
 #include "BreakoutScore.c"
 #include "GrafxData.c"
@@ -135,6 +136,19 @@ void readJoystick(byte *x, byte *y) {
   }
 }
 
+BreakoutScore breakoutScore;
+
+/** Draws the current score on the screen */
+void BreakoutDrawScore() {
+  char buffer[7];
+  BreakoutScoreFormat(&breakoutScore, buffer);
+  blitNumericText(buffer, 0x78, 0x50);
+}
+
+
+#include "BreakoutBall.c"
+
+
 
 /** Initializes Breakout */
 void initBreakout() {
@@ -146,6 +160,10 @@ void initBreakout() {
 
   // Show the graphics screen
   clearAndShowGraphicsScreen();
+
+  // Initialize objects
+  BreakoutScoreInit(&breakoutScore);
+  BreakoutBallInit();
 
   // Set final palette
   memcpy(cocoPaletteBaseReg, breakoutColorPalette, COCO_NUM_PALETTE_REGISTERS);
@@ -299,8 +317,10 @@ END
 }
 
 
-
 void playBreakoutGame() {
+  BreakoutScoreReset(&breakoutScore);
+  BreakoutBallReset();
+
   // Initialize men, etc
   asm {
     ORCC #80
@@ -312,8 +332,12 @@ void playBreakoutGame() {
     STD	SCORFMT+2
     STD	SCORFMT+4
   }
-  numberOfBalls = 9;
-  
+
+  numberOfBalls = 9;  
+
+  BreakoutDrawScore();  
+  BreakoutBallDrawCount();
+
   // Play breakout until we run out of balls
   while(numberOfBalls > 0) {
     playBreakoutBall();
@@ -342,8 +366,6 @@ void playNewBreakoutLevel() {
   blitGraphics2(GrafxDataBricksData, 65, 2);
   blitGraphics2(GrafxDataBricksData, 80, 2);
   blitGraphics2(GrafxDataBricksData, 95, 2);
-
-  blitNumericText("1234567890", 60, 60);
 
   asm {
 * Draw Score
@@ -518,6 +540,7 @@ REJIN	LDA	#30
 	STD	SLPX
 	STD	FLGX
 REGIN	LBSR	_controlPaddle
+        LBSR    _BreakoutBallTick
 	LEAX	GrafxDataBallData
 	STX	MEMAR
 GLGL	LDA	FLGX
@@ -532,7 +555,7 @@ GLGL	LDA	FLGX
 	CMPB	#5
 	LBLO	ZZTP
 	STB	XAXIS
-	STB	XX
+  // STB	XX
 TDK	LDA	FLGY
 	TSTA
 	LBEQ	RCHK
@@ -545,10 +568,10 @@ TDK	LDA	FLGY
 	CMPB	#2
 	BLO	NTX1
 	STB	YAXIS
-	STB	YY
+  //	STB	YY
 	LDB	XX
 	STB	XAXIS
-MCDLT	LBSR	BLITTER
+MCDLT	//LBSR	BLITTER
 	LDA	XX
 	CMPA	#43
 	LBLO	GLOR
@@ -607,7 +630,7 @@ BLAR	CMPA	YY
 MISS	
 	LDA	numberOfBalls
         DECA
-        STA     numberOfBalls
+  //STA     numberOfBalls
 	LDB	#$FF
 	STD	SCORFMT
 	LDX	#SCORFMT

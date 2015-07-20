@@ -67,14 +67,14 @@ NextDigit lda  ,-x
 /**
  * Formats score into dst for printing.
  * @param score[in] score to format
- * @param dst[out] destination location that must contain at least 9 bytes
+ * @param dst[out] destination location that must contain at least 7 bytes
  */
 void BreakoutScoreFormat(BreakoutScore *score, char *dst) {
-  for(int ii=0; ii<BREAKOUT_SCORE_NUM_BYTES; ii++) {
-    dst[2 * ii] = ((score->score[ii] >> 4) & 0xf) + '0';
-    dst[2 * ii + 1] = (score->score[ii] & 0xf) + '0';
+  for(int ii=1; ii<BREAKOUT_SCORE_NUM_BYTES; ii++) {
+    dst[2 * (ii - 1)] = ((score->score[ii] >> 4) & 0xf) + '0';
+    dst[2 * (ii - 1) + 1] = (score->score[ii] & 0xf) + '0';
   }
-  dst[2 * BREAKOUT_SCORE_NUM_BYTES] = 0;
+  dst[2 * (BREAKOUT_SCORE_NUM_BYTES - 1)] = 0;
 }
 
 
