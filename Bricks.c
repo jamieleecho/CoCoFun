@@ -28,6 +28,9 @@ void BricksReset() {
   memcpy(line2BrickYPositions, brickYPositions, brickYPositionsSz);
   memcpy(line3BrickYPositions, brickYPositions, brickYPositionsSz);
   memcpy(line4BrickYPositions, brickYPositions, brickYPositionsSz);
+  memcpy(line5BrickYPositions, brickYPositions, brickYPositionsSz);
+  memcpy(line6BrickYPositions, brickYPositions, brickYPositionsSz);
+  memcpy(line7BrickYPositions, brickYPositions, brickYPositionsSz);
   bricksRemovedCount = 0;
 }
 
@@ -38,16 +41,13 @@ void BricksRemove() {
 
 
 byte BricksAllGone() {
-  return bricksRemovedCount >= (17 * 4);
+  return bricksRemovedCount >= (17 * brickXPositionsSz);
 }
 
 
 void BricksDrawBricks() {
-  // Draw graphic bars
-  blitGraphics2(GrafxDataBricksData, 50, 2);
-  blitGraphics2(GrafxDataBricksData, 65, 2);
-  blitGraphics2(GrafxDataBricksData, 80, 2);
-  blitGraphics2(GrafxDataBricksData, 95, 2);
+  for (byte ii=0; ii<brickXPositionsSz; ii++)
+    blitGraphics2(GrafxDataBricksData, brickXPositions[ii], 2);
 }
 
 

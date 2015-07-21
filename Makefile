@@ -22,4 +22,4 @@ clean :
 	rm -rf CoCoFun.dsk *.bin *.i *.lst *.asm *.hex cfg $(BREAKOUT_BIN)
 
 debug : CoCoFun.dsk
-	~/Applications/MacSDLMESS/mess0155/mess coco3 -rompath ~/Applications/MacSDLMESS/mess0155/roms -window -flop1 CoCoFun.dsk
+	~/Applications/MacSDLMESS/mess0155/mess coco3 -rompath ~/Applications/MacSDLMESS/mess0155/roms -window -flop1 CoCoFun.dsk -cfg_directory ~/Applications/MacSDLMESS/mess0155/cfg

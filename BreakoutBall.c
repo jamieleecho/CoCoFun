@@ -16,6 +16,10 @@
 #include "Blitter.h"
 
 
+/** Flag - if 1, then the ball was missed, let it hit left side of screen */
+byte breakoutBallWasMissed = 0;
+
+
 void BreakoutBallReset() {
   breakoutBallPositionX = 30;
   breakoutBallPositionY = 3;
@@ -25,6 +29,7 @@ void BreakoutBallReset() {
   breakoutBallSlopeY = 5;
   breakoutBallCounterX = breakoutBallSlopeX;
   breakoutBallCounterY = breakoutBallSlopeY;
+  breakoutBallWasMissed = 0;
 }
 
 
@@ -56,12 +61,16 @@ void BreakoutBallMiss() {
 
 
 void BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositions) {
+  // We are a little generous with hit detection here to reduce half destroyed bricks
+  byte b1 = breakoutBallPositionY;
+  byte bend = b1 + 8;
+  byte numHit = 0;
   for(byte ii=0; ii<brickYPositionsSz; ii++) {    
-    byte yPosition = lineBrickYPositions[ii];
-
-    if ((breakoutBallPositionY == yPosition) 
-	|| ((yPosition < breakoutBallPositionY) && ((yPosition + 14) > breakoutBallPositionY))
-	|| ((yPosition > breakoutBallPositionY) && (yPosition < (breakoutBallPositionY + 11)))) {
+    byte p1 = lineBrickYPositions[ii];
+    byte pend = p1 + 14;
+    
+    if (((p1 <= b1) && (pend >= b1))
+	|| ((b1 <= p1) && (bend >= p1))) {
       blitGraphics2(GrafxDataBlankData, lineBrickXPos, lineBrickYPositions[ii]);
       lineBrickYPositions[ii] = 0xff;
       breakoutBallSlopeX = (byte)random(5);
@@ -72,9 +81,8 @@ void BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
       breakoutBallCounterY = breakoutBallSlopeY;
       BreakoutScoreIncrement(&breakoutScore, 10);
       BreakoutDrawScore();      
-      sound(1, 1);
-      sound(20, 1);
-
+      numHit++;
+      
       // Remove the brick - if none left, reset the level
       BricksRemove();
       if (BricksAllGone()) {
@@ -84,7 +92,13 @@ void BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
 	BricksDrawBricks();
 	return;
       }
-    }    
+    }
+  }
+
+  // Play a sound if we hit any bricks
+  if (numHit > 0) {
+    sound(1, 1);
+    sound(20, 1);
   }
 }
 
@@ -95,31 +109,31 @@ void BreakoutBallTick() {
     breakoutBallCounterX--;
     breakoutBallPositionX += breakoutBallIncrementX;
 
-    if (breakoutBallPositionX > 110) { 
+    if (breakoutBallPositionX > 115) { 
       breakoutBallIncrementX = -1;
-    } else if (breakoutBallPositionX < 5) {
-      breakoutBallIncrementX = 1;
-      
-      // Check collision with the paddle
-      if (breakoutPaddlePosition <= 7) {
-	if ((breakoutPaddlePosition + 32) >= breakoutBallPositionY) {
-	  breakoutBallSlopeX = (byte)random(5);
-	  sound(1, 1);
-	} else {
+    } else if (breakoutBallPositionX < 4) {
+      if (breakoutBallWasMissed) {
+	if (breakoutBallPositionX <= 0) {
 	  BreakoutBallMiss();
 	  return;
 	}
-      } else if (breakoutPaddlePosition == breakoutBallPositionY) {
-	breakoutBallSlopeX = (byte)random(5);
-	sound(1, 1);
-      } else if ((breakoutPaddlePosition - 7) < breakoutBallPositionY) {
-	if ((breakoutPaddlePosition + 32) >= breakoutBallPositionY) {
-	  breakoutBallSlopeX = (byte)random(5);
+      } else {	
+	// Check collision with the paddle
+	byte p1 = breakoutPaddlePosition - 2;
+	byte b1 = breakoutBallPositionY - 1;
+	byte pend = p1 + 39;
+	byte bend = b1 + 6;
+	
+	// Was there a collision?
+	if (((p1 <= b1) && (pend >= b1))
+	    || ((b1 <= p1) && (bend >= p1))) {
 	  sound(1, 1);
-	}	  
-      } else {
-	BreakoutBallMiss();
-	return;
+	  breakoutBallSlopeX = (byte)random(5);
+	  breakoutBallSlopeY = (byte)random(5);
+	  breakoutBallIncrementX = 1;
+	} else {
+	  breakoutBallWasMissed = 1;
+	}
       }
     }
   }
@@ -145,14 +159,11 @@ void BreakoutBallTick() {
   blitGraphics2(GrafxDataBallData, breakoutBallPositionX, breakoutBallPositionY);
 
   // Check collisions with bricks
-  if ((breakoutBallPositionX >= 43) && (breakoutBallPositionX < 50))
-    BreakoutBallCheckBrickCollision(50, line1BrickYPositions);
-  else if ((breakoutBallPositionX >= 58) && (breakoutBallPositionX < 65))
-    BreakoutBallCheckBrickCollision(65, line2BrickYPositions);
-  else if ((breakoutBallPositionX >= 73) && (breakoutBallPositionX < 80))
-    BreakoutBallCheckBrickCollision(80, line3BrickYPositions);
-  else if ((breakoutBallPositionX >= 88) && (breakoutBallPositionX < 95))
-    BreakoutBallCheckBrickCollision(95, line4BrickYPositions);
+  for (byte ii=0; ii<brickXPositionsSz; ii++) {
+    byte pos = brickXPositions[ii];
+    if ((breakoutBallPositionX >= (pos - 7)) && (breakoutBallPositionX < pos))
+      BreakoutBallCheckBrickCollision(pos, lineBrickYPositions[ii]);
+  }
 }
 
 

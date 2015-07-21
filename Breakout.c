@@ -29,8 +29,7 @@
 
 /** Breakout palette colors */
 byte breakoutColorPalette[COCO_NUM_PALETTE_REGISTERS] = {
-  127, 118, 110, 102, 89, 80, 79, 120,
-  71, 98, 104, 96, 74, 66, 73, 0
+  63, 36, 46, 38, 25, 16, 38, 56, 7, 34, 40, 32, 10, 2, 9, 0
 };
 
 
