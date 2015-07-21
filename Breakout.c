@@ -8,7 +8,7 @@
   back around 1989 or so.
 */
 
-#pragma org 0x4000
+#pragma org 0x3000
 #include <cmoc.h>
 #include <legacy.h>
 #include <coco.h>
@@ -29,9 +29,10 @@
 
 /** Breakout palette colors */
 byte breakoutColorPalette[COCO_NUM_PALETTE_REGISTERS] = {
-  63, 36, 46, 38, 25, 16, 38, 56, 7, 34, 40, 32, 10, 2, 9, 0
+  63, 36, 46, 52, 25, 18, 38, 56,
+  7, 54, 40, 34, 10, 2, 9, 0
 };
-
+ 
 
 /** Position of the paddle */
 byte breakoutPaddlePosition = 72;
