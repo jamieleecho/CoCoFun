@@ -24,7 +24,7 @@ void blitGraphics() {
       LDX	MEMAR
       STA	TEMPA+1
       CLR	XCOUNT+1
-FIND	PSHS	A
+FIND
       CMPB	#51
       BLO	SEL1
       CMPB	#51
@@ -49,7 +49,7 @@ SEL2	LDA	#$31
 SEL3	LDA	#$32
 STBNK	STA	$FFA3
       STA	BNK
-      PULS	A
+      LDA       XAXIS
       LDA	#160
       MUL
       ADDD	TEMPA
@@ -68,8 +68,9 @@ AD192	LEAY	-32,Y
 AD384	LEAY	-64,Y
       BRA	PULL
 AD576	LEAY	-96,Y
-PULL	LDD     XAXIS
-CHEK1	ADDA	XCOUNT+1
+PULL	LDB     YAXIS
+CHEK1 LDA       XAXIS
+      ADDA	XCOUNT+1
       CMPA	#159
       BHI	CUTOFF
 CHEK2	LDA	,X+
@@ -78,11 +79,9 @@ CHEK2	LDA	,X+
 STA	STA	,Y+
       INC	XCOUNT+1
       CMPY	#$8000
-      BNE	GOON
+      BNE	CHEK1
       INC	$FFA3
       LEAY	-$2000,Y
-GOON	LDA	TEMPA+1
-      BRA	CHEK1
 CUTOFF	LDA	,X+
       CMPA	#$FF
       BNE	CUTOFF
