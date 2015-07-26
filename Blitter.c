@@ -15,109 +15,111 @@
 #define BREAKOUT_SCORE_NUM_BYTES 4
 
 
-void blitGraphics() {
+void blitGraphics3() {
   asm {
-      LDA	XAXIS
-      CMPA	#159
-      LBHI	END
-      LDB	YAXIS
-      LDX	MEMAR
-      STA	TEMPA+1
-      CLR	XCOUNT+1
-FIND
-      CMPB	#51
-      BLO	SEL1
-      CMPB	#51
-      LBEQ	LOONY
-CONT1	SUBB	#51
-      CMPB	#51
-      BLO	SEL2
-      CMPB	#51
-      LBEQ	LOON
-CONT2	SUBB	#51
-      CMPB	#51
-      BLO	SEL3
-      CMPB	#51
-      LBEQ	LOON2
-CONT3	SUBB	#51
-      LDA	#$33
-      BRA	STBNK
-SEL1	LDA	#$30
-      BRA	STBNK
-SEL2	LDA	#$31
-      BRA	STBNK
-SEL3	LDA	#$32
-STBNK	STA	$FFA3
-      STA	BNK
-      LDA       XAXIS
-      LDA	#160
-      MUL
-      ADDD	TEMPA
-      ADDD	#$6000
-TRANS	TFR	D,Y
-      LDA	BNK
-      CMPA	#$31
-      BEQ	AD192
-      CMPA	#$32
-      BEQ	AD384
-      CMPA	#$33
-      BEQ	AD576
-      BRA	PULL
-AD192	LEAY	-32,Y
-      BRA	PULL
-AD384	LEAY	-64,Y
-      BRA	PULL
-AD576	LEAY	-96,Y
-PULL	LDB     YAXIS
-CHEK1 LDA       XAXIS
-      ADDA	XCOUNT+1
-      CMPA	#159
-      BHI	CUTOFF
-CHEK2	LDA	,X+
-      CMPA	#$FF
-      BEQ	ADDY
-STA	STA	,Y+
-      INC	XCOUNT+1
-      CMPY	#$8000
-      BNE	CHEK1
-      INC	$FFA3
-      LEAY	-$2000,Y
-CUTOFF	LDA	,X+
-      CMPA	#$FF
-      BNE	CUTOFF
-ADDY	LDA	,X+
-      CMPA	#$FF
-      BEQ	END
-      LEAY	160,Y
-      EXG	Y,D
-      SUBD	XCOUNT
-      CLR	XCOUNT+1
-      EXG	Y,D
-      CMPY	#$8000
-      BLO	STA
-      LEAY	-$2000,Y
-      INC	$FFA3
-      BRA	STA
-LOONY	LDA	TEMPA+1
-      CMPA	#32
-      LBGE	CONT1
-      LBRA	SEL1
-LOON	LDA	TEMPA+1
-      CMPA	#64
-      LBGE	CONT2
-      LBRA	SEL2
-LOON2	LDA	TEMPA+1
-      CMPA	#96
-      LBGE	CONT3
-      LBRA	SEL3
+start_blit
+      orcc      #$50
+      pshs      u
+
+* Boundary check XAXIS and YAXIS
+      ldd	XAXIS
+      cmpa	#159
+      lbhi	end_blit2
+      cmpb      #191
+      lbhi	end_blit2
+
+* Map the graphics screen starting at 0x8000
+* Squirrel away the MMU register settings
+      ldx       #$ffa4
+      ldu       mmu
+      ldb       #$30
+
+      lda       ,x
+      sta       ,u+
+      stb       ,x+
+      incb
+      lda       ,x
+      sta       ,u+
+      stb       ,x+
+      incb
+      lda       ,x
+      sta       ,u+
+      stb       ,x+
+      incb
+      lda       ,x
+      sta       ,u+
+      stb       ,x+
+      incb
+
+* Setup registers to point to memory
+* U - src
+* X - dst
+* Y - current row
+* b - running counter of number of bytes
+      ldu       MEMAR
+      clra
+      ldb       YAXIS
+      tfr       d,y
+      lda       YAXIS
+      ldb       #160
+yloop mul
+      addd      #$8000      
+      tfr       d,X
+      ldb       XAXIS
+      abx
+
+* Transfer one line of pixels
+xloop lda       ,u+
+      cmpa      #$ff
+      beq       yend
+      sta       ,x+
+      incb
+      cmpb      #160
+      bcs       xloop
+
+* Skip source bytes due to edge clipping
+xskip lda       ,u+
+      cmpa      #$ff
+      bne       xskip
+
+* Go to the next line
+yend  lda       ,u
+      cmpa      #$ff
+      beq       end_blit
+      leay      1,y
+      cmpy      #192
+      bge       end_blit
+      tfr       y,d
+      lda       #160
+      bra       yloop
+
 XAXIS	FCB	10
 YAXIS	FCB	10
 MEMAR	FDB	$E00
 TEMPA	FDB	0
 XCOUNT	FDB	0
 BNK	FCB	0
-END
-      }
+mmu     rmb     4
+
+end_blit
+* Map the ROMs back to 0x8000
+      ldx       #$ffa4
+      ldu       mmu
+      lda       ,u+
+      sta       ,x+
+      lda       ,u+
+      sta       ,x+
+      lda       ,u+
+      sta       ,x+
+      lda       ,u+
+      sta       ,x+
+
+end_blit2
+* Enable interrupts
+      andcc     #$af
+
+      puls      u
+  }
 }
 
 
@@ -129,7 +131,7 @@ void blitGraphics2(byte *bitmap, byte x, byte y) {
       ldb  y
       std  XAXIS
   }
-  blitGraphics();
+  blitGraphics3();
 }
 
 
