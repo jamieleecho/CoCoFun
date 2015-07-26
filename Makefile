@@ -2,7 +2,7 @@ CFLAGS=-a09=/usr/local/bin/lwasm -I/usr/local/share/cmoc
 BREAKOUT_BAS=AsmGameFiles/Breakout.bas
 BREAKOUT_BIN=Breakout.bin
 
-CoCoFun.dsk : Foo.bin Breakout.bin $(BREAKOUT_BAS) $(BREAKOUT_BIN)
+CoCoFun.dsk : Foo.bin Breakout.bin $(BREAKOUT_BAS) $(BREAKOUT_BIN) Oops.bin
 	rm -f $@
 	decb dskini $@
 	decb copy Foo.bin $@,FOO.BIN
@@ -11,6 +11,8 @@ CoCoFun.dsk : Foo.bin Breakout.bin $(BREAKOUT_BAS) $(BREAKOUT_BIN)
 	decb attr $@,BREAKOUT.BAS -0
 	decb copy $(BREAKOUT_BIN) $@,BREAKOUT.BIN
 	decb attr $@,BREAKOUT.BIN -2 -b
+	decb copy Oops.bin $@,OOPS.BIN
+	decb attr $@,OOPS.BIN -2 -b
 
 Breakout.bin : Breakout.c GrafxData.c BreakoutScore.c BreakoutBall.c Blitter.c Bricks.c \
 			   FontData.c
