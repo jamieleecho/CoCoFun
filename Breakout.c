@@ -21,6 +21,7 @@
 #include "CoCoMisc.h"
 
 #include "GrafxData.c"
+#include "FontData.c"
 #include "Bricks.c"
 #include "BreakoutBall.c"
 #include "BreakoutScore.c"

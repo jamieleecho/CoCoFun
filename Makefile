@@ -12,7 +12,8 @@ CoCoFun.dsk : Foo.bin Breakout.bin $(BREAKOUT_BAS) $(BREAKOUT_BIN)
 	decb copy $(BREAKOUT_BIN) $@,BREAKOUT.BIN
 	decb attr $@,BREAKOUT.BIN -2 -b
 
-Breakout.bin : Breakout.c GrafxData.c BreakoutScore.c BreakoutBall.c Blitter.c Bricks.c
+Breakout.bin : Breakout.c GrafxData.c BreakoutScore.c BreakoutBall.c Blitter.c Bricks.c \
+			   FontData.c
 	cmoc $< $(CFLAGS)
 
 %.bin : %.c
