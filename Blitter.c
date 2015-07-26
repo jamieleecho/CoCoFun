@@ -15,18 +15,20 @@
 #define BREAKOUT_SCORE_NUM_BYTES 4
 
 
-void blitGraphics3() {
+void blitGraphics2(byte *bitmap, byte x, byte y) {
+  // Bounds check
+  if ((x > 159) || (y > 191))
+    return;
+
   asm {
-start_blit
+      ldx bitmap
+      stx  MEMAR
+      lda  x
+      ldb  y
+      std  XAXIS
+
       orcc      #$50
       pshs      u
-
-* Boundary check XAXIS and YAXIS
-      ldd	XAXIS
-      cmpa	#159
-      lbhi	end_blit2
-      cmpb      #191
-      lbhi	end_blit2
 
 * Map the graphics screen starting at 0x8000
 * Squirrel away the MMU register settings
@@ -120,18 +122,6 @@ end_blit2
 
       puls      u
   }
-}
-
-
-void blitGraphics2(byte *bitmap, byte x, byte y) {
-  asm {
-      ldx bitmap
-      stx  MEMAR
-      lda  x
-      ldb  y
-      std  XAXIS
-  }
-  blitGraphics3();
 }
 
 
