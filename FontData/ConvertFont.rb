@@ -90,6 +90,16 @@ Dir.foreach(".") do |file|
   char2CharData[file[0]] = charData
 end
 
+# Iterate through [a, z] mapping missing upper/lower cases chars
+(97..122).each do |x|
+  myChar = [x].pack('c*')
+  if ((char2CharData[myChar] != nil) && (char2CharData[myChar.upcase] == nil))
+    char2CharData[myChar.upcase] = char2CharData[myChar]
+  elsif ((char2CharData[myChar.upcase] != nil) && (char2CharData[myChar] == nil))
+    char2CharData[myChar] = char2CharData[myChar.upcase]
+  end
+end
+
 # Iterate through all of the visible ASCII characters and record the number of bytes required to
 # store each char.
 offset = 0
@@ -118,7 +128,7 @@ puts
 # Output the C data structure for each character
 puts '// Each glyph is preceded by 2 bytes that define the rows and columns per font'
 puts '// The remaining bytes define 1-bit data organized as bytes for each glyph'
-puts "char fontData[] = {"
+puts "byte fontData[] = {"
 firstChar = true
 chars.each do |myChar| 
   charData = char2CharData[myChar]

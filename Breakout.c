@@ -73,8 +73,14 @@ void BreakoutInit() {
   *cocoBorderRegister = 0xff;
 
   // Draw some text
-  BlitterBlitText(FontDataFontIndex, FontDataFontData,
-				  0x2, 0x0, 0, 0, "0123456789hello");
+  while(1) {
+	for(byte jj=0; jj<16; jj++) {
+	  for(byte ii=0;ii<16; ii++) {
+		BlitterBlitText(FontDataFontIndex, FontDataFontData,
+						ii, jj, 0, 0, "0123456789 Hello World");
+	  }
+	}
+  }
   while(1);
 }
 
