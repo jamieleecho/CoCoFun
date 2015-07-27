@@ -71,17 +71,6 @@ void BreakoutInit() {
   // Set final palette
   memcpy(cocoPaletteBaseReg, breakoutColorPalette, COCO_NUM_PALETTE_REGISTERS);
   *cocoBorderRegister = 0xff;
-
-  // Draw some text
-  while(1) {
-	for(byte jj=0; jj<16; jj++) {
-	  for(byte ii=0;ii<16; ii++) {
-		BlitterBlitText(FontDataFontIndex, FontDataFontData,
-						ii, jj, 0, 0, "0123456789 Hello World");
-	  }
-	}
-  }
-  while(1);
 }
 
 
@@ -96,6 +85,12 @@ void BreakoutPlayGame() {
   // Clear previous paddle
   hscreen(2);
   *cocoBorderRegister = 0xff;
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+				  1, 0, 235, 0, "BREAKOUT");
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+				  3, 0, 250, 30, "SCORE");
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+				  14, 0, 252, 60, "LIVES");
 
   // Reset data structures
   BreakoutScoreReset(&breakoutScore);
@@ -114,6 +109,7 @@ void BreakoutPlayGame() {
     BreakoutControlPaddle();
     BreakoutBallTick();
   }
+  blitGraphics2(GrafxDataPaddleData, 4, breakoutPaddlePosition);
 
   // Wait around before starting a new game
   waitkey(0);
@@ -135,9 +131,13 @@ void BreakoutControlPaddle() {
 
 
 void BreakoutDrawScore() {
-  char buffer[7];
+  char buffer[13];
   BreakoutScoreFormat(&breakoutScore, buffer);
-  blitNumericText(buffer, 0x78, 0x50);
+  for(int ii = 6; ii<13; ii++)
+	buffer[ii] = ' ';
+  buffer[12] = 0;
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+				  3, 0, 245, 40, buffer);
 }
 
 

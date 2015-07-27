@@ -124,7 +124,7 @@ void blitNumericText(char *text, byte x, byte y) {
 }
 
 
-void BlitterBlitText(int *fontIndex, byte *fontData,
+void BlitterDrawText(int *fontIndex, byte *fontData,
 					 byte foreground, byte background,
 					 int x, int y,
 					 char *text) {
@@ -175,8 +175,12 @@ void BlitterBlitText(int *fontIndex, byte *fontData,
 		  // Iteratre
 		  widthBits--;
 		  fontByte = fontByte << 1;
-		  currentX++;		
+		  currentX++;
+		  if (currentX > 319)
+			break;
 		}
+		if (currentX > 319)
+		  break;
 	  }
 	  dst = dst + 160 - forwardBytes;
 	}
@@ -200,6 +204,8 @@ void BlitterBlitText(int *fontIndex, byte *fontData,
 		
 		// Iteratre
 		currentX++;		
+		if (currentX > 319)
+		  break;
 	  }
 	  dst = dst + 160 - forwardBytes;
 	}

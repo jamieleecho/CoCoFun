@@ -39,10 +39,12 @@ void BreakoutBallInit() {
 
 
 void BreakoutBallDrawCount() {
-  char buffer[2];
+  char buffer[4];
   buffer[0] = breakoutNumberOfBalls + '0';
-  buffer[1] = 0;
-  blitNumericText(buffer, 0x78, 0x6f);
+  buffer[1] = ' ';
+  buffer[2] = 0;
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+				  14, 0, 270, 70, buffer);
 }
 
 
@@ -76,28 +78,27 @@ void BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
       breakoutBallSlopeX = (byte)random(5);
       breakoutBallSlopeY = (byte)random(5);
       if (breakoutBallSlopeX & 1)
-	breakoutBallIncrementX = -1;
+		breakoutBallIncrementX = -1;
       breakoutBallCounterX = breakoutBallSlopeX;
       breakoutBallCounterY = breakoutBallSlopeY;
       BreakoutScoreIncrement(&breakoutScore, 10);
-      BreakoutDrawScore();      
       numHit++;
       
       // Remove the brick - if none left, reset the level
       BricksRemove();
       if (BricksAllGone()) {
-	blitGraphics2(GrafxDataBlankData, breakoutBallPositionX, breakoutBallPositionY);
-	BricksReset();
-	BreakoutBallReset();	
-	BricksDrawBricks();
-	return;
+		blitGraphics2(GrafxDataBlankData, breakoutBallPositionX, breakoutBallPositionY);
+		BricksReset();
+		BreakoutBallReset();	
+		BricksDrawBricks();
+		return;
       }
     }
   }
 
   // Play a sound if we hit any bricks
   if (numHit > 0) {
-    sound(1, 1);
+	BreakoutDrawScore();      
     sound(20, 1);
   }
 }
@@ -113,27 +114,27 @@ void BreakoutBallTick() {
       breakoutBallIncrementX = -1;
     } else if (breakoutBallPositionX < 4) {
       if (breakoutBallWasMissed) {
-	if (breakoutBallPositionX <= 0) {
-	  BreakoutBallMiss();
-	  return;
-	}
+		if (breakoutBallPositionX <= 0) {
+		  BreakoutBallMiss();
+		  return;
+		}
       } else {	
-	// Check collision with the paddle
-	byte p1 = breakoutPaddlePosition - 2;
-	byte b1 = breakoutBallPositionY - 1;
-	byte pend = p1 + 39;
-	byte bend = b1 + 6;
-	
-	// Was there a collision?
-	if (((p1 <= b1) && (pend >= b1))
-	    || ((b1 <= p1) && (bend >= p1))) {
-	  sound(1, 1);
-	  breakoutBallSlopeX = (byte)random(5);
-	  breakoutBallSlopeY = (byte)random(5);
-	  breakoutBallIncrementX = 1;
-	} else {
-	  breakoutBallWasMissed = 1;
-	}
+		// Check collision with the paddle
+		byte p1 = breakoutPaddlePosition - 2;
+		byte b1 = breakoutBallPositionY - 1;
+		byte pend = p1 + 39;
+		byte bend = b1 + 6;
+		
+		// Was there a collision?
+		if (((p1 <= b1) && (pend >= b1))
+			|| ((b1 <= p1) && (bend >= p1))) {
+		  sound(1, 1);
+		  breakoutBallSlopeX = (byte)random(5);
+		  breakoutBallSlopeY = (byte)random(5);
+		  breakoutBallIncrementX = 1;
+		} else {
+		  breakoutBallWasMissed = 1;
+		}
       }
     }
   }

@@ -52,7 +52,7 @@ void blitNumericText(char *text, byte x, byte y);
  * @param y[in] Y location in pixels
  * @param text[in] Text to output
  */
-void BlitterBlitText(int *fontIndex, byte *fontData,
+void BlitterDrawText(int *fontIndex, byte *fontData,
 					 byte foreground, byte background,
 					 int x, int y,
 					 char *text);
