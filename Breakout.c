@@ -54,6 +54,7 @@ void BreakoutInit() {
   // High speed mode
   initCoCoSupport();
   setHighSpeed(1);
+  BlitterInit();
   
 
   // Black out the screen
@@ -70,6 +71,11 @@ void BreakoutInit() {
   // Set final palette
   memcpy(cocoPaletteBaseReg, breakoutColorPalette, COCO_NUM_PALETTE_REGISTERS);
   *cocoBorderRegister = 0xff;
+
+  // Draw some text
+  BlitterBlitText(FontDataFontIndex, FontDataFontData,
+				  0x2, 0x0, 0, 0, "0123456789hello");
+  while(1);
 }
 
 

@@ -15,11 +15,39 @@
 #define BREAKOUT_SCORE_NUM_BYTES 4
 
 
+byte mmuBuffer[4];
+void BlitterInit() {
+  memcpy(mmuBuffer, (byte *)0xffa4, sizeof(mmuBuffer));
+}
+
+
+/** 
+ * Disables interrupts and maps in the screen
+ */
+void BlitterMapScreen() {
+  asm { orcc      #$50 }
+  *((byte *)0xffa4) = 0x30;
+  *((byte *)0xffa5) = 0x31;
+  *((byte *)0xffa6) = 0x32;
+  *((byte *)0xffa7) = 0x33;
+}
+
+
+/**
+ * Unmaps the screen and enabled interrupts
+ */
+void BlitterUnmapScreen() {
+  memcpy((byte *)0xffa4, mmuBuffer, sizeof(mmuBuffer));
+  asm { andcc     #$af }
+}
+
+
 void blitGraphics2(byte *bitmap, byte x, byte y) {
   // Bounds check
   if ((x > 159) || (y > 191))
     return;
 
+  BlitterMapScreen();
   asm {
       ldx bitmap
       stx  MEMAR
@@ -29,29 +57,6 @@ void blitGraphics2(byte *bitmap, byte x, byte y) {
 
       orcc      #$50
       pshs      u
-
-* Map the graphics screen starting at 0x8000
-* Squirrel away the MMU register settings
-      ldx       #$ffa4
-      ldu       mmu
-      ldb       #$30
-
-      lda       ,x
-      sta       ,u+
-      stb       ,x+
-      incb
-      lda       ,x
-      sta       ,u+
-      stb       ,x+
-      incb
-      lda       ,x
-      sta       ,u+
-      stb       ,x+
-      incb
-      lda       ,x
-      sta       ,u+
-      stb       ,x+
-      incb
 
 * Setup registers to point to memory
 * U - src
@@ -95,33 +100,16 @@ yend  lda       ,u
       lda       #160
       bra       yloop
 
+* Storage for random variables
 XAXIS	FCB	10
 YAXIS	FCB	10
 MEMAR	FDB	$E00
-TEMPA	FDB	0
-XCOUNT	FDB	0
-BNK	FCB	0
-mmu     rmb     4
 
 end_blit
-* Map the ROMs back to 0x8000
-      ldx       #$ffa4
-      ldu       mmu
-      lda       ,u+
-      sta       ,x+
-      lda       ,u+
-      sta       ,x+
-      lda       ,u+
-      sta       ,x+
-      lda       ,u+
-      sta       ,x+
-
-end_blit2
-* Enable interrupts
-      andcc     #$af
-
       puls      u
   }
+
+  BlitterUnmapScreen();
 }
 
 
@@ -134,6 +122,94 @@ void blitNumericText(char *text, byte x, byte y) {
     x += 3;
   }
 }
+
+
+void BlitterBlitText(int *fontIndex, byte *fontData,
+					 byte foreground, byte background,
+					 int x, int y,
+					 char *text) {
+  BlitterMapScreen();
+  byte glyphSpacing = 1;
+
+  for(char c = *text++; c != 0; c = *text++) {
+    // Ignore characters that are out of range
+    if ((c < 32) || (c > 127)) {
+      continue;
+	}
+
+    // Ignore unknown glyphs
+    int offset = fontIndex[c - 32];
+    if (offset < 0) {
+      continue;	  
+	}
+
+    byte *fontPtr = fontData + offset;
+    byte width = *fontPtr++;
+    byte height = *fontPtr++;
+    byte numBytes = (width + 7) / 8;
+    byte *dst = (byte *)0x8000 + (y * 160) + x/2;
+	byte fcolor4 = foreground << 4;
+	byte bcolor4 = background << 4;
+    for(int jj=0; jj<height; jj++) {
+	  byte widthBits = width;
+	  int currentX = x;
+	  int forwardBytes = 0;
+	  for(int ii=0; ii<numBytes; ii++) {
+		byte fontByte = *fontPtr++;
+		for(int kk=0; kk<8; kk++) {
+		  // No more bits???
+		  if (widthBits == 0xff)
+			break;
+
+		  // Draw the bit
+		  if (currentX & 1) {
+			byte color = (fontByte & 0x80) ? foreground : background;
+			*dst = (*dst & 0xf0) | color;
+			dst++;
+			forwardBytes++;
+		  } else {
+			byte color = (fontByte & 0x80) ? fcolor4 : bcolor4;
+			*dst = (*dst & 0x0f) | color;
+		  }
+		  
+		  // Iteratre
+		  widthBits--;
+		  fontByte = fontByte << 1;
+		  currentX++;		
+		}
+	  }
+	  dst = dst + 160 - forwardBytes;
+	}
+
+	// Put in some white space
+	x = x + width;
+    dst = (byte *)0x8000 + (y * 160) + x/2;
+    for(int jj=0; jj<height; jj++) {
+	  byte widthBits = glyphSpacing;
+	  int currentX = x;
+	  int forwardBytes = 0;
+	  for(int ii=0; ii<widthBits; ii++) {
+		// Draw the bit
+		if (currentX & 1) {
+		  *dst = (*dst & 0xf0) | background;
+		  dst++;
+		  forwardBytes++;
+		} else {
+		  *dst = (*dst & 0x0f) | bcolor4;
+		}
+		
+		// Iteratre
+		currentX++;		
+	  }
+	  dst = dst + 160 - forwardBytes;
+	}
+	x = x + glyphSpacing;
+  }
+
+  // Restore MMU and Enable interrupts
+  BlitterUnmapScreen();
+}
+
 
 
 #endif

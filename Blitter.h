@@ -15,6 +15,10 @@
 #define BREAKOUT_SCORE_NUM_BYTES 4
 
 
+/** Must be invoked before other Blitter routines */
+void BlitterInit();
+
+
 /** Blit graphics to the screen */
 void blitGraphics();
 
@@ -34,6 +38,24 @@ void blitGraphics2(byte *bitmap, byte x, byte y);
  * @param y[input] y pixel location
  */
 void blitNumericText(char *text, byte x, byte y);
+
+
+/**
+ * @param fontIndex[in] index that maps ASCII [32, 127] to offsets into fontData
+ * @param fontData[in] array containing glyph data. Each glyph consists of
+ *                     width and height bytes that specify the glyph size in bits.
+ *                     The remaining data is the 1-bit data for the font packed in
+ *                     bytes.
+ * @param foreground[in] Foreground color on [0, 15]
+ * @param background[in] Background color on [0, 15]
+ * @param x[in] X location in pixels
+ * @param y[in] Y location in pixels
+ * @param text[in] Text to output
+ */
+void BlitterBlitText(int *fontIndex, byte *fontData,
+					 byte foreground, byte background,
+					 int x, int y,
+					 char *text);
 
 
 #endif

@@ -104,8 +104,8 @@ chars.each do |myChar|
 
   # Update the offset for the given character
   charData[:offset] = offset
-  offset = offset + charData[:num_bytes]
   offsets << offset
+  offset = offset + charData[:num_bytes]
 end
 
 # Output the C data structure for the font index that maps a character to its data structure offset
