@@ -130,6 +130,10 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
 					 char *text) {
   BlitterMapScreen();
   byte glyphSpacing = 1;
+  byte fcolor4 = foreground << 4;
+  byte bcolor4 = background << 4;
+  byte lookup[] = { bcolor4 | background, bcolor4 | foreground,
+                    fcolor4 | background, fcolor4 | foreground };
 
   for(char c = *text++; c != 0; c = *text++) {
     // Ignore characters that are out of range
@@ -148,37 +152,70 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
     byte height = *fontPtr++;
     byte numBytes = (width + 7) / 8;
     byte *dst = (byte *)0x8000 + (y * 160) + x/2;
-	byte fcolor4 = foreground << 4;
-	byte bcolor4 = background << 4;
+	
     for(int jj=0; jj<height; jj++) {
 	  byte widthBits = width;
 	  int currentX = x;
 	  int forwardBytes = 0;
 	  for(int ii=0; ii<numBytes; ii++) {
 		byte fontByte = *fontPtr++;
-		for(int kk=0; kk<8; kk++) {
-		  // No more bits???
-		  if (widthBits == 0xff)
-			break;
 
-		  // Draw the bit
-		  if (currentX & 1) {
-			byte color = (fontByte & 0x80) ? foreground : background;
-			*dst = (*dst & 0xf0) | color;
-			dst++;
-			forwardBytes++;
+		if (widthBits >= 8) {
+		  if ((currentX & 1) == 0) {
+			*(dst + 3) = lookup[(fontByte & 3)];
+			fontByte = fontByte >> 2;
+			*(dst + 2) = lookup[(fontByte & 3)];
+			fontByte = fontByte >> 2;
+			*(dst + 1) = lookup[(fontByte & 3)];
+			fontByte = fontByte >> 2;
+			*dst = lookup[(fontByte)];
+			currentX += 8;
+			dst += 4;
+			forwardBytes += 4;
+			widthBits -= 8;
 		  } else {
-			byte color = (fontByte & 0x80) ? fcolor4 : bcolor4;
-			*dst = (*dst & 0x0f) | color;
+			byte color = (fontByte & 0x1) ? fcolor4 : bcolor4;
+			*(dst + 4) = ((*dst + 4) & 0x0f) | color;
+			fontByte = fontByte >> 1;
+			*(dst + 3) = lookup[(fontByte & 3)];
+			fontByte = fontByte >> 2;
+			*(dst + 2) = lookup[(fontByte & 3)];
+			fontByte = fontByte >> 2;
+			*(dst + 1) = lookup[(fontByte & 3)];
+			fontByte = fontByte >> 2;
+			color = (fontByte & 0x1) ? foreground : background;
+			*dst = (*dst & 0xf0) | color;
+			currentX += 8;
+			dst += 4;
+			forwardBytes += 4;
+			widthBits -= 8;
 		  }
-		  
-		  // Iteratre
-		  widthBits--;
-		  fontByte = fontByte << 1;
-		  currentX++;
-		  if (currentX > 319)
-			break;
+		} else {
+		  for(int kk=0; kk<8; kk++) {
+			// No more bits???
+			if (widthBits == 0xff)
+			  break;
+			
+			// Draw the bit
+			if (currentX & 1) {
+			  byte color = (fontByte & 0x80) ? foreground : background;
+			  *dst = (*dst & 0xf0) | color;
+			  dst++;
+			  forwardBytes++;
+			} else {
+			  byte color = (fontByte & 0x80) ? fcolor4 : bcolor4;
+			  *dst = (*dst & 0x0f) | color;
+			}
+			
+			// Iteratre
+			widthBits--;
+			fontByte = fontByte << 1;
+			currentX++;
+			if (currentX > 319)
+			  break;
+		  }
 		}
+
 		if (currentX > 319)
 		  break;
 	  }

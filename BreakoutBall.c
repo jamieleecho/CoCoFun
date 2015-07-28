@@ -99,7 +99,7 @@ void BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
   // Play a sound if we hit any bricks
   if (numHit > 0) {
 	BreakoutDrawScore();      
-    sound(20, 1);
+    // sound(20, 1);
   }
 }
 
