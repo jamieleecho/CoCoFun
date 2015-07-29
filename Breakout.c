@@ -133,7 +133,7 @@ void BreakoutControlPaddle() {
 void BreakoutDrawScore() {
   char buffer[13];
   BreakoutScoreFormat(&breakoutScore, buffer);
-  for(int ii = 6; ii<13; ii++)
+  for(int ii = 6; ii<12; ii++)
 	buffer[ii] = ' ';
   buffer[12] = 0;
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
