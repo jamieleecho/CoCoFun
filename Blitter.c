@@ -128,6 +128,10 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
 					 byte foreground, byte background,
 					 int x, int y,
 					 char *text) {
+  // Bounds check
+  if ((x > 319) || (y > 191))
+	return;
+
   BlitterMapScreen();
   byte glyphSpacing = 1;
   byte fcolor4 = foreground << 4;
@@ -160,15 +164,45 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
 	  for(int ii=0; ii<numBytes; ii++) {
 		byte fontByte = *fontPtr++;
 
-		if (widthBits >= 8) {
+		if ((widthBits >= 8) && (x < 311)) {
 		  if ((currentX & 1) == 0) {
-			*(dst + 3) = lookup[(fontByte & 3)];
-			fontByte = fontByte >> 2;
-			*(dst + 2) = lookup[(fontByte & 3)];
-			fontByte = fontByte >> 2;
-			*(dst + 1) = lookup[(fontByte & 3)];
-			fontByte = fontByte >> 2;
-			*dst = lookup[(fontByte)];
+			asm {
+              lda  fontByte
+              ldy  dst
+
+           * most significant bits
+              tfr   a,b
+              andb  #0x3
+              leax  lookup
+              ldb   b,x
+              stb   3,y
+              rora
+              rora
+
+           * next bits
+              tfr   a,b
+              andb  #0x3
+              leax  lookup
+              ldb   b,x
+              stb   2,y
+              rora
+              rora
+
+           * next bits
+              tfr   a,b
+              andb  #0x3
+              leax  lookup
+              ldb   b,x
+              stb   1,y
+              rora
+              rora
+
+           * next bits
+              anda  #0x3
+              leax  lookup
+              ldb   a,x
+              stb   ,y
+			}
 			currentX += 8;
 			dst += 4;
 			forwardBytes += 4;
@@ -190,6 +224,49 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
 			forwardBytes += 4;
 			widthBits -= 8;
 		  }
+		} else if ((widthBits == 4) && (x < 315)) {
+		  if ((currentX & 1) == 0) {
+			asm {
+              lda  fontByte
+              ldy  dst
+              rora
+              rora
+              rora
+              rora
+
+           * most significant bits
+              tfr   a,b
+              andb  #0x3
+              leax  lookup
+              ldb   b,x
+              stb   1,y
+              rora
+              rora
+
+           * next bits
+              anda  #0x3
+              leax  lookup
+              ldb   a,x
+              stb   ,y
+			}
+			currentX += 4;
+			dst += 2;
+			forwardBytes += 2;
+			widthBits -= 4;
+		  } else {
+			fontByte = fontByte >> 4;
+			byte color = (fontByte & 0x1) ? fcolor4 : bcolor4;
+			*(dst + 2) = ((*dst + 2) & 0x0f) | color;
+			fontByte = fontByte >> 1;
+			*(dst + 1) = lookup[(fontByte & 3)];
+			fontByte = fontByte >> 2;
+			color = (fontByte & 0x1) ? foreground : background;
+			*dst = (*dst & 0xf0) | color;
+			currentX += 2;
+			dst += 2;
+			forwardBytes += 2;
+			widthBits -= 4;
+		  }
 		} else {
 		  for(int kk=0; kk<8; kk++) {
 			// No more bits???
@@ -207,7 +284,7 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
 			  *dst = (*dst & 0x0f) | color;
 			}
 			
-			// Iteratre
+			// Iterate
 			widthBits--;
 			fontByte = fontByte << 1;
 			currentX++;
@@ -247,6 +324,10 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
 	  dst = dst + 160 - forwardBytes;
 	}
 	x = x + glyphSpacing;
+
+	// Bounds check
+	if (x > 319)
+	  break;
   }
 
   // Restore MMU and Enable interrupts
