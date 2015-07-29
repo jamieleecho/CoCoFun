@@ -205,17 +205,61 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
 			forwardBytes += 4;
 			widthBits -= 8;
 		  } else {
-			byte color = (fontByte & 0x1) ? fcolor4 : bcolor4;
-			*(dst + 4) = ((*dst + 4) & 0x0f) | color;
-			fontByte = fontByte >> 1;
-			*(dst + 3) = lookup[(fontByte & 3)];
-			fontByte = fontByte >> 2;
-			*(dst + 2) = lookup[(fontByte & 3)];
-			fontByte = fontByte >> 2;
-			*(dst + 1) = lookup[(fontByte & 3)];
-			fontByte = fontByte >> 2;
-			color = (fontByte & 0x1) ? foreground : background;
-			*dst = (*dst & 0xf0) | color;
+			byte temp;
+			asm {
+              leax  lookup
+              ldy  dst
+              lda  fontByte
+
+           * most significant bit
+              tfr   a,b
+              andb  #0x1
+              ldb   b,x
+              rolb
+              rolb
+              rolb
+              rolb
+              stb   temp
+              ldb   4,y
+              andb  #0xf
+              orb   temp
+              stb   4,y
+              rora
+
+           * next bits
+              tfr   a,b
+              andb  #0x3
+              ldb   b,x
+              stb   3,y
+              rora
+              rora
+
+           * next bits
+              tfr   a,b
+              andb  #0x3
+              ldb   b,x
+              stb   2,y
+              rora
+              rora
+
+           * next bits
+              tfr   a,b
+              andb  #0x3
+              ldb   b,x
+              stb   1,y
+              rora
+              rora
+
+           * least significant bit
+              anda  #0x1
+              ldb   a,x
+              stb   temp
+              ldb   ,y
+              andb  #0xf0
+              orb   temp
+              stb   ,y
+			}
+
 			currentX += 8;
 			dst += 4;
 			forwardBytes += 4;
