@@ -168,12 +168,12 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
 		  if ((currentX & 1) == 0) {
 			asm {
               lda  fontByte
+              leax  lookup
               ldy  dst
 
            * most significant bits
               tfr   a,b
               andb  #0x3
-              leax  lookup
               ldb   b,x
               stb   3,y
               rora
@@ -182,7 +182,6 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
            * next bits
               tfr   a,b
               andb  #0x3
-              leax  lookup
               ldb   b,x
               stb   2,y
               rora
@@ -191,7 +190,6 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
            * next bits
               tfr   a,b
               andb  #0x3
-              leax  lookup
               ldb   b,x
               stb   1,y
               rora
@@ -199,7 +197,6 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
 
            * next bits
               anda  #0x3
-              leax  lookup
               ldb   a,x
               stb   ,y
 			}
@@ -228,6 +225,7 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
 		  if ((currentX & 1) == 0) {
 			asm {
               lda  fontByte
+              leax  lookup
               ldy  dst
               rora
               rora
@@ -237,7 +235,6 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
            * most significant bits
               tfr   a,b
               andb  #0x3
-              leax  lookup
               ldb   b,x
               stb   1,y
               rora
@@ -245,7 +242,6 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
 
            * next bits
               anda  #0x3
-              leax  lookup
               ldb   a,x
               stb   ,y
 			}
