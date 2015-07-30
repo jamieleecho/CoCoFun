@@ -156,10 +156,11 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
     byte height = *fontPtr++;
     byte numBytes = (width + 7) / 8;
     byte *dst = (byte *)0x8000 + (y * 160) + x/2;
+	int currentX = x;
 	
     for(int jj=0; jj<height; jj++) {
 	  byte widthBits = width;
-	  int currentX = x;
+	  currentX = x;
 	  int forwardBytes = 0;
 	  for(int ii=0; ii<numBytes; ii++) {
 		byte fontByte = *fontPtr++;
@@ -357,30 +358,54 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
 	  }
 
 	  // Put in whitespace
-	  for(int ii=0; ii<glyphSpacing; ii++) {
-		if (currentX > 319)
-		  break;
-		
-		// Draw the bit
-		if (currentX & 1) {
-		  *dst = (*dst & 0xf0) | background;
-		  dst++;
-		  forwardBytes++;
-		} else {
-		  *dst = (*dst & 0x0f) | bcolor4;
-		}
-		
-		// Iteratre
-		currentX++;		
-		if (currentX > 319)
-		  break;
-	  }
+      byte temp;
+	  asm {
+         clr temp
+         ldx currentX
+         ldy dst
+
+WHITELOOP
+         lda temp
+         cmpa glyphSpacing
+         bge CLIPWHITE
+         cmpx #319
+         bgt CLIPWHITE
+
+         tfr x,d
+         andb #1
+         beq  WHITELEFTNIBBLE
+
+WHITERIGHTNIBBLE
+         lda ,y
+         anda #$f0
+         ora  background
+         sta ,y+
+         ldd  forwardBytes
+         addd #1
+         std  forwardBytes         
+         bra  WHITEITER
+
+WHITELEFTNIBBLE         
+         lda ,y
+         anda #$0f
+         ora  bcolor4
+         sta ,y
+
+WHITEITER
+		 leax 1,x
+         inc  temp
+         bra  WHITELOOP
+
+CLIPWHITE
+         sty  dst
+         stx  currentX
+		   }
 
 	  dst = dst + 160 - forwardBytes;
 	}
 
 	// Increment to the next character
-	x = x + width + glyphSpacing;
+	x = currentX;
 
 	// Bounds check
 	if (x > 319)
