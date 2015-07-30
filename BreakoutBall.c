@@ -128,7 +128,7 @@ void BreakoutBallTick() {
 		// Was there a collision?
 		if (((p1 <= b1) && (pend >= b1))
 			|| ((b1 <= p1) && (bend >= p1))) {
-		  sound(1, 1);
+		  // sound(1, 1);
 		  breakoutBallSlopeX = (byte)random(5);
 		  breakoutBallSlopeY = (byte)random(5);
 		  breakoutBallIncrementX = 1;

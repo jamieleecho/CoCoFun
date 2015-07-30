@@ -119,10 +119,10 @@ void BreakoutPlayGame() {
 void BreakoutControlPaddle() {
   byte joyX, joyY;
   readJoystick(&joyX, &joyY);
-  if (joyY < 20) {
+  if (joyY < 21) {
     if (breakoutPaddlePosition > 2)
       breakoutPaddlePosition -= 2;
-  } else if (joyY > 40) {
+  } else if (joyY > 42) {
     if (breakoutPaddlePosition < 146)
       breakoutPaddlePosition += 2;
   }

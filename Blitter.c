@@ -200,10 +200,6 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
               ldb   a,x
               stb   ,y
 			}
-			currentX += 8;
-			dst += 4;
-			forwardBytes += 4;
-			widthBits -= 8;
 		  } else {
 			byte temp;
 			asm {
@@ -256,12 +252,11 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
               orb   temp
               stb   ,y
 			}
-
-			currentX += 8;
-			dst += 4;
-			forwardBytes += 4;
-			widthBits -= 8;
 		  }
+		  currentX += 8;
+		  dst += 4;
+		  forwardBytes += 4;
+		  widthBits -= 8;
 		} else if ((widthBits == 4) && (x < 315)) {
 		  if ((currentX & 1) == 0) {
 			asm {
