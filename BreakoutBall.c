@@ -52,7 +52,7 @@ void BreakoutBallMiss() {
   // Decrease the number of balls
   breakoutNumberOfBalls--;
   BreakoutBallDrawCount();
-  sound(1, 10);
+  // sound(1, 1);
 
   // Erase the displayed ball
   blitGraphics2(GrafxDataBlankData, breakoutBallPositionX, breakoutBallPositionY);
@@ -99,7 +99,7 @@ void BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
   // Play a sound if we hit any bricks
   if (numHit > 0) {
 	BreakoutDrawScore();      
-    // sound(20, 1);
+    sound(255, 1);
   }
 }
 

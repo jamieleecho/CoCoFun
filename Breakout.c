@@ -133,9 +133,15 @@ void BreakoutControlPaddle() {
 void BreakoutDrawScore() {
   char buffer[13];
   BreakoutScoreFormat(&breakoutScore, buffer);
-  for(int ii = 6; ii<12; ii++)
-	buffer[ii] = ' ';
-  buffer[12] = 0;
+
+  // Hack - add white space to compensate for "1"s that are
+  // smaller than the other numbers
+  byte ii;
+  byte jj = 6;
+  for(byte ii=0; ii<6; ii++)
+	if (buffer[ii] == '1')
+		buffer[jj++] = ' ';
+  buffer[jj] = 0;
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
 				  3, 0, 245, 40, buffer);
 }
