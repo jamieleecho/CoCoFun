@@ -44,7 +44,7 @@ void BreakoutBallDrawCount() {
   buffer[1] = ' ';
   buffer[2] = 0;
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
-				  14, 0, 270, 70, buffer);
+				  14, 0, 270, 70, 1, buffer);
 }
 
 

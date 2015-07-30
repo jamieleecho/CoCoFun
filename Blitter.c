@@ -127,13 +127,13 @@ void blitNumericText(char *text, byte x, byte y) {
 void BlitterDrawText(int *fontIndex, byte *fontData,
 					 byte foreground, byte background,
 					 int x, int y,
+					 byte glyphSpacing,
 					 char *text) {
   // Bounds check
   if ((x > 319) || (y > 191))
 	return;
 
   BlitterMapScreen();
-  byte glyphSpacing = 1;
   byte fcolor4 = foreground << 4;
   byte bcolor4 = background << 4;
   byte lookup[] = { bcolor4 | background, bcolor4 | foreground,

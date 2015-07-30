@@ -86,11 +86,11 @@ void BreakoutPlayGame() {
   hscreen(2);
   *cocoBorderRegister = 0xff;
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
-				  1, 0, 235, 0, "BREAKOUT");
+				  1, 0, 235, 0, 1, "BREAKOUT");
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
-				  3, 0, 250, 30, "SCORE");
+				  3, 0, 250, 30, 1, "SCORE");
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
-				  14, 0, 252, 60, "LIVES");
+				  14, 0, 252, 60, 1, "LIVES");
 
   // Reset data structures
   BreakoutScoreReset(&breakoutScore);
@@ -143,7 +143,7 @@ void BreakoutDrawScore() {
 		buffer[jj++] = ' ';
   buffer[jj] = 0;
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
-				  3, 0, 245, 40, buffer);
+				  3, 0, 245, 40, 1, buffer);
 }
 
 

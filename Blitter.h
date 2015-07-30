@@ -50,11 +50,13 @@ void blitNumericText(char *text, byte x, byte y);
  * @param background[in] Background color on [0, 15]
  * @param x[in] X location in pixels
  * @param y[in] Y location in pixels
+ * @param glyphSpacing[in] spacing between glyphs in pixels
  * @param text[in] Text to output
  */
 void BlitterDrawText(int *fontIndex, byte *fontData,
 					 byte foreground, byte background,
 					 int x, int y,
+					 byte glyphSpacing,
 					 char *text);
 
 
