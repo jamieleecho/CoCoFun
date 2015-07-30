@@ -214,11 +214,8 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
            * most significant bit
               tfr   a,b
               andb  #0x1
+              rolb
               ldb   b,x
-              rolb
-              rolb
-              rolb
-              rolb
               stb   temp
               ldb   4,y
               andb  #0xf
@@ -289,10 +286,6 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
               ldb   a,x
               stb   ,y
 			}
-			currentX += 4;
-			dst += 2;
-			forwardBytes += 2;
-			widthBits -= 4;
 		  } else {
 			byte temp;
 			asm {
@@ -307,11 +300,8 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
            * most significant bit
               tfr   a,b
               andb  #0x1
+              rolb
               ldb   b,x
-              rolb
-              rolb
-              rolb
-              rolb
               stb   temp
               ldb   2,y
               andb  #0xf
@@ -336,6 +326,11 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
               orb   temp
               stb   ,y
 				}
+		  }
+		  currentX += 4;
+		  dst += 2;
+		  forwardBytes += 2;
+		  widthBits -= 4;
 		} else {
 		  for(int kk=0; kk<8; kk++) {
 			// No more bits???
@@ -365,17 +360,12 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
 		if (currentX > 319)
 		  break;
 	  }
-	  dst = dst + 160 - forwardBytes;
-	}
 
-	// Put in some white space
-	x = x + width;
-    dst = (byte *)0x8000 + (y * 160) + x/2;
-    for(int jj=0; jj<height; jj++) {
-	  byte widthBits = glyphSpacing;
-	  int currentX = x;
-	  int forwardBytes = 0;
-	  for(int ii=0; ii<widthBits; ii++) {
+	  // Put in whitespace
+	  for(int ii=0; ii<glyphSpacing; ii++) {
+		if (currentX > 319)
+		  break;
+		
 		// Draw the bit
 		if (currentX & 1) {
 		  *dst = (*dst & 0xf0) | background;
@@ -390,9 +380,12 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
 		if (currentX > 319)
 		  break;
 	  }
+
 	  dst = dst + 160 - forwardBytes;
 	}
-	x = x + glyphSpacing;
+
+	// Increment to the next character
+	x = x + width + glyphSpacing;
 
 	// Bounds check
 	if (x > 319)
