@@ -27,6 +27,7 @@
 #include "BreakoutScore.c"
 #include "Blitter.c"
 
+#define BREAKOUT_FADE_DELAY 2500
 
 /** Breakout palette colors */
 byte breakoutColorPalette[COCO_NUM_PALETTE_REGISTERS] = {
@@ -56,9 +57,8 @@ void BreakoutInit() {
   setHighSpeed(1);
   BlitterInit();
   
-
   // Black out the screen
-  memset(cocoPaletteBaseReg, 0, COCO_NUM_PALETTE_REGISTERS);
+  CoCoMiscPaletteFade(breakoutColorPalette, 0);
 
   // Show the graphics screen
   hscreen(2);
@@ -67,10 +67,6 @@ void BreakoutInit() {
   BricksInit();
   BreakoutScoreInit(&breakoutScore);
   BreakoutBallInit();
-
-  // Set final palette
-  memcpy(cocoPaletteBaseReg, breakoutColorPalette, COCO_NUM_PALETTE_REGISTERS);
-  *cocoBorderRegister = 0xff;
 }
 
 
@@ -84,7 +80,6 @@ void BreakoutPlay() {
 void BreakoutPlayGame() {
   // Clear previous paddle
   hscreen(2);
-  *cocoBorderRegister = 0xff;
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
 				  1, 0, 235, 0, 1, "BREAKOUT");
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
@@ -103,6 +98,10 @@ void BreakoutPlayGame() {
   BreakoutDrawScore();  
   BreakoutBallDrawCount();
   BricksDrawBricks();
+  blitGraphics2(GrafxDataPaddleData, 4, breakoutPaddlePosition);  
+
+  // Display the screen
+  CoCoMiscFadeIn(breakoutColorPalette, BREAKOUT_FADE_DELAY);
 
   // Play breakout until we run out of balls
   while(breakoutNumberOfBalls > 0) {
@@ -113,6 +112,9 @@ void BreakoutPlayGame() {
 
   // Wait around before starting a new game
   waitkey(0);
+
+  // Make the screen go dark
+  CoCoMiscFadeOut(breakoutColorPalette, BREAKOUT_FADE_DELAY);
 }
 
 

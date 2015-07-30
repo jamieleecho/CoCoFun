@@ -66,4 +66,76 @@ void readJoystick(byte *x, byte *y) {
 }
 
 
+/**
+ * Sets the CoCo Palette, either making it darker or brighter.
+ * @param palette[in] Base palette
+ * @param level[in] 0->2 means darker where 0 is darkest
+ *                     3 means no change
+ *                  4->6 means lighter where 1 is brighest
+ */
+void CoCoMiscPaletteFade(byte *palette, byte level) {
+  switch(level) {
+  case 0:
+	memset(cocoPaletteBaseReg, 0, COCO_NUM_PALETTE_REGISTERS);
+	break;
+  case 1:
+	for(int ii=0; ii<COCO_NUM_PALETTE_REGISTERS; ii++)
+	  cocoPaletteBaseReg[ii] = palette[ii] >> 3;
+	break;
+  case 2:
+	for(int ii=0; ii<COCO_NUM_PALETTE_REGISTERS; ii++)
+	  cocoPaletteBaseReg[ii] = palette[ii] & 0x38;
+	break;
+  case 3:
+	memcpy(cocoPaletteBaseReg, palette, COCO_NUM_PALETTE_REGISTERS);
+	break;
+  case 4:
+	for(int ii=0; ii<COCO_NUM_PALETTE_REGISTERS; ii++)
+	  cocoPaletteBaseReg[ii] = palette[ii] | 0x7;
+	break;
+  case 5:
+	for(int ii=0; ii<COCO_NUM_PALETTE_REGISTERS; ii++)
+	  cocoPaletteBaseReg[ii] = 0x38 | palette[ii];
+	break;
+  case 6:
+	memset(cocoPaletteBaseReg, 0x3f, COCO_NUM_PALETTE_REGISTERS);
+	break;
+  }
+  *cocoBorderRegister = *cocoPaletteBaseReg;
+}
+
+
+/**
+ * Delay loop.
+ * @param count[in] number of times to loop.
+ */
+void CoCoMiscDelay(unsigned int count) {
+  for(int ii=0; ii<count; ii++);
+}
+
+
+/**
+ * Fade into the palette
+ * @param count[in] delay time
+ */
+void CoCoMiscFadeIn(byte *palette, unsigned int count) {
+  for(byte ii=0; ii<4; ii++) {
+	CoCoMiscPaletteFade(palette, ii);
+	CoCoMiscDelay(count);
+  }
+}
+
+
+/**
+ * Fade out of the palette
+ * @param count[in] delay time
+ */
+void CoCoMiscFadeOut(byte *palette, unsigned int count) {
+  for(byte ii=4; ii>0; ii--) {
+	CoCoMiscPaletteFade(palette, ii-1);
+	CoCoMiscDelay(count);
+  }
+}
+
+
 #endif
