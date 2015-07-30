@@ -213,6 +213,7 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
               andb  #0x1
               rolb
               ldb   b,x
+              andb  #0xf0
               stb   temp
               ldb   4,y
               andb  #0xf
@@ -247,6 +248,7 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
            * least significant bit
               anda  #0x1
               ldb   a,x
+              andb  #0x0f
               stb   temp
               ldb   ,y
               andb  #0xf0
@@ -298,6 +300,7 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
               andb  #0x1
               rolb
               ldb   b,x
+              andb  #0xf0
               stb   temp
               ldb   2,y
               andb  #0xf
