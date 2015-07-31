@@ -26,11 +26,13 @@ Dir.foreach(".") do |file|
   glyphImageList = ImageList.new(file)
   glyphImage = glyphImageList[0]
   glyphImagePixels = glyphImage.export_pixels_to_str
-
+ 
   # Convert each pixel in the image to 0 and 1
-  puts "#{1 + glyphImage.columns / reductionFactor} x #{1 + glyphImage.rows / reductionFactor}"
-  pixels = Array.new(1 + glyphImage.columns / reductionFactor) { Array.new(1 + glyphImage.rows / reductionFactor) { ' ' } }
-  bits = Array.new((7 + glyphImage.columns / reductionFactor)/8) { Array.new(1 + glyphImage.rows / reductionFactor) { '0' } }
+  numXBits = (glyphImage.columns + reductionFactor - 1)/reductionFactor
+  numYBits = (glyphImage.rows + reductionFactor - 1)/reductionFactor
+  puts "#{numXBits} x #{numYBits}"
+  bits = Array.new((numXBits + 7)/8) { Array.new(numYBits) { 0 } }
+  pixels = Array.new(numXBits) { Array.new(numYBits) { ' ' } }
   glyphImagePixelsIndex = 0
   (0..(glyphImage.rows-1)).each do |row|
     # Skip rows as needed
@@ -40,6 +42,7 @@ Dir.foreach(".") do |file|
     end
 
     bitMask = 0
+    colCount = 0
     (0..(glyphImage.columns-1)).each do |column|
       # Skip columns as needed
       if ((column % reductionFactor) != 0)
@@ -48,8 +51,9 @@ Dir.foreach(".") do |file|
       end
 
       # Stuff the bits
-      if ((column % 8) == 0) && (column != 0)
-        bits[((column / reductionFactor)/8) - 1][row / reductionFactor] = bitMask
+      colCount = colCount + 1
+      if ((colCount % 8) == 0) && (colCount != 0)
+        bits[(colCount / 8) - 1][row / reductionFactor] = bitMask
         bitMask = 0
       else
         bitMask = (bitMask << 1)
@@ -69,9 +73,11 @@ Dir.foreach(".") do |file|
     end
 
     # Update bits array
-    bitsToShift = 7 - ((glyphImage.columns / reductionFactor) % 8)
-    bitMask = bitMask << bitsToShift
-    bits[(glyphImage.columns / reductionFactor)/8][row / reductionFactor] = bitMask
+    bitsToShift = 8 - (numXBits % 8)
+    if (bitsToShift < 8)
+      bitMask = bitMask << bitsToShift
+      bits[bits.length-1][row / reductionFactor] = bitMask
+    end
 
     # Start a new line
     puts
@@ -142,7 +148,7 @@ chars.each do |myChar|
   firstChar = false
 
   puts
-  puts "// Font Data for #{myChar}"
+  puts "// Font Data for '#{myChar}' #{charData[:width]}x#{charData[:height]}"
   puts "#{charData[:width]}, #{charData[:height]}"
   firstByte = true
   charBytes = charData[:bytes]
