@@ -332,8 +332,10 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
 		  widthBits -= 4;
 		} else {
 		  // No more bits???
-		  if (widthBits != 0xff) {
 		    for(int kk=0; kk<8; kk++) {
+		      if (widthBits == 0)
+			break;
+
 		      if (currentX > 319) {
 			while(widthBits != 0xff) {
 			  if (currentX & 1)
@@ -358,12 +360,9 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
 		      
 		      // Iterate
 		      widthBits--;
-		      if (widthBits == 0xff)
-			break;
 		      fontByte = fontByte << 1;
 		      currentX++;
 		    }
-		  }			
 		}
 	  }
 
