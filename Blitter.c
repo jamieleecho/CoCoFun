@@ -331,33 +331,40 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
 		  forwardBytes += 2;
 		  widthBits -= 4;
 		} else {
-		  for(int kk=0; kk<8; kk++) {
-			// No more bits???
-			if (widthBits == 0xff)
-			  break;
-			
-			// Draw the bit
-			if (currentX & 1) {
-			  byte color = (fontByte & 0x80) ? foreground : background;
-			  *dst = (*dst & 0xf0) | color;
-			  dst++;
-			  forwardBytes++;
-			} else {
-			  byte color = (fontByte & 0x80) ? fcolor4 : bcolor4;
-			  *dst = (*dst & 0x0f) | color;
+		  // No more bits???
+		  if (widthBits != 0xff) {
+		    for(int kk=0; kk<8; kk++) {
+		      if (currentX > 319) {
+			while(widthBits != 0xff) {
+			  if (currentX & 1)
+			    dst++;
+			  
+			  // Iterate
+			  widthBits--;
 			}
-			
-			// Iterate
-			widthBits--;
-			fontByte = fontByte << 1;
-			currentX++;
-			if (currentX > 319)
-			  break;
-		  }
+			break;
+		      }
+		      
+		      // Draw the bit
+		      if (currentX & 1) {
+			byte color = (fontByte & 0x80) ? foreground : background;
+			*dst = (*dst & 0xf0) | color;
+			dst++;
+			forwardBytes++;
+		      } else {
+			byte color = (fontByte & 0x80) ? fcolor4 : bcolor4;
+			*dst = (*dst & 0x0f) | color;
+		      }
+		      
+		      // Iterate
+		      widthBits--;
+		      if (widthBits == 0xff)
+			break;
+		      fontByte = fontByte << 1;
+		      currentX++;
+		    }
+		  }			
 		}
-
-		if (currentX > 319)
-		  break;
 	  }
 
 	  // Put in whitespace
