@@ -50,15 +50,6 @@ Dir.foreach(".") do |file|
         next
       end
 
-      # Stuff the bits
-      colCount = colCount + 1
-      if ((colCount % 8) == 0) && (colCount != 0)
-        bits[(colCount / 8) - 1][row / reductionFactor] = bitMask
-        bitMask = 0
-      else
-        bitMask = (bitMask << 1)
-      end
-
       # Compute whether or not the pixel is set
       sum = glyphImagePixels.getbyte(glyphImagePixelsIndex)
       sum += glyphImagePixels.getbyte(glyphImagePixelsIndex + 1)
@@ -70,12 +61,21 @@ Dir.foreach(".") do |file|
       pixels[column / reductionFactor][row / reductionFactor] = pixelIsSet ? 1 : 0
       bitMask = bitMask | (pixelIsSet ? 0x1 : 0)
       print pixelIsSet ? '#' : ' '
+
+      # Stuff the bits
+      colCount = colCount + 1
+      if ((colCount % 8) == 0)
+        bits[(colCount / 8) - 1][row / reductionFactor] = bitMask
+        bitMask = 0
+      else
+        bitMask = (bitMask << 1)
+      end
     end
 
     # Update bits array
     bitsToShift = 8 - (numXBits % 8)
     if (bitsToShift < 8)
-      bitMask = bitMask << bitsToShift
+      bitMask = bitMask << (bitsToShift - 1)
       bits[bits.length-1][row / reductionFactor] = bitMask
     end
 
