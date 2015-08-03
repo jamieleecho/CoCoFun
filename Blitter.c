@@ -426,5 +426,12 @@ CLIPWHITE
 }
 
 
+void BlitterClearScreen(byte color) {
+  BlitterMapScreen();
+  color = color & 0xf;
+  memset((byte *)0x8000, (color << 4) | color, 160 * 192);
+  BlitterUnmapScreen();
+}
+
 
 #endif

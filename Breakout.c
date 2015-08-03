@@ -58,11 +58,41 @@ void BreakoutInit() {
   BlitterInit();
   
   // Black out the screen
-  CoCoMiscPaletteFade(breakoutColorPalette, 0);
+  CoCoMiscPaletteFade(breakoutColorPalette, 0, 0);
 
-  // Show the graphics screen
+  // Draw and show the do you have an rgb monitor screen...
   hscreen(2);
+  byte b = 15;
+  byte f = 0;
+  int y = 0;
+  int x = 16;
+  BlitterClearScreen(b);
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+		  f, b, x, y + 0, 0,
+		  "{__________________________________}");
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+		  f, b, x, y + 8, 0,
+		  "~                                                                    ~");
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+		  f, b, x, y + 16, 0,
+		  "~                                                                    ~");
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+		  f, b, x, y + 24, 0,
+		  "~                                                                    ~");
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+		  f, b, x, y + 32, 0,
+		  "~                                                                    ~");
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+		  f, b, x, y + 40, 0,
+		  "[__________________________________]"); 
+  CoCoMiscFadeIn(breakoutColorPalette, BREAKOUT_FADE_DELAY, 15);
+  waitkey(0);
+  
+  
+  // Black out the screen
+  CoCoMiscPaletteFade(breakoutColorPalette, 0, 0);
 
+  
   // Initialize objects
   BricksInit();
   BreakoutScoreInit(&breakoutScore);
@@ -101,7 +131,7 @@ void BreakoutPlayGame() {
   blitGraphics2(GrafxDataPaddleData, 4, breakoutPaddlePosition);  
 
   // Display the screen
-  CoCoMiscFadeIn(breakoutColorPalette, BREAKOUT_FADE_DELAY);
+  CoCoMiscFadeIn(breakoutColorPalette, BREAKOUT_FADE_DELAY, 0);
 
   // Play breakout until we run out of balls
   while(breakoutNumberOfBalls > 0) {
@@ -114,7 +144,7 @@ void BreakoutPlayGame() {
   waitkey(0);
 
   // Make the screen go dark
-  CoCoMiscFadeOut(breakoutColorPalette, BREAKOUT_FADE_DELAY);
+  CoCoMiscFadeOut(breakoutColorPalette, BREAKOUT_FADE_DELAY, 0);
 }
 
 

@@ -59,5 +59,11 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
 					 byte glyphSpacing,
 					 char *text);
 
+/**
+ * Clears the screen to the given color
+ * @param color[in] color to set
+ */
+void BlitterClearScreen(byte color);
+
 
 #endif

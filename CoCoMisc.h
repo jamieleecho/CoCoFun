@@ -72,8 +72,9 @@ void readJoystick(byte *x, byte *y) {
  * @param level[in] 0->2 means darker where 0 is darkest
  *                     3 means no change
  *                  4->6 means lighter where 1 is brighest
+ * @param border[in] [0, 15] slot to set border to
  */
-void CoCoMiscPaletteFade(byte *palette, byte level) {
+void CoCoMiscPaletteFade(byte *palette, byte level, byte border) {
   switch(level) {
   case 0:
 	memset(cocoPaletteBaseReg, 0, COCO_NUM_PALETTE_REGISTERS);
@@ -101,7 +102,7 @@ void CoCoMiscPaletteFade(byte *palette, byte level) {
 	memset(cocoPaletteBaseReg, 0x3f, COCO_NUM_PALETTE_REGISTERS);
 	break;
   }
-  *cocoBorderRegister = *cocoPaletteBaseReg;
+  *cocoBorderRegister = cocoPaletteBaseReg[border];
 }
 
 
@@ -116,11 +117,13 @@ void CoCoMiscDelay(unsigned int count) {
 
 /**
  * Fade into the palette
+ * @param palette[in] palette colors
  * @param count[in] delay time
+ * @param border[in] border color slot
  */
-void CoCoMiscFadeIn(byte *palette, unsigned int count) {
+void CoCoMiscFadeIn(byte *palette, unsigned int count, byte border) {
   for(byte ii=0; ii<4; ii++) {
-	CoCoMiscPaletteFade(palette, ii);
+    CoCoMiscPaletteFade(palette, ii, border);
 	CoCoMiscDelay(count);
   }
 }
@@ -128,11 +131,13 @@ void CoCoMiscFadeIn(byte *palette, unsigned int count) {
 
 /**
  * Fade out of the palette
+ * @param palette[in] palette colors
  * @param count[in] delay time
+ * @param border[in] border color slot
  */
-void CoCoMiscFadeOut(byte *palette, unsigned int count) {
+void CoCoMiscFadeOut(byte *palette, unsigned int count, byte border) {
   for(byte ii=4; ii>0; ii--) {
-	CoCoMiscPaletteFade(palette, ii-1);
+    CoCoMiscPaletteFade(palette, ii-1, border);
 	CoCoMiscDelay(count);
   }
 }
