@@ -426,6 +426,93 @@ CLIPWHITE
 }
 
 
+void BlitterDrawText2(int *fontIndex, byte *fontData,
+					  byte foreground,
+					  int x, int y,
+					  byte glyphSpacing,
+					  char *text) {
+  // Bounds check
+  if ((x > 319) || (y > 191))
+	return;
+  BlitterMapScreen();
+  byte fcolor4 = foreground << 4;
+
+  for(char c = *text++; c != 0; c = *text++) {
+    // Ignore characters that are out of range
+    if ((c < 32) || (c > 127)) {
+      continue;
+	}
+
+    // Ignore unknown glyphs
+    int offset = fontIndex[c - 32];
+    if (offset < 0) {
+      continue;	  
+	}
+
+    byte *fontPtr = fontData + offset;
+    byte width = *fontPtr++;
+    byte height = *fontPtr++;
+    byte numBytes = (width + 7) / 8;
+    byte *dst = (byte *)0x8000 + (y * 160) + x/2;
+	int currentX = x;
+	
+    for(int jj=0; jj<height; jj++) {
+	  byte widthBits = width;
+	  currentX = x;
+	  int forwardBytes = 0;
+	  for(int ii=0; ii<numBytes; ii++) {
+		byte fontByte = *fontPtr++;
+
+		// No more bits???
+		for(int kk=0; kk<8; kk++) {
+		  if (widthBits == 0)
+			break;
+		  
+		  if (currentX > 319) {
+			while(widthBits != 0xff) {
+			  if (currentX & 1)
+			    dst++;
+			  
+			  // Iterate
+			  widthBits--;
+			}
+			break;
+		  }
+		      
+		  // Draw the bit
+		  if (currentX & 1) {
+			if (fontByte & 0x80)
+			  *dst = (*dst & 0xf0) | foreground;
+			dst++;
+			forwardBytes++;
+		  } else {
+			if (fontByte & 0x80)
+			  *dst = (*dst & 0x0f) | fcolor4;
+		  }
+		  
+		  // Iterate
+		  widthBits--;
+		  fontByte = fontByte << 1;
+		  currentX++;
+		}
+	  }
+
+	  dst = dst + 160 - forwardBytes;	  
+	}
+
+	// Increment to the next character
+	x = currentX + glyphSpacing;
+
+	// Bounds check
+	if (x > 319)
+	  break;
+  }
+
+  // Restore MMU and Enable interrupts
+  BlitterUnmapScreen();
+}
+
+
 void BlitterClearScreen(byte color) {
   BlitterMapScreen();
   color = color & 0xf;

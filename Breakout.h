@@ -16,6 +16,9 @@ BreakoutScore breakoutScore;
 /** Initializes Breakout */
 void BreakoutInit();
 
+/** Show the title screen */
+void BreakoutShowMonitorScreen();
+
 /** Draws the current score on the screen */
 void BreakoutDrawScore();
 

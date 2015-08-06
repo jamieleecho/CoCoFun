@@ -137,6 +137,7 @@ puts '// The remaining bytes define 1-bit data organized as bytes for each glyph
 puts "byte fontData[] = {"
 firstChar = true
 chars.each do |myChar| 
+  # Make sure a glyph is defined
   charData = char2CharData[myChar]
   if (charData == nil)
     next

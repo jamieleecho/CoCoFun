@@ -32,9 +32,11 @@
 /** Breakout palette colors */
 byte breakoutColorPalette[COCO_NUM_PALETTE_REGISTERS] = {
   63, 36, 46, 52, 25, 18, 38, 56,
-  7, 54, 40, 34, 10, 2, 9, 0
+  7, 54, 40, 34, 29, 2, 9, 0
 };
  
+
+char *breakoutTitle = "BREAKOUT";
 
 /** Position of the paddle */
 byte breakoutPaddlePosition = 72;
@@ -62,32 +64,7 @@ void BreakoutInit() {
 
   // Draw and show the do you have an rgb monitor screen...
   hscreen(2);
-  byte b = 15;
-  byte f = 0;
-  int y = 0;
-  int x = 16;
-  BlitterClearScreen(b);
-  BlitterDrawText(FontDataFontIndex, FontDataFontData,
-		  f, b, x, y + 0, 0,
-		  "{__________________________________}");
-  BlitterDrawText(FontDataFontIndex, FontDataFontData,
-		  f, b, x, y + 8, 0,
-		  "~                                                                    ~");
-  BlitterDrawText(FontDataFontIndex, FontDataFontData,
-		  f, b, x, y + 16, 0,
-		  "~                                                                    ~");
-  BlitterDrawText(FontDataFontIndex, FontDataFontData,
-		  f, b, x, y + 24, 0,
-		  "~                                                                    ~");
-  BlitterDrawText(FontDataFontIndex, FontDataFontData,
-		  f, b, x, y + 32, 0,
-		  "~                                                                    ~");
-  BlitterDrawText(FontDataFontIndex, FontDataFontData,
-		  f, b, x, y + 40, 0,
-		  "[__________________________________]"); 
-  CoCoMiscFadeIn(breakoutColorPalette, BREAKOUT_FADE_DELAY, 15);
-  waitkey(0);
-  
+  BreakoutShowMonitorScreen();  
   
   // Black out the screen
   CoCoMiscPaletteFade(breakoutColorPalette, 0, 0);
@@ -179,3 +156,51 @@ void BreakoutDrawScore() {
 }
 
 
+void BreakoutShowMonitorScreen() {
+  byte b = 12;
+  byte f = 0;
+  int y = 0;
+  int x = 0;
+  BlitterClearScreen(b);
+
+  // Draw the border
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+				  f, b, x, y + 0, 0,
+				  "{______________________________________}");
+
+  for(byte ii=8; ii<184; ii+=8) {
+	BlitterDrawText(FontDataFontIndex, FontDataFontData,
+					f, b, x, y + ii, 0,
+					"~");
+	BlitterDrawText(FontDataFontIndex, FontDataFontData,
+					f, b, 312, y + ii, 0,
+					"~");
+  }
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+				  f, b, x, y + 184, 0,
+				  "[______________________________________]"); 
+
+  // Draw the title
+  char buffer[2];
+  buffer[1] = 0;
+  for(int jj=0; jj<8; jj++) {
+	buffer[0] = breakoutTitle[jj];
+	int xx = x + (jj * 10) + 120;
+	BlitterDrawText2(FontDataFontIndex, FontDataFontData,
+					15, xx, y + 11, 2, buffer);
+	BlitterDrawText2(FontDataFontIndex, FontDataFontData,
+					2, xx-1, y + 10, 2, buffer);
+  }
+  
+  // Draw the message
+  BlitterDrawText2(FontDataFontIndex, FontDataFontData,
+				   15, x + 16, y + 30, 1, "Press ENTER if the rainbow colors");
+  BlitterDrawText2(FontDataFontIndex, FontDataFontData,
+				   15, x + 16, y + 40, 1, "look correct. Otherwise press the ");
+  BlitterDrawText2(FontDataFontIndex, FontDataFontData,
+				   15, x + 16, y + 50, 1, "SPACEBAR until they look right.");
+
+  // Show the screen
+  CoCoMiscFadeIn(breakoutColorPalette, BREAKOUT_FADE_DELAY, b);
+  waitkey(0);
+}

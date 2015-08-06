@@ -60,6 +60,24 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
 					 char *text);
 
 /**
+ * @param fontIndex[in] index that maps ASCII [32, 127] to offsets into fontData
+ * @param fontData[in] array containing glyph data. Each glyph consists of
+ *                     width and height bytes that specify the glyph size in bits.
+ *                     The remaining data is the 1-bit data for the font packed in
+ *                     bytes.
+ * @param foreground[in] Foreground color on [0, 15]
+ * @param x[in] X location in pixels
+ * @param y[in] Y location in pixels
+ * @param glyphSpacing[in] spacing between glyphs in pixels
+ * @param text[in] Text to output
+ */
+void BlitterDrawText2(int *fontIndex, byte *fontData,
+					  byte foreground,
+					  int x, int y,
+					  byte glyphSpacing,
+					  char *text);
+
+/**
  * Clears the screen to the given color
  * @param color[in] color to set
  */
