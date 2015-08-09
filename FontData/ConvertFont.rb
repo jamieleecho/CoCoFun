@@ -127,14 +127,14 @@ end
 # Output the C data structure for the font index that maps a character to its data structure offset
 puts '// Index into fontData. Maps chars 32->127 to offsets into fontData.'
 puts '// -1 imples a glyph is not defined for that character.'
-puts "int fontIndex[] = {#{offsets.join(",")}};\n"
+puts "unsigned FontDataFontIndex[] = {#{offsets.join(",")}};\n"
 puts
 puts
 
 # Output the C data structure for each character
 puts '// Each glyph is preceded by 2 bytes that define the rows and columns per font'
 puts '// The remaining bytes define 1-bit data organized as bytes for each glyph'
-puts "byte fontData[] = {"
+puts "byte FontDataFontData[] = {"
 firstChar = true
 chars.each do |myChar| 
   # Make sure a glyph is defined

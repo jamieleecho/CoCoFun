@@ -118,15 +118,15 @@ void blitNumericText(char *text, byte x, byte y) {
     if (c < '0') c = '0';
     if (c > '9') c = '9';
     c = c - '0';
-    blitGraphics2((byte *)GrafxDataNumberData + ((int)49 * (int)c), x, y);
+    blitGraphics2((byte *)GrafxDataNumberData + ((unsigned)49 * (unsigned)c), x, y);
     x += 3;
   }
 }
 
 
-void BlitterDrawText(int *fontIndex, byte *fontData,
+void BlitterDrawText(unsigned *fontIndex, byte *fontData,
 					 byte foreground, byte background,
-					 int x, int y,
+					 unsigned x, unsigned y,
 					 byte glyphSpacing,
 					 char *text) {
   // Bounds check
@@ -146,7 +146,7 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
 	}
 
     // Ignore unknown glyphs
-    int offset = fontIndex[c - 32];
+    unsigned offset = fontIndex[c - 32];
     if (offset < 0) {
       continue;	  
 	}
@@ -156,13 +156,13 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
     byte height = *fontPtr++;
     byte numBytes = (width + 7) / 8;
     byte *dst = (byte *)0x8000 + (y * 160) + x/2;
-	int currentX = x;
+	unsigned currentX = x;
 	
-    for(int jj=0; jj<height; jj++) {
+    for(unsigned jj=0; jj<height; jj++) {
 	  byte widthBits = width;
 	  currentX = x;
-	  int forwardBytes = 0;
-	  for(int ii=0; ii<numBytes; ii++) {
+	  unsigned forwardBytes = 0;
+	  for(unsigned ii=0; ii<numBytes; ii++) {
 		byte fontByte = *fontPtr++;
 
 		if ((widthBits >= 8) && (x < 311)) {
@@ -332,7 +332,7 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
 		  widthBits -= 4;
 		} else {
 		  // No more bits???
-		    for(int kk=0; kk<8; kk++) {
+		    for(unsigned kk=0; kk<8; kk++) {
 		      if (widthBits == 0)
 			break;
 
@@ -349,13 +349,13 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
 		      
 		      // Draw the bit
 		      if (currentX & 1) {
-			byte color = (fontByte & 0x80) ? foreground : background;
-			*dst = (*dst & 0xf0) | color;
-			dst++;
-			forwardBytes++;
+				byte color = (fontByte & 0x80) ? foreground : background;
+				*dst = (*dst & 0xf0) | color;
+				dst++;
+				forwardBytes++;
 		      } else {
-			byte color = (fontByte & 0x80) ? fcolor4 : bcolor4;
-			*dst = (*dst & 0x0f) | color;
+				byte color = (fontByte & 0x80) ? fcolor4 : bcolor4;
+				*dst = (*dst & 0x0f) | color;
 		      }
 		      
 		      // Iterate
@@ -426,9 +426,9 @@ CLIPWHITE
 }
 
 
-void BlitterDrawText2(int *fontIndex, byte *fontData,
+void BlitterDrawText2(unsigned *fontIndex, byte *fontData,
 					  byte foreground,
-					  int x, int y,
+					  unsigned x, unsigned y,
 					  byte glyphSpacing,
 					  char *text) {
   // Bounds check
@@ -444,7 +444,7 @@ void BlitterDrawText2(int *fontIndex, byte *fontData,
 	}
 
     // Ignore unknown glyphs
-    int offset = fontIndex[c - 32];
+    unsigned offset = fontIndex[c - 32];
     if (offset < 0) {
       continue;	  
 	}
@@ -454,17 +454,17 @@ void BlitterDrawText2(int *fontIndex, byte *fontData,
     byte height = *fontPtr++;
     byte numBytes = (width + 7) / 8;
     byte *dst = (byte *)0x8000 + (y * 160) + x/2;
-	int currentX = x;
+	unsigned currentX = x;
 	
-    for(int jj=0; jj<height; jj++) {
+    for(unsigned jj=0; jj<height; jj++) {
 	  byte widthBits = width;
 	  currentX = x;
-	  int forwardBytes = 0;
-	  for(int ii=0; ii<numBytes; ii++) {
+	  unsigned forwardBytes = 0;
+	  for(unsigned ii=0; ii<numBytes; ii++) {
 		byte fontByte = *fontPtr++;
 
 		// No more bits???
-		for(int kk=0; kk<8; kk++) {
+		for(unsigned kk=0; kk<8; kk++) {
 		  if (widthBits == 0)
 			break;
 		  

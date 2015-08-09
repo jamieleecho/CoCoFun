@@ -16,14 +16,12 @@
 
 
 void BreakoutScoreInit(BreakoutScore *score) {
-  for(int ii=0; ii<BREAKOUT_SCORE_NUM_BYTES; ii++)
-    score->score[ii] = 0;
+  memset(score, 0, sizeof(*score));
 }
 
 
 void BreakoutScoreReset(BreakoutScore *score) {
-  for(int ii=0; ii<BREAKOUT_SCORE_NUM_BYTES; ii++)
-    score->score[ii] = 0;
+  memset(score, 0, sizeof(*score));
 }
 
 
@@ -46,7 +44,7 @@ NextDigit lda  ,-x
 
 
 void BreakoutScoreFormat(BreakoutScore *score, char *dst) {
-  for(int ii=1; ii<BREAKOUT_SCORE_NUM_BYTES; ii++) {
+  for(byte ii=1; ii<BREAKOUT_SCORE_NUM_BYTES; ii++) {
     dst[2 * (ii - 1)] = ((score->score[ii] >> 4) & 0xf) + '0';
     dst[2 * (ii - 1) + 1] = (score->score[ii] & 0xf) + '0';
   }

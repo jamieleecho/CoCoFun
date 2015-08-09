@@ -36,7 +36,7 @@ byte breakoutColorPalette[COCO_NUM_PALETTE_REGISTERS] = {
 };
  
 
-char *breakoutTitle = "BREAKOUT";
+char *breakoutTitle = "Breakout";
 
 /** Position of the paddle */
 byte breakoutPaddlePosition = 72;
@@ -88,7 +88,7 @@ void BreakoutPlayGame() {
   // Clear previous paddle
   hscreen(2);
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
-				  1, 0, 235, 0, 1, "BREAKOUT");
+				  1, 0, 235, 0, 1, breakoutTitle);
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
 				  3, 0, 250, 30, 1, "SCORE");
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
@@ -159,8 +159,8 @@ void BreakoutDrawScore() {
 void BreakoutShowMonitorScreen() {
   byte b = 12;
   byte f = 0;
-  int y = 0;
-  int x = 0;
+  unsigned y = 0;
+  unsigned x = 0;
   BlitterClearScreen(b);
 
   // Draw the border
@@ -183,9 +183,9 @@ void BreakoutShowMonitorScreen() {
   // Draw the title
   char buffer[2];
   buffer[1] = 0;
-  for(int jj=0; jj<8; jj++) {
+  for(unsigned jj=0; jj<8; jj++) {
 	buffer[0] = breakoutTitle[jj];
-	int xx = x + (jj * 10) + 120;
+	unsigned xx = x + (jj * 10) + 120;
 	BlitterDrawText2(FontDataFontIndex, FontDataFontData,
 					15, xx, y + 11, 2, buffer);
 	BlitterDrawText2(FontDataFontIndex, FontDataFontData,

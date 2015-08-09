@@ -53,9 +53,9 @@ void blitNumericText(char *text, byte x, byte y);
  * @param glyphSpacing[in] spacing between glyphs in pixels
  * @param text[in] Text to output
  */
-void BlitterDrawText(int *fontIndex, byte *fontData,
+void BlitterDrawText(unsigned *fontIndex, byte *fontData,
 					 byte foreground, byte background,
-					 int x, int y,
+					 unsigned x, unsigned y,
 					 byte glyphSpacing,
 					 char *text);
 
@@ -71,9 +71,9 @@ void BlitterDrawText(int *fontIndex, byte *fontData,
  * @param glyphSpacing[in] spacing between glyphs in pixels
  * @param text[in] Text to output
  */
-void BlitterDrawText2(int *fontIndex, byte *fontData,
+void BlitterDrawText2(unsigned *fontIndex, byte *fontData,
 					  byte foreground,
-					  int x, int y,
+					  unsigned x, unsigned y,
 					  byte glyphSpacing,
 					  char *text);
 

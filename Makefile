@@ -1,4 +1,4 @@
-CFLAGS=-a09=/usr/local/bin/lwasm -I/usr/local/share/cmoc
+CFLAGS=--verbose -V
 BREAKOUT_BAS=AsmGameFiles/Breakout.bas
 BREAKOUT_BIN=Breakout.bin
 
@@ -16,10 +16,10 @@ CoCoFun.dsk : Foo.bin Breakout.bin $(BREAKOUT_BAS) $(BREAKOUT_BIN) Oops.bin
 
 Breakout.bin : Breakout.c GrafxData.c BreakoutScore.c BreakoutBall.c Blitter.c Bricks.c \
 			   FontData.c BreakoutBall.c
-	cmoc $< $(CFLAGS)
+	cmoc $(CFLAGS) $< 
 
 %.bin : %.c
-	cmoc $< $(CFLAGS)
+	cmoc $(CFLAGS) $< 
 
 clean :
 	rm -rf CoCoFun.dsk *.bin *.i *.lst *.asm *.hex cfg $(BREAKOUT_BIN)
