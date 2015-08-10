@@ -3,6 +3,17 @@
 require 'rmagick'
 include Magick
 
+class String
+  def is_upper?
+    !!self.match(/\p{Upper}/)
+  end
+
+  def is_lower?
+    !!self.match(/\p{Lower}/)
+    # or: !self.is_upper?
+  end
+end
+
 # Factor to use to reduce size of fonts
 reductionFactor = 5
 
@@ -91,7 +102,8 @@ Dir.foreach(".") do |file|
     :num_width_bytes => bits.length,
     :num_height_bytes => bits[0].length,
     :offset => 0,
-    :bytes => bits
+    :bytes => bits,
+    :skip => :none
   }
   char2CharData[file[0]] = charData
 end
@@ -101,8 +113,10 @@ end
   myChar = [x].pack('c*')
   if ((char2CharData[myChar] != nil) && (char2CharData[myChar.upcase] == nil))
     char2CharData[myChar.upcase] = char2CharData[myChar]
+    char2CharData[myChar][:skip] = :upper
   elsif ((char2CharData[myChar.upcase] != nil) && (char2CharData[myChar] == nil))
     char2CharData[myChar] = char2CharData[myChar.upcase]
+    char2CharData[myChar][:skip] = :lower    
   end
 end
 
@@ -121,7 +135,11 @@ chars.each do |myChar|
   # Update the offset for the given character
   charData[:offset] = offset
   offsets << offset
-  offset = offset + charData[:num_bytes]
+  if (myChar.is_lower? && (charData[:skip] == :lower)) ||
+     (myChar.is_upper? && (charData[:skip] == :upper)) 
+     next
+  end
+  offset = offset + charData[:num_bytes]  
 end
 
 # Output the C data structure for the font index that maps a character to its data structure offset
@@ -143,6 +161,11 @@ chars.each do |myChar|
     next
   end
 
+  if (myChar.is_lower? && (charData[:skip] == :lower)) ||
+     (myChar.is_upper? && (charData[:skip] == :upper))
+    offset = offset + charData[:num_bytes]
+  end
+
   if (!firstChar)
     puts ','
   end
@@ -159,7 +182,6 @@ chars.each do |myChar|
     end
     puts
   end
-
 
 end
 puts "};"

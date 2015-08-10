@@ -1,4 +1,4 @@
-CFLAGS=--verbose -V
+CFLAGS=
 BREAKOUT_BAS=AsmGameFiles/Breakout.bas
 BREAKOUT_BIN=Breakout.bin
 
