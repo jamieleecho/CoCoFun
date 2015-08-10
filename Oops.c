@@ -9,6 +9,8 @@ typedef struct Bitmap {
 } Bitmap;
 
 
+char buffer[] = "Hello";
+
 void foo(Bitmap *b) {
   memset(b, 1, sizeof(*b));
 }

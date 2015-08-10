@@ -31,8 +31,7 @@
 
 /** Breakout palette colors */
 byte breakoutColorPalette[COCO_NUM_PALETTE_REGISTERS] = {
-  63, 36, 46, 52, 25, 18, 38, 56,
-  7, 54, 40, 34, 29, 2, 9, 0
+  63, 36, 46, 52, 25, 18, 38, 56, 7, 54, 40, 34, 11, 41, 9, 0
 };
  
 
@@ -68,7 +67,6 @@ void BreakoutInit() {
   
   // Black out the screen
   CoCoMiscPaletteFade(breakoutColorPalette, 0, 0);
-
   
   // Initialize objects
   BricksInit();
@@ -199,6 +197,9 @@ void BreakoutShowMonitorScreen() {
 				   15, x + 16, y + 40, 1, "look correct. Otherwise press the ");
   BlitterDrawText2(FontDataFontIndex, FontDataFontData,
 				   15, x + 16, y + 50, 1, "SPACEBAR until they look right.");
+
+  // Draw the rainbow
+  blitGraphics2(GrafxDataRainbowData, (byte)(x + 57), (byte)(y + 90));
 
   // Show the screen
   CoCoMiscFadeIn(breakoutColorPalette, BREAKOUT_FADE_DELAY, b);
