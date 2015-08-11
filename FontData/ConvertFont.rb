@@ -116,7 +116,7 @@ end
     char2CharData[myChar][:skip] = :upper
   elsif ((char2CharData[myChar.upcase] != nil) && (char2CharData[myChar] == nil))
     char2CharData[myChar] = char2CharData[myChar.upcase]
-    char2CharData[myChar][:skip] = :lower    
+    char2CharData[myChar][:skip] = :lower
   end
 end
 
@@ -125,7 +125,7 @@ end
 offset = 0
 offsets = []
 chars = (32..127).map{ |x| [x].pack('c*') }
-chars.each do |myChar| 
+chars.each do |myChar|
   charData = char2CharData[myChar]
   if (charData == nil)
     offsets << -1
@@ -136,10 +136,23 @@ chars.each do |myChar|
   charData[:offset] = offset
   offsets << offset
   if (myChar.is_lower? && (charData[:skip] == :lower)) ||
-     (myChar.is_upper? && (charData[:skip] == :upper)) 
+     (myChar.is_upper? && (charData[:skip] == :upper))
      next
   end
-  offset = offset + charData[:num_bytes]  
+  offset = offset + charData[:num_bytes]
+end
+
+# The offsets for the uppercase characters not valid if they
+# should have been skipped. Fix them here.
+upperChars = (65..90).each do |charVal|
+  myChar = [charVal].pack('c*')
+  charData = char2CharData[myChar]
+  if (charData == nil) || (charData[:skip] != :upper)
+    next
+  end
+  offset = char2CharData[myChar.downcase][:offset]
+  charData[:offset] = offset
+  offsets[charVal - 32] = offset
 end
 
 # Output the C data structure for the font index that maps a character to its data structure offset
@@ -163,8 +176,9 @@ chars.each do |myChar|
 
   if (myChar.is_lower? && (charData[:skip] == :lower)) ||
      (myChar.is_upper? && (charData[:skip] == :upper))
-    offset = offset + charData[:num_bytes]
+    next
   end
+  offset = offset + charData[:num_bytes]
 
   if (!firstChar)
     puts ','
