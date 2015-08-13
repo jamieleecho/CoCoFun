@@ -26,15 +26,25 @@
 #include "BreakoutBall.c"
 #include "BreakoutScore.c"
 #include "Blitter.c"
+#include "CoCoMisc.c"
 
+
+/** Loop delay for performing screen fades */
 #define BREAKOUT_FADE_DELAY 2500
 
-/** Breakout palette colors */
-byte breakoutColorPalette[COCO_NUM_PALETTE_REGISTERS] = {
+/** Breakout RGB palette colors */
+byte breakoutRGBColorPalette[COCO_NUM_PALETTE_REGISTERS] = {
   63, 36, 46, 52, 25, 18, 38, 56, 7, 54, 40, 34, 11, 41, 9, 0
 };
  
 
+/** Breakout CMP palette colors */
+byte breakoutCMPColorPalette[COCO_NUM_PALETTE_REGISTERS] = {
+  63, 23, 40, 37, 46, 18, 37, 32, 16, 52, 9, 5, 28, 26, 12, 0
+};
+
+
+/** Game title */
 char *breakoutTitle = "Breakout";
 
 /** Position of the paddle */
@@ -59,14 +69,14 @@ void BreakoutInit() {
   BlitterInit();
   
   // Black out the screen
-  CoCoMiscPaletteFade(breakoutColorPalette, 0, 0);
+  CoCoMiscPaletteFade(breakoutRGBColorPalette, breakoutCMPColorPalette, 0, 0);
 
   // Draw and show the do you have an rgb monitor screen...
   hscreen(2);
   BreakoutShowMonitorScreen();  
   
   // Black out the screen
-  CoCoMiscPaletteFade(breakoutColorPalette, 0, 0);
+  CoCoMiscPaletteFade(breakoutRGBColorPalette, breakoutCMPColorPalette, 0, 0);
   
   // Initialize objects
   BricksInit();
@@ -106,7 +116,7 @@ void BreakoutPlayGame() {
   blitGraphics2(GrafxDataPaddleData, 4, breakoutPaddlePosition);  
 
   // Display the screen
-  CoCoMiscFadeIn(breakoutColorPalette, BREAKOUT_FADE_DELAY, 0);
+  CoCoMiscFadeIn(breakoutRGBColorPalette, breakoutCMPColorPalette, BREAKOUT_FADE_DELAY, 0);
 
   // Play breakout until we run out of balls
   while(breakoutNumberOfBalls > 0) {
@@ -119,7 +129,7 @@ void BreakoutPlayGame() {
   waitkey(0);
 
   // Make the screen go dark
-  CoCoMiscFadeOut(breakoutColorPalette, BREAKOUT_FADE_DELAY, 0);
+  CoCoMiscFadeOut(breakoutRGBColorPalette, breakoutCMPColorPalette, BREAKOUT_FADE_DELAY, 0);
 }
 
 
@@ -202,6 +212,27 @@ void BreakoutShowMonitorScreen() {
   blitGraphics2(GrafxDataRainbowData, (byte)(x + 57), (byte)(y + 90));
 
   // Show the screen
-  CoCoMiscFadeIn(breakoutColorPalette, BREAKOUT_FADE_DELAY, b);
-  waitkey(0);
+  CoCoMiscFadeIn(breakoutRGBColorPalette, breakoutCMPColorPalette, BREAKOUT_FADE_DELAY, b);
+  
+  for(byte key = waitkey(0); key != 0; key = waitkey(0)) {
+	if ((key == 'r') || (key == 'R')) {
+	  CoCoMiscSetRGBMode(1);
+	  break;
+	} 
+
+	if ((key == 'c') || (key == 'C')) {
+	  CoCoMiscSetRGBMode(0);
+	  break;
+	} 
+
+	if (key == ' ') {
+	  CoCoMiscSetRGBMode(!CoCoMiscGetRGBMode());
+	  CoCoMiscPaletteFade(breakoutRGBColorPalette, breakoutCMPColorPalette, 3, 0);
+	} 
+
+	if (key == 13) 
+	  break;
+  }
+
+  CoCoMiscPaletteFade(breakoutRGBColorPalette, breakoutCMPColorPalette, 3, 0);
 }
