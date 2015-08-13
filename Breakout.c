@@ -39,7 +39,7 @@ byte breakoutRGBColorPalette[COCO_NUM_PALETTE_REGISTERS] = {
  
 /** Breakout CMP palette colors */
 byte breakoutCMPColorPalette[COCO_NUM_PALETTE_REGISTERS] = {
-  63, 23, 40, 37, 46, 18, 37, 32, 16, 52, 9, 5, 28, 26, 12, 0
+  48, 23, 40, 37, 46, 18, 37, 32, 16, 52, 9, 5, 28, 26, 12, 0
 };
 
 
