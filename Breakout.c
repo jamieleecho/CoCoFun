@@ -37,7 +37,6 @@ byte breakoutRGBColorPalette[COCO_NUM_PALETTE_REGISTERS] = {
   63, 36, 46, 52, 25, 18, 38, 56, 7, 54, 40, 34, 11, 41, 9, 0
 };
  
-
 /** Breakout CMP palette colors */
 byte breakoutCMPColorPalette[COCO_NUM_PALETTE_REGISTERS] = {
   63, 23, 40, 37, 46, 18, 37, 32, 16, 52, 9, 5, 28, 26, 12, 0
@@ -215,21 +214,25 @@ void BreakoutShowMonitorScreen() {
   CoCoMiscFadeIn(breakoutRGBColorPalette, breakoutCMPColorPalette, BREAKOUT_FADE_DELAY, b);
   
   for(byte key = waitkey(0); key != 0; key = waitkey(0)) {
-	if ((key == 'r') || (key == 'R')) {
+	// RGB or Yes we do not have an RGB monitor
+	if ((key == 'r') || (key == 'R') || (key == 'y') || (key == 'Y')) {
 	  CoCoMiscSetRGBMode(1);
 	  break;
 	} 
 
-	if ((key == 'c') || (key == 'C')) {
+	// Composite or No we do not have an RGB monitor
+	if ((key == 'c') || (key == 'C') || (key == 'n') || (key == 'N')) {
 	  CoCoMiscSetRGBMode(0);
 	  break;
 	} 
 
+	// Swap colors
 	if (key == ' ') {
 	  CoCoMiscSetRGBMode(!CoCoMiscGetRGBMode());
 	  CoCoMiscPaletteFade(breakoutRGBColorPalette, breakoutCMPColorPalette, 3, 0);
 	} 
 
+	// Enter pressed
 	if (key == 13) 
 	  break;
   }
