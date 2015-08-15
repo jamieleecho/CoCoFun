@@ -19,16 +19,13 @@
 void BlitterInit();
 
 
-/** Blit graphics to the screen */
-void blitGraphics();
-
 /**
  * Blits graphics located at bitmap to (x, y)
  * @param bitmap[input] location of bitmap data
  * @param x[input] x byte location
  * @param y[input] y pixel location
  */
-void blitGraphics2(byte *bitmap, byte x, byte y);
+void BlitterDrawGraphics(byte *bitmap, byte x, byte y);
 
 
 /**
@@ -37,7 +34,7 @@ void blitGraphics2(byte *bitmap, byte x, byte y);
  * @param x[input] x byte location
  * @param y[input] y pixel location
  */
-void blitNumericText(char *text, byte x, byte y);
+void BlitterDrawNumericText(char *text, byte x, byte y);
 
 
 /**

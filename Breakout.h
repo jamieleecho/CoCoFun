@@ -31,5 +31,7 @@ void BreakoutPlayGame();
 /** Moves the paddle up and down based on the joystick */
 void BreakoutControlPaddle();
 
+/** Pause the game */
+void BreakoutPauseGame();
 
 #endif

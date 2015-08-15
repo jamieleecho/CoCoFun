@@ -55,7 +55,7 @@ void BreakoutBallMiss() {
   // sound(1, 1);
 
   // Erase the displayed ball
-  blitGraphics2(GrafxDataBlankData, breakoutBallPositionX, breakoutBallPositionY);
+  BlitterDrawGraphics(GrafxDataBlankData, breakoutBallPositionX, breakoutBallPositionY);
 
   // Reset the ball location
   BreakoutBallReset();
@@ -73,7 +73,7 @@ void BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
     
     if (((p1 <= b1) && (pend >= b1))
 	|| ((b1 <= p1) && (bend >= p1))) {
-      blitGraphics2(GrafxDataBlankData, lineBrickXPos, lineBrickYPositions[ii]);
+      BlitterDrawGraphics(GrafxDataBlankData, lineBrickXPos, lineBrickYPositions[ii]);
       lineBrickYPositions[ii] = 0xff;
       breakoutBallSlopeX = (byte)random(5);
       breakoutBallSlopeY = (byte)random(5);
@@ -87,7 +87,7 @@ void BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
       // Remove the brick - if none left, reset the level
       BricksRemove();
       if (BricksAllGone()) {
-		blitGraphics2(GrafxDataBlankData, breakoutBallPositionX, breakoutBallPositionY);
+		BlitterDrawGraphics(GrafxDataBlankData, breakoutBallPositionX, breakoutBallPositionY);
 		BricksReset();
 		BreakoutBallReset();	
 		BricksDrawBricks();
@@ -157,7 +157,7 @@ void BreakoutBallTick() {
   }
 
   // Draw the graphics
-  blitGraphics2(GrafxDataBallData, breakoutBallPositionX, breakoutBallPositionY);
+  BlitterDrawGraphics(GrafxDataBallData, breakoutBallPositionX, breakoutBallPositionY);
 
   // Check collisions with bricks
   for (byte ii=0; ii<brickXPositionsSz; ii++) {

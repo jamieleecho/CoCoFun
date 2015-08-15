@@ -42,7 +42,7 @@ void BlitterUnmapScreen() {
 }
 
 
-void blitGraphics2(byte *bitmap, byte x, byte y) {
+void BlitterDrawGraphics(byte *bitmap, byte x, byte y) {
   // Bounds check
   if ((x > 159) || (y > 191))
     return;
@@ -113,12 +113,12 @@ end_blit
 }
 
 
-void blitNumericText(char *text, byte x, byte y) {
+void BlitterDrawNumericText(char *text, byte x, byte y) {
   for(char c = *text++; c != 0; c = *text++) {
     if (c < '0') c = '0';
     if (c > '9') c = '9';
     c = c - '0';
-    blitGraphics2((byte *)GrafxDataNumberData + ((unsigned)49 * (unsigned)c), x, y);
+    BlitterDrawGraphics((byte *)GrafxDataNumberData + ((unsigned)49 * (unsigned)c), x, y);
     x += 3;
   }
 }

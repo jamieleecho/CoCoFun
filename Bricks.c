@@ -47,7 +47,7 @@ byte BricksAllGone() {
 
 void BricksDrawBricks() {
   for (byte ii=0; ii<brickXPositionsSz; ii++)
-    blitGraphics2(GrafxDataBricksData[ii], brickXPositions[ii], 2);
+    BlitterDrawGraphics(GrafxDataBricksData[ii], brickXPositions[ii], 2);
 }
 
 

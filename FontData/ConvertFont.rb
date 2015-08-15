@@ -37,7 +37,7 @@ Dir.foreach(".") do |file|
   glyphImageList = ImageList.new(file)
   glyphImage = glyphImageList[0]
   glyphImagePixels = glyphImage.export_pixels_to_str
- 
+
   # Convert each pixel in the image to 0 and 1
   numXBits = (glyphImage.columns + reductionFactor - 1)/reductionFactor
   numYBits = (glyphImage.rows + reductionFactor - 1)/reductionFactor

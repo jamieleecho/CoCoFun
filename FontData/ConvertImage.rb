@@ -3,28 +3,12 @@ require './pixel_color'
 require "rmagick"
 include Magick
 
-
-width = 92
-height = 46
-image = Image.new width, height
-
-rectangle = Draw.new
-rectangle.stroke_antialias false
-rectangle.fill "#0040FF"
-rectangle.rectangle 0, 0, width, height
-rectangle.draw image
-
-# Rainbow colors
-colors = ["#FF0000", "#FF8000", "#FFF000", "#00FF00", "#0080FF", "#0000FF", "#FF00FF", "#0040FF"]
-offset = 0
-colors.each do |color|
-  circle = Draw.new
-  circle.fill color
-  circle.stroke_antialias false
-  circle.circle width/2, height, width/2, offset
-  circle.draw image
-  offset = offset + 5
-end
+# Load the image
+file = ARGV[0]
+imageList = ImageList.new(file)
+image = imageList[0]
+width = image.columns
+height = image.rows
 
 # Define the CoCo palette here
 cocoPalette = [ 63, 36, 46, 52, 25, 18, 38, 56, 7, 54, 40, 34, 11, 41, 9, 0 ]

@@ -112,7 +112,7 @@ void BreakoutPlayGame() {
   BreakoutDrawScore();  
   BreakoutBallDrawCount();
   BricksDrawBricks();
-  blitGraphics2(GrafxDataPaddleData, 4, breakoutPaddlePosition);  
+  BlitterDrawGraphics(GrafxDataPaddleData, 4, breakoutPaddlePosition);  
 
   // Display the screen
   CoCoMiscFadeIn(breakoutRGBColorPalette, breakoutCMPColorPalette, BREAKOUT_FADE_DELAY, 0);
@@ -122,7 +122,7 @@ void BreakoutPlayGame() {
     BreakoutControlPaddle();
     BreakoutBallTick();
   }
-  blitGraphics2(GrafxDataPaddleData, 4, breakoutPaddlePosition);
+  BlitterDrawGraphics(GrafxDataPaddleData, 4, breakoutPaddlePosition);
 
   // Wait around before starting a new game
   waitkey(0);
@@ -133,6 +133,10 @@ void BreakoutPlayGame() {
 
 
 void BreakoutControlPaddle() {
+  byte k = inkey();
+  if ((k == 'p') || (k == 'P') || (k ==' '))
+	BreakoutPauseGame();
+
   byte joyX, joyY;
   readJoystick(&joyX, &joyY);
   if (joyY < 21) {
@@ -142,7 +146,7 @@ void BreakoutControlPaddle() {
     if (breakoutPaddlePosition < 146)
       breakoutPaddlePosition += 2;
   }
-  blitGraphics2(GrafxDataPaddleData, 4, breakoutPaddlePosition);
+  BlitterDrawGraphics(GrafxDataPaddleData, 4, breakoutPaddlePosition);
 }
 
 
@@ -208,7 +212,7 @@ void BreakoutShowMonitorScreen() {
 				   15, x + 16, y + 50, 1, "SPACEBAR until they look right.");
 
   // Draw the rainbow
-  blitGraphics2(GrafxDataRainbowData, (byte)(x + 57), (byte)(y + 90));
+  BlitterDrawGraphics(GrafxDataRainbowData, (byte)(x + 57), (byte)(y + 90));
 
   // Show the screen
   CoCoMiscFadeIn(breakoutRGBColorPalette, breakoutCMPColorPalette, BREAKOUT_FADE_DELAY, b);
@@ -237,5 +241,12 @@ void BreakoutShowMonitorScreen() {
 	  break;
   }
 
+  CoCoMiscPaletteFade(breakoutRGBColorPalette, breakoutCMPColorPalette, 3, 0);
+}
+
+
+void BreakoutPauseGame() {  
+  CoCoMiscPaletteFade(breakoutRGBColorPalette, breakoutCMPColorPalette, 2, 0);
+  waitkey(0);
   CoCoMiscPaletteFade(breakoutRGBColorPalette, breakoutCMPColorPalette, 3, 0);
 }
