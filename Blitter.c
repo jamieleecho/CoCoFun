@@ -521,4 +521,8 @@ void BlitterClearScreen(byte color) {
 }
 
 
+void BlitterFillRectangle(int x, int y, int width, int height, byte color) {
+}
+
+
 #endif

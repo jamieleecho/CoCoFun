@@ -233,7 +233,7 @@ void BreakoutShowMonitorScreen() {
 	// Swap colors
 	if (key == ' ') {
 	  CoCoMiscSetRGBMode(!CoCoMiscGetRGBMode());
-	  CoCoMiscPaletteFade(breakoutRGBColorPalette, breakoutCMPColorPalette, 3, 0);
+	  CoCoMiscPaletteFade(breakoutRGBColorPalette, breakoutCMPColorPalette, 3, b);
 	} 
 
 	// Enter pressed
@@ -241,7 +241,7 @@ void BreakoutShowMonitorScreen() {
 	  break;
   }
 
-  CoCoMiscPaletteFade(breakoutRGBColorPalette, breakoutCMPColorPalette, 3, 0);
+  CoCoMiscPaletteFade(breakoutRGBColorPalette, breakoutCMPColorPalette, 3, b);
 }
 
 

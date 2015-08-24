@@ -1,6 +1,8 @@
 CFLAGS=
 BREAKOUT_BAS=AsmGameFiles/Breakout.bas
 BREAKOUT_BIN=Breakout.bin
+MESS_DIR=~/Applications/MacSDLMESS/mame0163
+MESS=$(MESS_DIR)/mess64
 
 CoCoFun.dsk : Foo.bin Breakout.bin $(BREAKOUT_BAS) $(BREAKOUT_BIN) Oops.bin
 	rm -f $@
@@ -25,7 +27,8 @@ clean :
 	rm -rf CoCoFun.dsk *.bin *.i *.lst *.asm *.hex cfg $(BREAKOUT_BIN)
 
 debug : CoCoFun.dsk
-	~/Applications/MacSDLMESS/mess0155/mess coco3 -rompath ~/Applications/MacSDLMESS/mess0155/roms -window -flop1 CoCoFun.dsk -cfg_directory rgb
+	$(MESS) coco3 -rompath $(MESS_DIR)/roms -window -flop1 CoCoFun.dsk -cfg_directory rgb
 
 debug_cmp : CoCoFun.dsk
-	~/Applications/MacSDLMESS/mess0155/mess coco3 -rompath ~/Applications/MacSDLMESS/mess0155/roms -window -flop1 CoCoFun.dsk -cfg_directory cmp
+	$(MESS) coco3 -rompath $(MESS_DIR)/roms -window -flop1 CoCoFun.dsk -cfg_directory cmp
+
