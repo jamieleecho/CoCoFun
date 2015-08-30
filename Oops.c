@@ -1,5 +1,9 @@
 #include <cmoc.h>
 #include <legacy.h>
+#include "CoCoMisc.h"
+#include "CoCo.h"
+
+#include "CoCoMisc.c"
 
 // This causes CMOC to crash on OS X
 // char buffer[] = "HELLO";
@@ -22,6 +26,9 @@ int main() {
   foo(&bb);
   for(byte ii=0; ii<10; ii++)
 	printf("%d\n", bb.bytes[ii]);
+
+  while(1)
+    printf("%d\n", inkey());
   
   return 0;
 }
