@@ -521,7 +521,106 @@ void BlitterClearScreen(byte color) {
 }
 
 
-void BlitterFillRectangle(int x, int y, int width, int height, byte color) {
+void BlitterFillRectangle(unsigned x, unsigned y, unsigned width, unsigned height,
+			  byte color) {
+  BlitterMapScreen();
+  asm { pshs u }
+
+  // Bounds check
+  color = color & 0xf;  
+  if ((x > 319) || (y > 191)) return;
+  if ((width == 0) || (height == 0)) return;
+  unsigned endX = x + width;
+  unsigned endY = y + height;
+  if (endX > 320) endX = 320;
+  if (endY > 192) endY = 192;
+
+  // Figure out what we can quickly blast out in 16-bit chunks
+  width = endY - y;
+  byte startPixels = (byte)(x & 1);
+  byte endPixels = (byte)(endX & 3);
+  byte wordStartX = (byte)((x + 1) >> 1);
+  byte wordEndX = (byte)(wordStartX + (((endX - x - startPixels) >> 2) << 1));
+  word numLines = endY - y;
+  unsigned wordColor = color | (color << 4);
+  wordColor = (wordColor << 8) | wordColor;
+  unsigned ptr = (0x8000 + (160 * y)) + wordStartX;
+  unsigned bytesPerLine = (wordEndX - wordStartX);
+  byte skip = 160 - (byte)bytesPerLine;
+  unsigned endLine;
+  byte temp;
+  asm {
+    ldd ptr
+    ldy numLines
+    tfr d,x
+
+Blast16Rec
+    addd bytesPerLine
+    std endLine
+
+*** Check for the case where we start on an off pixel
+    lda startPixels
+    cmpa #1
+    bne Blast16RecStart
+    ldb -1,x
+    andb #$f0
+    orb color
+    stb -1,x
+
+Blast16RecStart
+*** Blast out 16-bits at a time
+    ldd wordColor
+    cmpx endLine
+    bhs Blast16EndOfLine
+
+Blast16RecLine
+    std ,x++
+    cmpx endLine
+    blo Blast16RecLine
+
+*** Check for pixels not on word boundary
+Blast16EndOfLine
+    lda endPixels
+    beq Blast16NextLine
+    cmpa #2
+    bhs BlastLastByte
+
+*** One remaining pixel
+    andb #$f0
+    stb temp
+    ldb ,x
+    andb #$0f
+    orb temp
+    stb ,x
+    bra Blast16NextLine
+
+*** At least one full byte remaining
+BlastLastByte
+    stb ,x
+    cmpa #3
+    bne Blast16NextLine
+
+*** Final remaining pixel
+    andb #$f0
+    stb temp
+    ldb 1,x
+    andb #$0f
+    orb temp
+    stb 1,x
+
+Blast16NextLine
+*** Prepare for the next line
+    leay -1,y
+    beq Blast16RecDone
+    ldb skip
+    abx
+    tfr x,d
+    bra Blast16Rec
+Blast16RecDone
+ }
+
+  asm { puls u }
+  BlitterUnmapScreen();
 }
 
 

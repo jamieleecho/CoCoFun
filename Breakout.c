@@ -276,6 +276,9 @@ void BreakoutShowTitleScreen() {
   CoCoMiscFadeIn(breakoutRGBColorPalette, breakoutCMPColorPalette,
 		 BREAKOUT_FADE_DELAY, 0);
 
+  BlitterFillRectangle(60, 30, 200, 100, f);
+  BlitterFillRectangle(61, 31, 196, 98, 3);
+
   waitkey(0);
 
   CoCoMiscFadeOut(breakoutRGBColorPalette, breakoutCMPColorPalette,

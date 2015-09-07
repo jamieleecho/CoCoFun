@@ -81,4 +81,14 @@ void BlitterDrawText2(unsigned *fontIndex, byte *fontData,
 void BlitterClearScreen(byte color);
 
 
+/**
+ * Fills a rectangle with the given color
+ * @param x[in] starting x coordinate
+ * @param y[in] starting y coordinate
+ * @param width[in] width in pixels
+ * @param height[in] height in pixels
+ */
+void BlitterFillRectangle(unsigned x, unsigned y, unsigned width, unsigned height,
+			  byte color);
+
 #endif
