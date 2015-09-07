@@ -58,52 +58,53 @@ void readJoystick(byte *x, byte *y) {
 }
 
 
-void CoCoMiscPaletteFade(byte *rgbPalette, byte *cmpPalette, byte level, byte border) {
+void CoCoMiscPaletteFade(byte *rgbPalette, byte *cmpPalette, byte level,
+			 byte border) {
   byte *palette = (_cocoRGBMode) ? rgbPalette : cmpPalette;
-
+  
   switch(level) {
   case 0:
-	memset(cocoPaletteBaseReg, 0, COCO_NUM_PALETTE_REGISTERS);
-	break;
+    memset(cocoPaletteBaseReg, 0, COCO_NUM_PALETTE_REGISTERS);
+    break;
   case 1:
-	if (_cocoRGBMode)
-	  for(int ii=0; ii<COCO_NUM_PALETTE_REGISTERS; ii++)
-		cocoPaletteBaseReg[ii] = palette[ii] >> 3;
-	else
-	  for(int ii=0; ii<COCO_NUM_PALETTE_REGISTERS; ii++)
-		cocoPaletteBaseReg[ii] = palette[ii] & 0x1f;
-	break;
+    if (_cocoRGBMode)
+      for(int ii=0; ii<COCO_NUM_PALETTE_REGISTERS; ii++)
+	cocoPaletteBaseReg[ii] = palette[ii] >> 3;
+    else
+      for(int ii=0; ii<COCO_NUM_PALETTE_REGISTERS; ii++)
+	cocoPaletteBaseReg[ii] = palette[ii] & 0x1f;
+    break;
   case 2:
-	if (_cocoRGBMode)
-	  for(int ii=0; ii<COCO_NUM_PALETTE_REGISTERS; ii++)
-		cocoPaletteBaseReg[ii] = palette[ii] & 0x38;
-	else
-	  for(int ii=0; ii<COCO_NUM_PALETTE_REGISTERS; ii++)
-		cocoPaletteBaseReg[ii] = palette[ii] & 0x2f;
-	break;
+    if (_cocoRGBMode)
+      for(int ii=0; ii<COCO_NUM_PALETTE_REGISTERS; ii++)
+	cocoPaletteBaseReg[ii] = palette[ii] & 0x38;
+    else
+      for(int ii=0; ii<COCO_NUM_PALETTE_REGISTERS; ii++)
+	cocoPaletteBaseReg[ii] = palette[ii] & 0x2f;
+    break;
   case 3:
-	for(int ii=0; ii<COCO_NUM_PALETTE_REGISTERS; ii++)
-	  memcpy(cocoPaletteBaseReg, palette, COCO_NUM_PALETTE_REGISTERS);
-	break;
+    for(int ii=0; ii<COCO_NUM_PALETTE_REGISTERS; ii++)
+      memcpy(cocoPaletteBaseReg, palette, COCO_NUM_PALETTE_REGISTERS);
+    break;
   case 4:
-	if (_cocoRGBMode)
-	  for(int ii=0; ii<COCO_NUM_PALETTE_REGISTERS; ii++)
-		cocoPaletteBaseReg[ii] = palette[ii] | 0x7;
-	else
-	  for(int ii=0; ii<COCO_NUM_PALETTE_REGISTERS; ii++)
-		cocoPaletteBaseReg[ii] = palette[ii] | 0x10;
-	break;
+    if (_cocoRGBMode)
+      for(int ii=0; ii<COCO_NUM_PALETTE_REGISTERS; ii++)
+	cocoPaletteBaseReg[ii] = palette[ii] | 0x7;
+    else
+      for(int ii=0; ii<COCO_NUM_PALETTE_REGISTERS; ii++)
+	cocoPaletteBaseReg[ii] = palette[ii] | 0x10;
+    break;
   case 5:
-	if (_cocoRGBMode)
-	  for(int ii=0; ii<COCO_NUM_PALETTE_REGISTERS; ii++)
-		cocoPaletteBaseReg[ii] = 0x38 | palette[ii];
-	else
-	  for(int ii=0; ii<COCO_NUM_PALETTE_REGISTERS; ii++)
-		cocoPaletteBaseReg[ii] = palette[ii] | 0x20;
-	break;
+    if (_cocoRGBMode)
+      for(int ii=0; ii<COCO_NUM_PALETTE_REGISTERS; ii++)
+	cocoPaletteBaseReg[ii] = 0x38 | palette[ii];
+    else
+      for(int ii=0; ii<COCO_NUM_PALETTE_REGISTERS; ii++)
+	cocoPaletteBaseReg[ii] = palette[ii] | 0x20;
+    break;
   case 6:
-	memset(cocoPaletteBaseReg, 0x3f, COCO_NUM_PALETTE_REGISTERS);
-	break;
+    memset(cocoPaletteBaseReg, 0x3f, COCO_NUM_PALETTE_REGISTERS);
+    break;
   }
   *cocoBorderRegister = cocoPaletteBaseReg[border];
 }
@@ -114,18 +115,20 @@ void CoCoMiscDelay(unsigned int count) {
 }
 
 
-void CoCoMiscFadeIn(byte *rgbPalette, byte *cmpPalette, unsigned int count, byte border) {
+void CoCoMiscFadeIn(byte *rgbPalette, byte *cmpPalette, unsigned int count,
+		    byte border) {
   for(byte ii=0; ii<4; ii++) {
     CoCoMiscPaletteFade(rgbPalette, cmpPalette, ii, border);
-	CoCoMiscDelay(count);
+    CoCoMiscDelay(count);
   }
 }
 
 
-void CoCoMiscFadeOut(byte *rgbPalette, byte *cmpPalette, unsigned int count, byte border) {
+void CoCoMiscFadeOut(byte *rgbPalette, byte *cmpPalette, unsigned int count,
+		     byte border) {
   for(byte ii=4; ii>0; ii--) {
     CoCoMiscPaletteFade(rgbPalette, cmpPalette, ii-1, border);
-	CoCoMiscDelay(count);
+    CoCoMiscDelay(count);
   }
 }
 

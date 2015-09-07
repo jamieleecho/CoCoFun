@@ -11,6 +11,8 @@
 #ifndef _CoCoMisc_h
 #define _CoCoMisc_h
 
+#include <coco.h>
+
 
 /**
  * @param value[in] largest number random() will return

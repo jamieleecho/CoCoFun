@@ -10,7 +10,6 @@
 
 #pragma org 0x3000
 #include <cmoc.h>
-#include <legacy.h>
 #include <coco.h>
 
 #include "Bricks.h"
@@ -30,7 +29,7 @@
 
 
 /** Loop delay for performing screen fades */
-#define BREAKOUT_FADE_DELAY 2500
+#define BREAKOUT_FADE_DELAY 3000
 
 /** Breakout RGB palette colors */
 byte breakoutRGBColorPalette[COCO_NUM_PALETTE_REGISTERS] = {
@@ -86,6 +85,7 @@ void BreakoutInit() {
 
 void BreakoutPlay() {
   while(1) {
+    BreakoutShowTitleScreen();
     BreakoutPlayGame();
   }
 }
@@ -94,12 +94,14 @@ void BreakoutPlay() {
 void BreakoutPlayGame() {
   // Clear previous paddle
   hscreen(2);
+  BlitterDrawText2(FontDataFontIndex, FontDataFontData,
+		   15, 231, 1, 2, breakoutTitle);
+  BlitterDrawText2(FontDataFontIndex, FontDataFontData,
+		   2, 230, 0, 2, breakoutTitle);
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
-				  1, 0, 235, 0, 1, breakoutTitle);
+		  3, 0, 250, 30, 1, "SCORE");
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
-				  3, 0, 250, 30, 1, "SCORE");
-  BlitterDrawText(FontDataFontIndex, FontDataFontData,
-				  14, 0, 252, 60, 1, "LIVES");
+		  14, 0, 252, 60, 1, "LIVES");
 
   // Reset data structures
   BreakoutScoreReset(&breakoutScore);
@@ -115,7 +117,8 @@ void BreakoutPlayGame() {
   BlitterDrawGraphics(GrafxDataPaddleData, 4, breakoutPaddlePosition);  
 
   // Display the screen
-  CoCoMiscFadeIn(breakoutRGBColorPalette, breakoutCMPColorPalette, BREAKOUT_FADE_DELAY, 0);
+  CoCoMiscFadeIn(breakoutRGBColorPalette, breakoutCMPColorPalette,
+		 BREAKOUT_FADE_DELAY, 0);
 
   // Play breakout until we run out of balls
   while(breakoutNumberOfBalls > 0) {
@@ -128,7 +131,8 @@ void BreakoutPlayGame() {
   waitkey(0);
 
   // Make the screen go dark
-  CoCoMiscFadeOut(breakoutRGBColorPalette, breakoutCMPColorPalette, BREAKOUT_FADE_DELAY, 0);
+  CoCoMiscFadeOut(breakoutRGBColorPalette, breakoutCMPColorPalette,
+		  BREAKOUT_FADE_DELAY, 0);
 }
 
 
@@ -167,81 +171,84 @@ void BreakoutDrawScore() {
 }
 
 
+void BreakoutDrawBorderedScreen(byte b, byte f) {
+  BlitterClearScreen(b);
+  
+  unsigned int x = 0, y = 0;
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+		  f, b, x, y + 0, 0,
+		  "{______________________________________}");
+  
+  for(byte ii=8; ii<184; ii+=8) {
+    BlitterDrawText(FontDataFontIndex, FontDataFontData,
+		    f, b, x, y + ii, 0,
+		    "~");
+    BlitterDrawText(FontDataFontIndex, FontDataFontData,
+		    f, b, 312, y + ii, 0,
+		    "~");
+  }
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+		  f, b, x, y + 184, 0,
+		  "[______________________________________]"); 
+}
+
+
 void BreakoutShowMonitorScreen() {
-  byte b = 12;
-  byte f = 0;
+  byte b = 0;
+  byte f = 14;
   unsigned y = 0;
   unsigned x = 0;
-  BlitterClearScreen(b);
 
   // Draw the border
-  BlitterDrawText(FontDataFontIndex, FontDataFontData,
-				  f, b, x, y + 0, 0,
-				  "{______________________________________}");
-
-  for(byte ii=8; ii<184; ii+=8) {
-	BlitterDrawText(FontDataFontIndex, FontDataFontData,
-					f, b, x, y + ii, 0,
-					"~");
-	BlitterDrawText(FontDataFontIndex, FontDataFontData,
-					f, b, 312, y + ii, 0,
-					"~");
-  }
-  BlitterDrawText(FontDataFontIndex, FontDataFontData,
-				  f, b, x, y + 184, 0,
-				  "[______________________________________]"); 
+  BreakoutDrawBorderedScreen(b, 7);
 
   // Draw the title
-  char buffer[2];
-  buffer[1] = 0;
-  for(unsigned jj=0; jj<8; jj++) {
-	buffer[0] = breakoutTitle[jj];
-	unsigned xx = x + (jj * 10) + 120;
-	BlitterDrawText2(FontDataFontIndex, FontDataFontData,
-					15, xx, y + 11, 2, buffer);
-	BlitterDrawText2(FontDataFontIndex, FontDataFontData,
-					2, xx-1, y + 10, 2, buffer);
-  }
+  BlitterDrawText2(FontDataFontIndex, FontDataFontData,
+		   15, x + 120, y + 11, 2, breakoutTitle);
+  BlitterDrawText2(FontDataFontIndex, FontDataFontData,
+		   2, x + 119, y + 10, 2, breakoutTitle);
   
   // Draw the message
   BlitterDrawText2(FontDataFontIndex, FontDataFontData,
-				   15, x + 16, y + 30, 1, "Press ENTER if the rainbow colors");
+		   f, x + 16, y + 30, 1, "Press ENTER if the rainbow colors");
   BlitterDrawText2(FontDataFontIndex, FontDataFontData,
-				   15, x + 16, y + 40, 1, "look correct. Otherwise press the ");
+		   f, x + 16, y + 40, 1, "look correct. Otherwise press the ");
   BlitterDrawText2(FontDataFontIndex, FontDataFontData,
-				   15, x + 16, y + 50, 1, "SPACEBAR until they look right.");
+		   f, x + 16, y + 50, 1, "SPACEBAR until they look right.");
 
   // Draw the rainbow
-  BlitterDrawGraphics(GrafxDataRainbowData, (byte)(x + 57), (byte)(y + 90));
+  BlitterDrawGraphics(GrafxDataRainbowData, (byte)(x + 57), (byte)(y + 100));
 
   // Show the screen
-  CoCoMiscFadeIn(breakoutRGBColorPalette, breakoutCMPColorPalette, BREAKOUT_FADE_DELAY, b);
+  CoCoMiscFadeIn(breakoutRGBColorPalette, breakoutCMPColorPalette,
+		 BREAKOUT_FADE_DELAY, b);
   
   for(byte key = waitkey(0); key != 0; key = waitkey(0)) {
-	// RGB or Yes we do not have an RGB monitor
-	if ((key == 'r') || (key == 'R') || (key == 'y') || (key == 'Y')) {
-	  CoCoMiscSetRGBMode(1);
-	  break;
-	} 
-
-	// Composite or No we do not have an RGB monitor
-	if ((key == 'c') || (key == 'C') || (key == 'n') || (key == 'N')) {
-	  CoCoMiscSetRGBMode(0);
-	  break;
-	} 
-
-	// Swap colors
-	if (key == ' ') {
-	  CoCoMiscSetRGBMode(!CoCoMiscGetRGBMode());
-	  CoCoMiscPaletteFade(breakoutRGBColorPalette, breakoutCMPColorPalette, 3, b);
-	} 
-
-	// Enter pressed
-	if (key == 13) 
-	  break;
+    // RGB or Yes we do not have an RGB monitor
+    if ((key == 'r') || (key == 'R') || (key == 'y') || (key == 'Y')) {
+      CoCoMiscSetRGBMode(1);
+      break;
+    } 
+    
+    // Composite or No we do not have an RGB monitor
+    if ((key == 'c') || (key == 'C') || (key == 'n') || (key == 'N')) {
+      CoCoMiscSetRGBMode(0);
+      break;
+    } 
+    
+    // Swap colors
+    if (key == ' ') {
+      CoCoMiscSetRGBMode(!CoCoMiscGetRGBMode());
+      CoCoMiscPaletteFade(breakoutRGBColorPalette, breakoutCMPColorPalette, 3, b);
+    } 
+    
+    // Enter pressed
+    if (key == 13) 
+      break;
   }
-
-  CoCoMiscPaletteFade(breakoutRGBColorPalette, breakoutCMPColorPalette, 3, b);
+  
+  CoCoMiscFadeOut(breakoutRGBColorPalette, breakoutCMPColorPalette,
+		  BREAKOUT_FADE_DELAY, b);
 }
 
 
@@ -249,4 +256,28 @@ void BreakoutPauseGame() {
   CoCoMiscPaletteFade(breakoutRGBColorPalette, breakoutCMPColorPalette, 2, 0);
   waitkey(0);
   CoCoMiscPaletteFade(breakoutRGBColorPalette, breakoutCMPColorPalette, 3, 0);
+}
+
+
+void BreakoutShowTitleScreen() {
+  BlitterClearScreen(0);
+  
+  // Draw the border
+  byte b = 0, f = 14;    
+  BreakoutDrawBorderedScreen(b, 7);
+
+  // Draw the title
+  unsigned int x = 0, y = 0;
+  BlitterDrawText2(FontDataFontIndex, FontDataFontData,
+		   15, x + 120, y + 11, 2, breakoutTitle);
+  BlitterDrawText2(FontDataFontIndex, FontDataFontData,
+		   2, x + 119, y + 10, 2, breakoutTitle);
+  
+  CoCoMiscFadeIn(breakoutRGBColorPalette, breakoutCMPColorPalette,
+		 BREAKOUT_FADE_DELAY, 0);
+
+  waitkey(0);
+
+  CoCoMiscFadeOut(breakoutRGBColorPalette, breakoutCMPColorPalette,
+		  BREAKOUT_FADE_DELAY, b);
 }

@@ -34,4 +34,16 @@ void BreakoutControlPaddle();
 /** Pause the game */
 void BreakoutPauseGame();
 
+/** 
+ * Draws a bordered screen with the given.
+ * @param b background color [0, 15]
+ * @param f foreground color [0, 15]
+ */
+void BreakoutDrawBorderedScreen(byte b, byte f);
+
+
+/** Shows the title screen */
+void BreakoutShowTitleScreen();
+
+
 #endif

@@ -1,5 +1,4 @@
 #include <cmoc.h>
-#include <legacy.h>
 #include "CoCoMisc.h"
 #include "CoCo.h"
 
