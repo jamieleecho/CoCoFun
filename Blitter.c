@@ -524,7 +524,6 @@ void BlitterClearScreen(byte color) {
 void BlitterFillRectangle(unsigned x, unsigned y, unsigned width, unsigned height,
 			  byte color) {
   BlitterMapScreen();
-  asm { pshs u }
 
   // Bounds check
   color = color & 0xf;  
@@ -537,11 +536,15 @@ void BlitterFillRectangle(unsigned x, unsigned y, unsigned width, unsigned heigh
 
   // Figure out what we can quickly blast out in 16-bit chunks
   width = endY - y;
-  byte startPixels = (byte)(x & 1);
-  byte endPixels = (byte)(endX & 3);
-  byte wordStartX = (byte)((x + 1) >> 1);
-  byte wordEndX = (byte)(wordStartX + (((endX - x - startPixels) >> 2) << 1));
-  word numLines = endY - y;
+  byte startPixels = (byte)(x & 1); // num pixels before 16-bit blasting
+  unsigned blastStartPixel = (x + 1) & 0xfffe; // pixel where 16-bit blasting starts
+  byte wordStartX = (byte)(blastStartPixel >> 1); // byte where 16-bit blasting starts
+  byte numPixelsAfterBlastStartPixel = (byte)(endX - blastStartPixel);
+  byte endPixels = (numPixelsAfterBlastStartPixel & 0x3); // num pixels after blast
+  byte blastPixels = numPixelsAfterBlastStartPixel & 0xfc; // num pixels to blast
+  byte blastBytes = blastPixels >> 1; // num pixels to blast
+  byte wordEndX = (byte)(wordStartX + blastBytes); // byte to stop blasting
+  unsigned numLines = endY - y;
   unsigned wordColor = color | (color << 4);
   wordColor = (wordColor << 8) | wordColor;
   unsigned ptr = (0x8000 + (160 * y)) + wordStartX;
@@ -619,8 +622,9 @@ Blast16NextLine
 Blast16RecDone
  }
 
-  asm { puls u }
   BlitterUnmapScreen();
+
+  printf("%d %d %d %d\n", wordStartX, wordEndX, blastPixels, endPixels);
 }
 
 

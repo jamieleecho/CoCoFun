@@ -204,20 +204,20 @@ void BreakoutShowMonitorScreen() {
 
   // Draw the title
   BlitterDrawText2(FontDataFontIndex, FontDataFontData,
-		   15, x + 120, y + 11, 2, breakoutTitle);
+		   15, x + 122, y + 11, 2, breakoutTitle);
   BlitterDrawText2(FontDataFontIndex, FontDataFontData,
-		   2, x + 119, y + 10, 2, breakoutTitle);
+		   2, x + 121, y + 10, 2, breakoutTitle);
   
   // Draw the message
-  BlitterDrawText2(FontDataFontIndex, FontDataFontData,
-		   f, x + 16, y + 30, 1, "Press ENTER if the rainbow colors");
-  BlitterDrawText2(FontDataFontIndex, FontDataFontData,
-		   f, x + 16, y + 40, 1, "look correct. Otherwise press the ");
-  BlitterDrawText2(FontDataFontIndex, FontDataFontData,
-		   f, x + 16, y + 50, 1, "SPACEBAR until they look right.");
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+		  f, b, x + 28, y + 38, 1, "Press ENTER if the rainbow colors");
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+		  f, b, x + 28, y + 48, 1, "look correct. Otherwise press the ");
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+		  f, b, x + 28, y + 58, 1, "SPACEBAR until they look right.");
 
   // Draw the rainbow
-  BlitterDrawGraphics(GrafxDataRainbowData, (byte)(x + 57), (byte)(y + 100));
+  BlitterDrawGraphics(GrafxDataRainbowData, (byte)(x + 57), (byte)(y + 110));
 
   // Show the screen
   CoCoMiscFadeIn(breakoutRGBColorPalette, breakoutCMPColorPalette,
@@ -269,16 +269,28 @@ void BreakoutShowTitleScreen() {
   // Draw the title
   unsigned int x = 0, y = 0;
   BlitterDrawText2(FontDataFontIndex, FontDataFontData,
-		   15, x + 120, y + 11, 2, breakoutTitle);
+		   15, x + 122, y + 11, 2, breakoutTitle);
   BlitterDrawText2(FontDataFontIndex, FontDataFontData,
-		   2, x + 119, y + 10, 2, breakoutTitle);
+		   2, x + 121, y + 10, 2, breakoutTitle);
   
+  y = 2;
+  BlitterFillRectangle(60, y + 26, 200, 130, f);
+  BlitterFillRectangle(61, y + 27, 198, 128, b);
+  BlitterDrawGraphics(GrafxDataPaddleData, 33, (byte)y + 70);
+  BlitterDrawGraphics(GrafxDataBallData, 53, (byte)y + 89);
+  BlitterFillRectangle(156, y + 27, 4, 128, 1);
+  BlitterFillRectangle(171, y + 27, 4, 128, 3);
+  BlitterFillRectangle(186, y + 27, 4, 128, 9);
+  BlitterFillRectangle(201, y + 27, 4, 128, 5);
+  BlitterFillRectangle(216, y + 27, 4, 128, 4);
+  BlitterFillRectangle(231, y + 27, 4, 128, 14);
+  BlitterFillRectangle(246, y + 27, 4, 128, 10);
+
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+		  f, b, 74, 168, 1, "Press Any Key to Play");
+
   CoCoMiscFadeIn(breakoutRGBColorPalette, breakoutCMPColorPalette,
 		 BREAKOUT_FADE_DELAY, 0);
-
-  BlitterFillRectangle(60, 30, 200, 100, f);
-  BlitterFillRectangle(61, 31, 196, 98, 3);
-
   waitkey(0);
 
   CoCoMiscFadeOut(breakoutRGBColorPalette, breakoutCMPColorPalette,
