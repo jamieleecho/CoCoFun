@@ -544,7 +544,7 @@ void BlitterFillRectangle(unsigned x, unsigned y, unsigned width, unsigned heigh
   byte blastPixels = numPixelsAfterBlastStartPixel & 0xfc; // num pixels to blast
   byte blastBytes = blastPixels >> 1; // num pixels to blast
   byte wordEndX = (byte)(wordStartX + blastBytes); // byte to stop blasting
-  unsigned numLines = endY - y;
+  unsigned numLines = endY - y; // total number of lines
   unsigned wordColor = color | (color << 4);
   wordColor = (wordColor << 8) | wordColor;
   unsigned ptr = (0x8000 + (160 * y)) + wordStartX;
