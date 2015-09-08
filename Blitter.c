@@ -623,8 +623,6 @@ Blast16RecDone
  }
 
   BlitterUnmapScreen();
-
-  printf("%d %d %d %d\n", wordStartX, wordEndX, blastPixels, endPixels);
 }
 
 
