@@ -18,6 +18,10 @@
 byte bricksRemovedCount = 0;
 
 
+/** Colors to use for the bricks */
+byte brickColors[] = { 1, 3, 9, 5, 4, 14, 10 };
+
+
 void BricksInit() {
   BricksReset();
 }
@@ -47,7 +51,7 @@ byte BricksAllGone() {
 
 void BricksDrawBricks() {
   for (byte ii=0; ii<brickXPositionsSz; ii++)
-    BlitterDrawGraphics(GrafxDataBricksData[ii], brickXPositions[ii], 2);
+    BlitterFillRectangle(2 * brickXPositions[ii], 2, 4, 187, brickColors[ii]);
 }
 
 
