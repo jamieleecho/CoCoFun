@@ -127,8 +127,8 @@ void BreakoutPlayGame() {
   }
   BlitterDrawGraphics(GrafxDataPaddleData, 4, breakoutPaddlePosition);
 
-  // Wait around before starting a new game
-  waitkey(0);
+  // Tell the user that the game has ended
+  BreakoutShowGameOver();
 
   // Make the screen go dark
   CoCoMiscFadeOut(breakoutRGBColorPalette, breakoutCMPColorPalette,
@@ -295,4 +295,47 @@ void BreakoutShowTitleScreen() {
 
   CoCoMiscFadeOut(breakoutRGBColorPalette, breakoutCMPColorPalette,
 		  BREAKOUT_FADE_DELAY, b);
+}
+
+
+void BreakoutShowGameOver() {
+  // Location in character coordinates
+  unsigned ww = 16, hh = 5;
+  unsigned xx = (40 - ww)/2, yy = (24 - hh)/2;
+
+  // Locations in pixel coordinates
+  unsigned x = xx * 8, y = yy * 8;
+  unsigned w = ww * 8 - 8, h = hh * 8 - 8;
+  byte f = 14, b = 0;
+
+  // White out the selected area
+  BlitterFillRectangle(x, y, w + 8, h + 8, b);
+
+  // Draw corners
+  BlitterDrawText(FontDataFontIndex, FontDataFontData, 7, b, x, y, 0, "{");
+  BlitterDrawText(FontDataFontIndex, FontDataFontData, 7, b, x + w, y, 0, "}");
+  BlitterDrawText(FontDataFontIndex, FontDataFontData, 7, b, x, y + h, 0, "[");
+  BlitterDrawText(FontDataFontIndex, FontDataFontData, 7, b, x + w, y + h, 0, "]");
+
+  // Draw Horizontal Edges
+  for(unsigned ii = 8; ii < w; ii += 8) {
+    BlitterDrawText(FontDataFontIndex, FontDataFontData,
+		    7, b, ii + x, y, 0, "_");
+    BlitterDrawText(FontDataFontIndex, FontDataFontData,
+		    7, b, ii + x, y + h, 0, "_");
+  }
+
+  // Draw Vertical Edges
+  for(byte ii=8; ii<h; ii+=8) {
+    BlitterDrawText(FontDataFontIndex, FontDataFontData,
+		    7, b, x, ii + y, 0, "~");
+    BlitterDrawText(FontDataFontIndex, FontDataFontData,
+		    7, b, x + w, ii + y, 0, "~");
+  }
+
+  // Draw thw game over message
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+		  f, b, 120, y + 16, 1, "Game Over");
+    
+  waitkey(0);
 }

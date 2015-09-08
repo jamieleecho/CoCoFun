@@ -45,5 +45,7 @@ void BreakoutDrawBorderedScreen(byte b, byte f);
 /** Shows the title screen */
 void BreakoutShowTitleScreen();
 
+/** Tells the user the game is over */
+void BreakoutShowGameOver();
 
 #endif
