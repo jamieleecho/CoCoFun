@@ -99,9 +99,9 @@ void BreakoutPlayGame() {
   BlitterDrawText2(FontDataFontIndex, FontDataFontData,
 		   2, 230, 0, 2, breakoutTitle);
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
-		  3, 0, 250, 30, 1, "SCORE");
+		  3, 0, 247, 30, 2, "SCORE");
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
-		  14, 0, 252, 60, 1, "LIVES");
+		  14, 0, 249, 60, 2, "LIVES");
 
   // Reset data structures
   BreakoutLastDirection = BreakoutLastDirectionNone;
@@ -198,11 +198,11 @@ void BreakoutDrawScore() {
   byte ii;
   byte jj = 6;
   for(byte ii=0; ii<6; ii++)
-	if (buffer[ii] == '1')
-		buffer[jj++] = ' ';
+    if (buffer[ii] == '1')
+      buffer[jj++] = ' ';
   buffer[jj] = 0;
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
-				  3, 0, 245, 40, 1, buffer);
+		  3, 0, 242, 40, 2, buffer);
 }
 
 
