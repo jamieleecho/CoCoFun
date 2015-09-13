@@ -21,7 +21,7 @@ byte breakoutBallWasMissed = 0;
 
 
 void BreakoutBallReset() {
-  breakoutBallPositionX = 30;
+  breakoutBallPositionX = 40;
   breakoutBallPositionY = 3;
   breakoutBallIncrementX = -1;
   breakoutBallIncrementY = 1;
@@ -111,7 +111,7 @@ void BreakoutBallTick() {
     breakoutBallCounterX--;
     breakoutBallPositionX += breakoutBallIncrementX;
 
-    if (breakoutBallPositionX > 115) { 
+    if (breakoutBallPositionX > 108) { 
       breakoutBallIncrementX = -1;
     } else if (breakoutBallPositionX < 4) {
       if (breakoutBallWasMissed) {
