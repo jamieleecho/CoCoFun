@@ -14,6 +14,14 @@
 #include <coco.h>
 
 
+/** Register to write when reading the keyboard */
+byte *CoCoMiscKeyboardScanOutput = (byte *)0xff02;
+
+
+/** Register to read when reading the keyboard */
+byte *CoCoMiscKeyboardScanInput = (byte *)0xff00;
+
+
 /**
  * @param value[in] largest number random() will return
  * @return a random value on [1, value]

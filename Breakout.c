@@ -104,6 +104,8 @@ void BreakoutPlayGame() {
 		  14, 0, 252, 60, 1, "LIVES");
 
   // Reset data structures
+  BreakoutLastDirection = BreakoutLastDirectionNone;
+  BreakoutFirstDirection = BreakoutLastDirectionNone;
   BreakoutScoreReset(&breakoutScore);
   BreakoutBallReset();
   BricksReset();
@@ -137,19 +139,48 @@ void BreakoutPlayGame() {
 
 
 void BreakoutControlPaddle() {
-  byte k = inkey();
-  if ((k == 'p') || (k == 'P') || (k ==' '))
+  // Look for 'p' to pause the game
+  *CoCoMiscKeyboardScanOutput = 0xfe;
+  if (*CoCoMiscKeyboardScanInput == 0xfb)
     BreakoutPauseGame();
+    
+  // Look for up arrow
+  *CoCoMiscKeyboardScanOutput = 0xf7;
+  byte upPressed = (*CoCoMiscKeyboardScanInput == 0xf7);
 
-  byte joyX, joyY;
-  readJoystick(&joyX, &joyY);
-  if (joyY < 21) {
+  // Look for down arrow
+  *CoCoMiscKeyboardScanOutput = 0xef;
+  byte downPressed = (*CoCoMiscKeyboardScanInput == 0xf7);
+
+  // Figure out the direction
+  if (upPressed && downPressed) {
+    if (BreakoutFirstDirection == BreakoutLastDirectionUp)
+      BreakoutLastDirection = BreakoutLastDirectionDown;
+    else if (BreakoutFirstDirection == BreakoutLastDirectionDown)
+      BreakoutLastDirection = BreakoutLastDirectionUp;
+    else
+      BreakoutLastDirection = BreakoutLastDirectionNone; 
+  } else if (upPressed) {
+    BreakoutLastDirection = BreakoutLastDirectionUp;
+    BreakoutFirstDirection = BreakoutLastDirectionUp;
+  } else if (downPressed) {
+    BreakoutLastDirection = BreakoutLastDirectionDown;
+    BreakoutFirstDirection = BreakoutLastDirectionDown;
+  } else {
+    BreakoutLastDirection = BreakoutLastDirectionNone;
+    BreakoutFirstDirection = BreakoutLastDirectionNone;
+  }
+
+  // Move the paddle
+  if (BreakoutLastDirection == BreakoutLastDirectionUp) {
     if (breakoutPaddlePosition > 2)
       breakoutPaddlePosition -= 2;
-  } else if (joyY > 42) {
+  } else if (BreakoutLastDirection == BreakoutLastDirectionDown) {
     if (breakoutPaddlePosition < 146)
       breakoutPaddlePosition += 2;
   }
+
+  // Draw the paddle
   BlitterDrawGraphics(GrafxDataPaddleData, 4, breakoutPaddlePosition);
 }
 

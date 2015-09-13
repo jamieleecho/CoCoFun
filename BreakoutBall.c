@@ -115,27 +115,27 @@ void BreakoutBallTick() {
       breakoutBallIncrementX = -1;
     } else if (breakoutBallPositionX < 4) {
       if (breakoutBallWasMissed) {
-		if (breakoutBallPositionX <= 0) {
-		  BreakoutBallMiss();
-		  return;
-		}
+	if (breakoutBallPositionX <= 0) {
+	  BreakoutBallMiss();
+	  return;
+	}
       } else {	
-		// Check collision with the paddle
-		byte p1 = breakoutPaddlePosition - 2;
-		byte b1 = breakoutBallPositionY - 1;
-		byte pend = p1 + 39;
-		byte bend = b1 + 6;
-		
-		// Was there a collision?
-		if (((p1 <= b1) && (pend >= b1))
-			|| ((b1 <= p1) && (bend >= p1))) {
-		  // sound(1, 1);
-		  breakoutBallSlopeX = (byte)random(5);
-		  breakoutBallSlopeY = (byte)random(5);
-		  breakoutBallIncrementX = 1;
-		} else {
-		  breakoutBallWasMissed = 1;
-		}
+	// Check collision with the paddle       
+	byte p1 = (breakoutPaddlePosition < 8) ? 0 : (breakoutPaddlePosition - 8);
+	byte b1 = breakoutBallPositionY - 1;
+	byte pend = (breakoutPaddlePosition < 8) ? p1 + 45 : p1 + 51;
+	byte bend = b1 + 6;
+	
+	// Was there a collision?
+	if (((p1 <= b1) && (pend >= b1))
+	    || ((b1 <= p1) && (bend >= p1))) {
+	  // sound(1, 1);
+	  breakoutBallSlopeX = (byte)random(5);
+	  breakoutBallSlopeY = (byte)random(5);
+	  breakoutBallIncrementX = 1;
+	} else {
+	  breakoutBallWasMissed = 1;
+	}
       }
     }
   }

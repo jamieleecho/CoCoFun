@@ -10,6 +10,21 @@
 #define _Breakout_h
 
 
+/** No motion */
+#define BreakoutLastDirectionNone (0)
+
+/** Moving up */
+#define BreakoutLastDirectionUp (1)
+
+/** Moving down */
+#define BreakoutLastDirectionDown (2)
+
+/** Last direction of the paddle */
+byte BreakoutLastDirection;
+
+/** First direction of the paddle when both keys are detected */
+byte BreakoutFirstDirection;
+
 /** Score during a breakout game */
 BreakoutScore breakoutScore;
 
