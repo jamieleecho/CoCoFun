@@ -304,17 +304,33 @@ void BreakoutShowTitleScreen() {
 		   2, x + 121, y + 10, 2, breakoutTitle);
   
   y = 2;
-  BlitterFillRectangle(60, y + 26, 200, 130, f);
-  BlitterFillRectangle(61, y + 27, 198, 128, b);
+  BlitterFillRectangle(60, y + 25, 200, 131, f);
+  BlitterFillRectangle(61, y + 26, 198, 129, b);
   BlitterDrawGraphics(GrafxDataPaddleData, 33, (byte)y + 70);
   BlitterDrawGraphics(GrafxDataBallData, 53, (byte)y + 89);
-  BlitterFillRectangle(156, y + 27, 4, 128, 1);
-  BlitterFillRectangle(171, y + 27, 4, 128, 3);
-  BlitterFillRectangle(186, y + 27, 4, 128, 9);
-  BlitterFillRectangle(201, y + 27, 4, 128, 5);
-  BlitterFillRectangle(216, y + 27, 4, 128, 4);
-  BlitterFillRectangle(231, y + 27, 4, 128, 14);
-  BlitterFillRectangle(246, y + 27, 4, 128, 10);
+  for(int ii=0; ii<128; ii += 8) {
+    int yy = y + 27 + ii;
+    BlitterFillRectangle(156, yy, 4, 7, 7);
+    BlitterFillRectangle(156 + 1, yy + 1, 2, 5, 1);
+
+    BlitterFillRectangle(171, yy, 4, 7, 7);
+    BlitterFillRectangle(171 + 1, yy + 1, 2, 5, 3);
+
+    BlitterFillRectangle(186, yy, 4, 7, 7);
+    BlitterFillRectangle(186 + 1, yy + 1, 2, 5, 9);
+
+    BlitterFillRectangle(201, yy, 4, 7, 7);
+    BlitterFillRectangle(201 + 1, yy + 1, 2, 5, 5);
+
+    BlitterFillRectangle(216, yy, 4, 7, 7);
+    BlitterFillRectangle(216 + 1, yy + 1, 2, 5, 14);
+
+    BlitterFillRectangle(231, yy, 4, 7, 7);
+    BlitterFillRectangle(231 + 1, yy + 1, 2, 5, 14);
+
+    BlitterFillRectangle(246, yy, 4, 7, 7);
+    BlitterFillRectangle(246 + 1, yy + 1, 2, 5, 10);
+  }
 
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
 		  f, b, 74, 168, 1, "Press Any Key to Play");

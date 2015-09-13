@@ -78,7 +78,7 @@ byte BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
     
     if (((p1 <= b1) && (pend >= b1))
 	|| ((b1 <= p1) && (bend >= p1))) {
-      BlitterFillRectangle(lineBrickXPos << 1, lineBrickYPositions[ii], 4, 11, 0);
+      BlitterFillRectangle(lineBrickXPos << 1, lineBrickYPositions[ii], 5, 11, 0);
       lineBrickYPositions[ii] = 0xff;
       breakoutBallSlopeX = (byte)random(5);
       breakoutBallSlopeY = (byte)random(5);

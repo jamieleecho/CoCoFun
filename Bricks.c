@@ -56,8 +56,10 @@ void BricksRefresh() {
     byte *brickYPositions = lineBrickYPositions[ii];
     for (byte jj=0; jj<brickYPositionsSz; jj++) {
       byte brickYPosition = brickYPositions[jj];
-      if (brickYPosition != 0xff)
-	BlitterFillRectangle(xpos, brickYPosition, 4, 11, color);
+      if (brickYPosition != 0xff) {
+	BlitterFillRectangle(xpos, brickYPosition, 5, 10, 7);
+	BlitterFillRectangle(xpos+1, brickYPosition+1, 3, 8, color);
+      }
     }
   }
 }
