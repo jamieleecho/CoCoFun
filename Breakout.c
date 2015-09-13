@@ -173,11 +173,15 @@ void BreakoutControlPaddle() {
 
   // Move the paddle
   if (BreakoutLastDirection == BreakoutLastDirectionUp) {
-    if (breakoutPaddlePosition > 2)
+    if (breakoutPaddlePosition > 0) {
+      BlitterFillRectangle(8, breakoutPaddlePosition + 37, 4, 2, 0);      
       breakoutPaddlePosition -= 2;
+    }
   } else if (BreakoutLastDirection == BreakoutLastDirectionDown) {
-    if (breakoutPaddlePosition < 146)
+    if (breakoutPaddlePosition < 148) {
+      BlitterFillRectangle(8, breakoutPaddlePosition, 4, 2, 0);      
       breakoutPaddlePosition += 2;
+    }
   }
 
   // Draw the paddle
