@@ -49,12 +49,6 @@ byte BricksAllGone() {
 }
 
 
-void BricksDrawBricks() {
-  BricksReset();
-  BricksRefresh();
-}
-
-
 void BricksRefresh() {
   for (byte ii=0; ii<brickXPositionsSz; ii++) {
     byte xpos = 2 * brickXPositions[ii];

@@ -70,9 +70,6 @@ void BricksRemove();
 /** @return 1 if all bricks were removed and 0 otherwise */
 byte BricksAllGone();
 
-/** Draw the bricks */
-void BricksDrawBricks();
-
 /** Refreshes the display */
 void BricksRefresh();
 

@@ -115,7 +115,7 @@ void BreakoutPlayGame() {
   // Draw the screen
   BreakoutDrawScore();  
   BreakoutBallDrawCount();
-  BricksDrawBricks();
+  BricksRefresh();
   BlitterDrawGraphics(GrafxDataPaddleData, 4, breakoutPaddlePosition);  
 
   // Display the screen

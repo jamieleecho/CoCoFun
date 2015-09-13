@@ -65,7 +65,7 @@ void BreakoutBallMiss() {
 void BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositions) {
   // We are a little generous with hit detection here to reduce half destroyed bricks
   byte b1 = breakoutBallPositionY;
-  byte bend = b1 + 8;
+  byte bend = b1 + 6;
   byte numHit = 0;
   for(byte ii=0; ii<brickYPositionsSz; ii++) {    
     byte p1 = lineBrickYPositions[ii];
@@ -91,7 +91,7 @@ void BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
 			     12, 11, 0);
 	BricksReset();
 	BreakoutBallReset();	
-	BricksDrawBricks();
+	BricksRefresh();
 	return;
       }
     }
@@ -106,6 +106,9 @@ void BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
 
 
 void BreakoutBallTick() {
+  byte oldX = breakoutBallPositionX;
+  byte oldY = breakoutBallPositionY;
+
   // Move the ball in the X direction
   if (breakoutBallCounterX > 0) {
     breakoutBallCounterX--;
@@ -113,7 +116,7 @@ void BreakoutBallTick() {
 
     if (breakoutBallPositionX > 108) { 
       breakoutBallIncrementX = -1;
-    } else if (breakoutBallPositionX < 4) {
+    } else if (breakoutBallPositionX < 7) {
       if (breakoutBallWasMissed) {
 	if (breakoutBallPositionX <= 0) {
 	  BreakoutBallMiss();
@@ -121,7 +124,7 @@ void BreakoutBallTick() {
 	}
       } else {	
 	// Check collision with the paddle       
-	byte p1 = (breakoutPaddlePosition < 8) ? 0 : (breakoutPaddlePosition - 8);
+	byte p1 = (breakoutPaddlePosition < 7) ? 0 : (breakoutPaddlePosition - 8);
 	byte b1 = breakoutBallPositionY - 1;
 	byte pend = (breakoutPaddlePosition < 8) ? p1 + 45 : p1 + 51;
 	byte bend = b1 + 6;
@@ -144,7 +147,8 @@ void BreakoutBallTick() {
   if (breakoutBallCounterY > 0) {
     breakoutBallCounterY--;
     breakoutBallPositionY += breakoutBallIncrementY;
-    if (breakoutBallPositionY > 179) {
+
+    if (breakoutBallPositionY > 181) {
       breakoutBallIncrementY = -1;  
     } else if (breakoutBallPositionY < 2) {
       breakoutBallIncrementY = +1;  
@@ -157,15 +161,22 @@ void BreakoutBallTick() {
     breakoutBallCounterY = breakoutBallSlopeY;
   }
 
-  // Draw the graphics
-  BlitterDrawGraphics(GrafxDataBallData, breakoutBallPositionX, breakoutBallPositionY);
-
   // Check collisions with bricks
   for (byte ii=0; ii<brickXPositionsSz; ii++) {
     byte pos = brickXPositions[ii];
-    if ((breakoutBallPositionX >= (pos - 7)) && (breakoutBallPositionX < pos))
+    if ((breakoutBallPositionX >= (pos - 5)) && (breakoutBallPositionX < pos))
       BreakoutBallCheckBrickCollision(pos, lineBrickYPositions[ii]);
   }
+
+  // Erase the part of the ball the will not be reset  
+  byte xx = (oldX << 1);
+  byte offsetX = (breakoutBallPositionX < oldX) ? 6 : 0;
+  byte offsetY = (breakoutBallPositionY < oldY) ? 5 : 0;
+  BlitterFillRectangle(xx + offsetX, oldY, 2, 6, 0);
+  BlitterFillRectangle(xx, oldY + offsetY, 8, 1, 0);
+
+  // Draw the graphics
+  BlitterDrawGraphics(GrafxDataBallData, breakoutBallPositionX, breakoutBallPositionY);
 }
 
 
