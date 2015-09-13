@@ -97,15 +97,7 @@ byte BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
 			     ? (breakoutBallPositionX << 1) - 2 : 0,
 			     breakoutBallPositionY
 			     ? breakoutBallPositionY - 1 : 0, 12, 8, 0);
-	BricksReset();
-	BreakoutBallReset();	
-	BricksRefresh();
-
-	sound(1, 2);
-	sound(50, 3);
-	sound(100, 6);
-
-	return 0;
+	return 255;
       }
     }
   }
@@ -179,19 +171,33 @@ void BreakoutBallTick() {
   }
 
   // Erase the part of the ball the will not be reset  
-  byte xx = (oldX << 1);
-  byte offsetX = (breakoutBallPositionX < oldX) ? 6 : 0;
-  byte offsetY = (breakoutBallPositionY < oldY) ? 5 : 0;
-  BlitterFillRectangle(xx + offsetX, oldY, 2, 6, 0);
-  BlitterFillRectangle(xx, oldY + offsetY, 8, 1, 0);
+  if (numHit != 255) {
+    byte xx = (oldX << 1);
+    byte offsetX = (breakoutBallPositionX < oldX) ? 6 : 0;
+    byte offsetY = (breakoutBallPositionY < oldY) ? 5 : 0;
+    BlitterFillRectangle(xx + offsetX, oldY, 2, 6, 0);
+    BlitterFillRectangle(xx, oldY + offsetY, 8, 1, 0);
+  }
 
   // Draw the graphics
   BlitterDrawGraphics(GrafxDataBallData, breakoutBallPositionX, breakoutBallPositionY);
 
   // Play a sound if we hit any bricks
   if (numHit) {
+    // Update the score, play a sound
     BreakoutDrawScore();      
     sound(128, 1);
+
+    // Do we have to reset the board?
+    if (numHit == 255) {
+      BricksReset();
+      BreakoutBallReset();	
+      BricksRefresh();
+      
+      sound(1, 2);
+      sound(50, 3);
+      sound(100, 6);
+    }
   }
 }
 

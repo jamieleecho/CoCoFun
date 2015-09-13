@@ -16,7 +16,7 @@
 /** X positions of all bricks */
 #define brickXPositionsSz 7
 byte brickXPositions[brickXPositionsSz] = {
-  50, 59, 68, 77, 86, 97, 106
+  50, 59, 68, 77, 86, 95, 104
 };
 
 /** Y Positions of all bricks. This array is never modified */

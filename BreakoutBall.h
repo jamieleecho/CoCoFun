@@ -64,7 +64,7 @@ void BreakoutBallMiss();
  * Determines whether the ball is colliding with bricks in lineBrickYPositions.
  * @param lineBrickXPos[in] x position of bricks
  * @param lineBrickYPositions[in/out] Y positions of a line of bricks.
- * @return number of bricks we hit
+ * @return number of bricks we hit - 255 means that we cleared the screen.
  */
 byte BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositions);
 
