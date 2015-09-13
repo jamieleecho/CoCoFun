@@ -39,13 +39,37 @@ void BreakoutPauseGame();
  * @param b background color [0, 15]
  * @param f foreground color [0, 15]
  */
-void BreakoutDrawBorderedScreen(byte b, byte f);
+void BreakoutDrawBorderedScreen(byte f, byte b);
 
 
 /** Shows the title screen */
 void BreakoutShowTitleScreen();
 
+
+/**
+ * Draws a centered dialog box.
+ * @param ww[in] width in character coordinates
+ * @param hh[in] height in character coordinates
+ * @param b background color [0, 15]
+ * @param f foreground color [0, 15]
+ */
+void BreakoutDrawDialogBox(unsigned ww, unsigned hh, byte f, byte b);
+
+
+/**
+ * Clears a centered dialog box with color 0
+ * @param ww[in] width in character coordinates
+ * @param hh[in] height in character coordinates
+ * @param b background color [0, 15]
+ */
+void BreakoutEraseDialogBox(unsigned ww, unsigned hh, byte b);
+
+
 /** Tells the user the game is over */
 void BreakoutShowGameOver();
+
+
+/** Refresh the breakout board */
+void BreakoutRefresh();
 
 #endif

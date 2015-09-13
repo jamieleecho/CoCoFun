@@ -139,7 +139,7 @@ void BreakoutPlayGame() {
 void BreakoutControlPaddle() {
   byte k = inkey();
   if ((k == 'p') || (k == 'P') || (k ==' '))
-	BreakoutPauseGame();
+    BreakoutPauseGame();
 
   byte joyX, joyY;
   readJoystick(&joyX, &joyY);
@@ -171,25 +171,8 @@ void BreakoutDrawScore() {
 }
 
 
-void BreakoutDrawBorderedScreen(byte b, byte f) {
-  BlitterClearScreen(b);
-  
-  unsigned int x = 0, y = 0;
-  BlitterDrawText(FontDataFontIndex, FontDataFontData,
-		  f, b, x, y + 0, 0,
-		  "{______________________________________}");
-  
-  for(byte ii=8; ii<184; ii+=8) {
-    BlitterDrawText(FontDataFontIndex, FontDataFontData,
-		    f, b, x, y + ii, 0,
-		    "~");
-    BlitterDrawText(FontDataFontIndex, FontDataFontData,
-		    f, b, 312, y + ii, 0,
-		    "~");
-  }
-  BlitterDrawText(FontDataFontIndex, FontDataFontData,
-		  f, b, x, y + 184, 0,
-		  "[______________________________________]"); 
+void BreakoutDrawBorderedScreen(byte f, byte b) {
+  BreakoutDrawDialogBox(40, 24, f, b);
 }
 
 
@@ -200,7 +183,7 @@ void BreakoutShowMonitorScreen() {
   unsigned x = 0;
 
   // Draw the border
-  BreakoutDrawBorderedScreen(b, 7);
+  BreakoutDrawBorderedScreen(7, b);
 
   // Draw the title
   BlitterDrawText2(FontDataFontIndex, FontDataFontData,
@@ -253,9 +236,25 @@ void BreakoutShowMonitorScreen() {
 
 
 void BreakoutPauseGame() {  
-  CoCoMiscPaletteFade(breakoutRGBColorPalette, breakoutCMPColorPalette, 2, 0);
+  // Location in character coordinates
+  unsigned ww = 16, hh = 5;
+  byte b = 0, f = 14;
+  BreakoutDrawDialogBox(ww, hh, f, b);
+  
+  // Locations in pixel coordinates
+  unsigned xx = (40 - ww)/2, yy = (24 - hh)/2;
+  unsigned x = xx * 8, y = yy * 8;
+  
+  // Draw the game paused message
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+		  f, b, 112, y + 16, 1, "Game Paused");
+
+  // Wait for the user to response
   waitkey(0);
-  CoCoMiscPaletteFade(breakoutRGBColorPalette, breakoutCMPColorPalette, 3, 0);
+
+  // Restore the screen
+  BreakoutEraseDialogBox(ww, hh, b);
+  BreakoutRefresh();
 }
 
 
@@ -264,7 +263,7 @@ void BreakoutShowTitleScreen() {
   
   // Draw the border
   byte b = 0, f = 14;    
-  BreakoutDrawBorderedScreen(b, 7);
+  BreakoutDrawBorderedScreen(7, b);
 
   // Draw the title
   unsigned int x = 0, y = 0;
@@ -298,9 +297,7 @@ void BreakoutShowTitleScreen() {
 }
 
 
-void BreakoutShowGameOver() {
-  // Location in character coordinates
-  unsigned ww = 16, hh = 5;
+void BreakoutDrawDialogBox(unsigned ww, unsigned hh, byte f, byte b) {
   unsigned xx = (40 - ww)/2, yy = (24 - hh)/2;
 
   // Locations in pixel coordinates
@@ -332,10 +329,41 @@ void BreakoutShowGameOver() {
     BlitterDrawText(FontDataFontIndex, FontDataFontData,
 		    7, b, x + w, ii + y, 0, "~");
   }
+}
 
-  // Draw thw game over message
+
+void BreakoutEraseDialogBox(unsigned ww, unsigned hh, byte b) {
+  unsigned xx = (40 - ww)/2, yy = (24 - hh)/2;
+
+  // Locations in pixel coordinates
+  unsigned x = xx * 8, y = yy * 8;
+  unsigned w = ww * 8 - 8, h = hh * 8 - 8;
+
+  // White out the selected area
+  BlitterFillRectangle(x, y, w + 8, h + 8, b);
+}
+
+
+void BreakoutShowGameOver() {
+  // Location in character coordinates
+  unsigned ww = 16, hh = 5;
+  byte b = 0, f = 14;
+  BreakoutDrawDialogBox(ww, hh, f, b);
+
+  // Locations in pixel coordinates
+  unsigned xx = (40 - ww)/2, yy = (24 - hh)/2;
+  unsigned x = xx * 8, y = yy * 8;
+
+  // Draw the game over message
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
 		  f, b, 120, y + 16, 1, "Game Over");
     
   waitkey(0);
+}
+
+
+void BreakoutRefresh() {
+  BreakoutBallRefresh();
+  BricksRefresh();
+  BlitterDrawGraphics(GrafxDataPaddleData, 4, breakoutPaddlePosition);  
 }

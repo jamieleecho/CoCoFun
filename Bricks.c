@@ -45,13 +45,27 @@ void BricksRemove() {
 
 
 byte BricksAllGone() {
-  return bricksRemovedCount >= (17 * brickXPositionsSz);
+  return bricksRemovedCount >= (brickYPositionsSz * brickXPositionsSz);
 }
 
 
 void BricksDrawBricks() {
-  for (byte ii=0; ii<brickXPositionsSz; ii++)
-    BlitterFillRectangle(2 * brickXPositions[ii], 2, 4, 187, brickColors[ii]);
+  BricksReset();
+  BricksRefresh();
+}
+
+
+void BricksRefresh() {
+  for (byte ii=0; ii<brickXPositionsSz; ii++) {
+    byte xpos = 2 * brickXPositions[ii];
+    byte color = brickColors[ii];
+    byte *brickYPositions = lineBrickYPositions[ii];
+    for (byte jj=0; jj<brickYPositionsSz; jj++) {
+      byte brickYPosition = brickYPositions[jj];
+      if (brickYPosition != 0xff)
+	BlitterFillRectangle(xpos, brickYPosition, 4, 11, color);
+    }
+  }
 }
 
 

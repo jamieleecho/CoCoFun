@@ -72,4 +72,8 @@ void BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
 void BreakoutBallTick();
 
 
+/** Draw the breakout ball */
+void BreakoutBallRefresh();
+
+
 #endif

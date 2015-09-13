@@ -73,4 +73,7 @@ byte BricksAllGone();
 /** Draw the bricks */
 void BricksDrawBricks();
 
+/** Refreshes the display */
+void BricksRefresh();
+
 #endif

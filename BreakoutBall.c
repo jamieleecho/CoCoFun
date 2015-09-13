@@ -169,4 +169,9 @@ void BreakoutBallTick() {
 }
 
 
+void BreakoutBallRefresh() {
+  BlitterDrawGraphics(GrafxDataBallData, breakoutBallPositionX, breakoutBallPositionY);
+}
+
+
 #endif
