@@ -52,17 +52,22 @@ void BreakoutBallMiss() {
   // Decrease the number of balls
   breakoutNumberOfBalls--;
   BreakoutBallDrawCount();
-  // sound(1, 1);
+  sound(100, 2);
+  sound(50, 3);
+  sound(1, 6);
 
   // Erase the displayed ball
-  BlitterFillRectangle(breakoutBallPositionX << 1, breakoutBallPositionY, 12, 11, 0);
+  BlitterFillRectangle(breakoutBallPositionX 
+		       ? (breakoutBallPositionX << 1) - 2 : 0,
+		       breakoutBallPositionY
+		       ? breakoutBallPositionY - 1 : 0, 12, 8, 0);
 
   // Reset the ball location
   BreakoutBallReset();
 }
 
 
-void BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositions) {
+byte BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositions) {
   // We are a little generous with hit detection here to reduce half destroyed bricks
   byte b1 = breakoutBallPositionY;
   byte bend = b1 + 6;
@@ -73,7 +78,7 @@ void BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
     
     if (((p1 <= b1) && (pend >= b1))
 	|| ((b1 <= p1) && (bend >= p1))) {
-      BlitterFillRectangle(lineBrickXPos << 1, lineBrickYPositions[ii], 12, 11, 0);
+      BlitterFillRectangle(lineBrickXPos << 1, lineBrickYPositions[ii], 4, 11, 0);
       lineBrickYPositions[ii] = 0xff;
       breakoutBallSlopeX = (byte)random(5);
       breakoutBallSlopeY = (byte)random(5);
@@ -87,21 +92,25 @@ void BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
       // Remove the brick - if none left, reset the level
       BricksRemove();
       if (BricksAllGone()) {
-	BlitterFillRectangle(breakoutBallPositionX << 1, breakoutBallPositionY,
-			     12, 11, 0);
+	sound(240, 1);
+	BlitterFillRectangle(breakoutBallPositionX 
+			     ? (breakoutBallPositionX << 1) - 2 : 0,
+			     breakoutBallPositionY
+			     ? breakoutBallPositionY - 1 : 0, 12, 8, 0);
 	BricksReset();
 	BreakoutBallReset();	
 	BricksRefresh();
-	return;
+
+	sound(1, 2);
+	sound(50, 3);
+	sound(100, 6);
+
+	return 0;
       }
     }
   }
 
-  // Play a sound if we hit any bricks
-  if (numHit > 0) {
-    BreakoutDrawScore();      
-    sound(255, 1);
-  }
+  return numHit;
 }
 
 
@@ -162,10 +171,11 @@ void BreakoutBallTick() {
   }
 
   // Check collisions with bricks
+  byte numHit = 0;
   for (byte ii=0; ii<brickXPositionsSz; ii++) {
     byte pos = brickXPositions[ii];
     if ((breakoutBallPositionX >= (pos - 5)) && (breakoutBallPositionX < pos))
-      BreakoutBallCheckBrickCollision(pos, lineBrickYPositions[ii]);
+      numHit += BreakoutBallCheckBrickCollision(pos, lineBrickYPositions[ii]);
   }
 
   // Erase the part of the ball the will not be reset  
@@ -177,6 +187,12 @@ void BreakoutBallTick() {
 
   // Draw the graphics
   BlitterDrawGraphics(GrafxDataBallData, breakoutBallPositionX, breakoutBallPositionY);
+
+  // Play a sound if we hit any bricks
+  if (numHit) {
+    BreakoutDrawScore();      
+    sound(128, 1);
+  }
 }
 
 
