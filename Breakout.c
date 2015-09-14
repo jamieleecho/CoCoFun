@@ -51,6 +51,9 @@ byte breakoutPaddlePosition = 72;
 /** current number of balls */
 char breakoutNumberOfBalls;
 
+/** last score drawn by the breakout routine */
+char breakoutLastDrawnScore[7];
+
 
 int main() {
   BreakoutInit();
@@ -105,6 +108,7 @@ void BreakoutPlayGame() {
 		  14, 0, 249, 60, 2, "LIVES");
 
   // Reset data structures
+  memset(breakoutLastDrawnScore, 0, sizeof(breakoutLastDrawnScore));
   BreakoutLastDirection = BreakoutLastDirectionNone;
   BreakoutFirstDirection = BreakoutLastDirectionNone;
   BreakoutScoreReset(&breakoutScore);
@@ -191,9 +195,31 @@ void BreakoutControlPaddle() {
 
 
 void BreakoutDrawScore() {
-  char buffer[7];
+  char buffer[7], buffer2[7];
   BreakoutScoreFormat(&breakoutScore, buffer);
-  BlitterDrawNumericText(buffer, 121, 40);
+  memcpy(buffer2, buffer, sizeof(buffer));
+
+  // Avoid drawing parts of the score that have not changed
+  byte ii;
+  for(ii=0; ii<sizeof(breakoutLastDrawnScore); ii++)
+    if (breakoutLastDrawnScore[ii] != buffer2[ii])
+      break;
+
+  // Score has not changed, do not draw
+  if (ii >= sizeof(breakoutLastDrawnScore))
+    return;
+
+  byte jj;
+  for(jj=sizeof(breakoutLastDrawnScore)-1; jj > ii; jj--)
+    if (breakoutLastDrawnScore[jj-1] != buffer2[jj-1])
+      break;
+  buffer2[jj] = 0;
+
+  if (ii > 0)
+    BlitterDrawNumericText(buffer2 + ii, 121 + ii*5, 40);
+  else
+    BlitterDrawNumericText(buffer2, 121, 40);
+  memcpy(breakoutLastDrawnScore, buffer, sizeof(breakoutLastDrawnScore));
 }
 
 
