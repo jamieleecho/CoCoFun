@@ -119,16 +119,16 @@ void BlitterDrawNumericText(char *text, byte x, byte y) {
     if (c > '9') c = '9';
     c = c - '0';
     BlitterDrawGraphics((byte *)GrafxDataNumberData + ((unsigned)49 * (unsigned)c), x, y);
-    x += 3;
+    x += 5;
   }
 }
 
 
 void BlitterDrawText(unsigned *fontIndex, byte *fontData,
-					 byte foreground, byte background,
-					 unsigned x, unsigned y,
-					 byte glyphSpacing,
-					 char *text) {
+		     byte foreground, byte background,
+		     unsigned x, unsigned y,
+		     byte glyphSpacing,
+		     char *text) {
   // Bounds check
   if ((x > 319) || (y > 191))
 	return;
@@ -427,10 +427,10 @@ CLIPWHITE
 
 
 void BlitterDrawText2(unsigned *fontIndex, byte *fontData,
-					  byte foreground,
-					  unsigned x, unsigned y,
-					  byte glyphSpacing,
-					  char *text) {
+		      byte foreground,
+		      unsigned x, unsigned y,
+		      byte glyphSpacing,
+		      char *text) {
   // Bounds check
   if ((x > 319) || (y > 191))
 	return;
@@ -621,6 +621,51 @@ Blast16NextLine
     bra Blast16Rec
 Blast16RecDone
  }
+
+  BlitterUnmapScreen();
+}
+
+
+/**
+ * Gets rectanguler bitmap data on screen from (x, y)->(x+width-1, y+height-1)
+ * in a format suitable BlitterDrawGraphics.
+ * NO BOUNDARY CHECKING IS PERFORMED.
+ *
+ * @param buffer[out] buffer that has at least 1 + ((x + 1) * y) bytes.
+ * @param x[in] x coordinate in bytes
+ * @param y[in] y coordinate in pixels
+ * @param width[in] width in bytes
+ * @param height[in] height in pixels
+ */
+void BlitterGet(byte *buffer, byte x, byte y, byte width, byte height) {
+  BlitterMapScreen();
+  
+  // Copy the rectangle to buffer
+  for(byte jj=0; jj<height; jj++) {
+    byte *offset = (byte *)(0x8000 + (((unsigned)(jj + y)) * 160) + x);
+    for(byte ii=0; ii<width; ii++)
+      *buffer++ = *offset++;
+    *buffer++ = 0xff;
+  }
+  *buffer = 0xff;
+
+  BlitterUnmapScreen();  
+}
+
+
+void BlitterInitGrafxDataNumberData(byte *buffer) {
+  BlitterMapScreen();
+  
+  char text[2];
+  text[1] = 0;
+  for(byte ii='0'; ii<='9'; ii++) {
+    text[0] = ii;
+    BlitterFillRectangle(0, 0, 10, 8, 0);
+    byte offset = (ii == '1') ? 2 : 0;
+    BlitterDrawText(FontDataFontIndex, FontDataFontData, 3, 0, offset, 0, 0, text);
+    BlitterGet(buffer, 0, 0, 5, 8);
+    buffer += 49;
+  }
 
   BlitterUnmapScreen();
 }

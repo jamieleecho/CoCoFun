@@ -89,4 +89,24 @@ void BlitterClearScreen(byte color);
 void BlitterFillRectangle(unsigned x, unsigned y, unsigned width, unsigned height,
 			  byte color);
 
+
+/**
+ * Gets rectanguler bitmap data on screen from (x, y)->(x+width-1, y+height-1)
+ * in a format suitable BlitterDrawGraphics.
+ *
+ * @param buffer[out] buffer that has at least 1 + ((x + 1) * y) bytes.
+ * @param x[in] x coordinate in bytes
+ * @param y[in] y coordinate in pixels
+ * @param width[in] width in bytes
+ * @param height[in] height in pixels
+ */
+void BlitterGet(byte *buffer, byte x, byte y, byte width, byte height);
+
+
+/**
+ * Initializes GrafxDataNumberData
+ * param buffer[in] pointer to GrafxDataNumberData
+ */
+void BlitterInitGrafxDataNumberData(byte *buffer);
+
 #endif

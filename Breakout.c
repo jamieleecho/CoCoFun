@@ -68,6 +68,7 @@ void BreakoutInit() {
   
   // Black out the screen
   CoCoMiscPaletteFade(breakoutRGBColorPalette, breakoutCMPColorPalette, 0, 0);
+  BlitterInitGrafxDataNumberData(GrafxDataNumberData);
 
   // Draw and show the do you have an rgb monitor screen...
   hscreen(2);
@@ -190,19 +191,9 @@ void BreakoutControlPaddle() {
 
 
 void BreakoutDrawScore() {
-  char buffer[13];
+  char buffer[7];
   BreakoutScoreFormat(&breakoutScore, buffer);
-
-  // Hack - add white space to compensate for "1"s that are
-  // smaller than the other numbers
-  byte ii;
-  byte jj = 6;
-  for(byte ii=0; ii<6; ii++)
-    if (buffer[ii] == '1')
-      buffer[jj++] = ' ';
-  buffer[jj] = 0;
-  BlitterDrawText(FontDataFontIndex, FontDataFontData,
-		  3, 0, 242, 40, 2, buffer);
+  BlitterDrawNumericText(buffer, 121, 40);
 }
 
 
