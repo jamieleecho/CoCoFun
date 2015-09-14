@@ -170,13 +170,11 @@ void BreakoutBallTick() {
   }
 
   // Erase the part of the ball the will not be reset  
-  if (numHit != 255) {
-    byte xx = (oldX << 1);
-    byte offsetX = (breakoutBallPositionX < oldX) ? 6 : 0;
-    byte offsetY = (breakoutBallPositionY < oldY) ? 5 : 0;
-    BlitterFillRectangle(xx + offsetX, oldY, 2, 6, 0);
-    BlitterFillRectangle(xx, oldY + offsetY, 8, 1, 0);
-  }
+  byte xx = (oldX << 1);
+  byte offsetX = (breakoutBallPositionX < oldX) ? 6 : 0;
+  byte offsetY = (breakoutBallPositionY < oldY) ? 5 : 0;
+  BlitterFillRectangle(xx + offsetX, oldY, 2, 6, 0);
+  BlitterFillRectangle(xx, oldY + offsetY, 8, 1, 0);
 
   // Draw the graphics
   BlitterDrawGraphics(GrafxDataBallData, breakoutBallPositionX, breakoutBallPositionY);
