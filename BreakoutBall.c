@@ -52,9 +52,9 @@ void BreakoutBallMiss() {
   // Decrease the number of balls
   breakoutNumberOfBalls--;
   BreakoutBallDrawCount();
-  sound(100, 2);
-  sound(50, 3);
-  sound(1, 6);
+  sound(89, 2);
+  sound(78, 3);
+  sound(58, 6);
 
   // Erase the displayed ball
   BlitterFillRectangle(breakoutBallPositionX 
@@ -91,14 +91,8 @@ byte BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
       
       // Remove the brick - if none left, reset the level
       BricksRemove();
-      if (BricksAllGone()) {
-	sound(240, 1);
-	BlitterFillRectangle(breakoutBallPositionX 
-			     ? (breakoutBallPositionX << 1) - 2 : 0,
-			     breakoutBallPositionY
-			     ? breakoutBallPositionY - 1 : 0, 12, 8, 0);
+      if (BricksAllGone())
 	return 255;
-      }
     }
   }
 
@@ -164,10 +158,15 @@ void BreakoutBallTick() {
 
   // Check collisions with bricks
   byte numHit = 0;
+  byte lastHitX = 0;
   for (byte ii=0; ii<brickXPositionsSz; ii++) {
     byte pos = brickXPositions[ii];
-    if ((breakoutBallPositionX >= (pos - 5)) && (breakoutBallPositionX < pos))
-      numHit += BreakoutBallCheckBrickCollision(pos, lineBrickYPositions[ii]);
+    if ((breakoutBallPositionX >= (pos - 5)) && (breakoutBallPositionX < pos)) {
+      byte newNumHit = BreakoutBallCheckBrickCollision(pos, lineBrickYPositions[ii]);
+      if (newNumHit)
+	lastHitX = ii;
+      numHit |= newNumHit;
+    }
   }
 
   // Erase the part of the ball the will not be reset  
@@ -186,17 +185,23 @@ void BreakoutBallTick() {
   if (numHit) {
     // Update the score, play a sound
     BreakoutDrawScore();      
-    sound(128, 1);
+    sound(brickXSounds[lastHitX], 1);
 
     // Do we have to reset the board?
     if (numHit == 255) {
       BricksReset();
+      
+      BlitterFillRectangle(breakoutBallPositionX 
+			   ? (breakoutBallPositionX << 1) - 2 : 0,
+			   breakoutBallPositionY
+			   ? breakoutBallPositionY - 1 : 0, 12, 8, 0);
       BreakoutBallReset();	
       BricksRefresh();
+      BlitterDrawGraphics(GrafxDataBallData, breakoutBallPositionX, breakoutBallPositionY);
       
-      sound(1, 2);
-      sound(50, 3);
-      sound(100, 6);
+      sound(58, 2);
+      sound(78, 3);
+      sound(89, 6);
     }
   }
 }

@@ -19,6 +19,12 @@ byte brickXPositions[brickXPositionsSz] = {
   50, 59, 68, 77, 86, 95, 104
 };
 
+/** brick sounds */
+byte brickXSounds[brickXPositionsSz] = {
+  89, 108, 125, 133, 147, 159, 170
+};
+
+
 /** Y Positions of all bricks. This array is never modified */
 #define brickYPositionsSz 17
 byte brickYPositions[brickYPositionsSz] = {
