@@ -18,6 +18,10 @@
 #include "Blitter.h"
 #include "Breakout.h"
 #include "CoCoMisc.h"
+#include "Sound.h"
+
+// Disable sound
+#define sound(a, b) { }
 
 #include "GrafxData.c"
 #include "FontData.c"
@@ -26,6 +30,7 @@
 #include "BreakoutScore.c"
 #include "Blitter.c"
 #include "CoCoMisc.c"
+#include "Sound.c"
 
 
 /** Loop delay for performing screen fades */
@@ -70,11 +75,12 @@ void BreakoutInit() {
   BlitterInit();
   
   // Black out the screen
+  hscreen(2);
   CoCoMiscPaletteFade(breakoutRGBColorPalette, breakoutCMPColorPalette, 0, 0);
+  SoundInit();
   BlitterInitGrafxDataNumberData(GrafxDataNumberData);
 
   // Draw and show the do you have an rgb monitor screen...
-  hscreen(2);
   BreakoutShowMonitorScreen();  
   
   // Black out the screen
@@ -97,7 +103,7 @@ void BreakoutPlay() {
 
 void BreakoutPlayGame() {
   // Clear previous paddle
-  hscreen(2);
+  BlitterClearScreen(0);
   BlitterDrawText2(FontDataFontIndex, FontDataFontData,
 		   15, 231, 1, 2, breakoutTitle);
   BlitterDrawText2(FontDataFontIndex, FontDataFontData,

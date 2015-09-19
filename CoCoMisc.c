@@ -11,20 +11,8 @@
 #include "CoCoMisc.h"
 
 
-/** CoCo base palette register */
-byte *cocoPaletteBaseReg = (byte *)0xffb0;
-
 /** Number of palette registers */
 #define COCO_NUM_PALETTE_REGISTERS 16
-
-/** CoCo high speed control register */
-byte *cocoBorderRegister = (byte *)0xff9a;
-
-/** CoCo slow speed control register */
-byte *cocoSlowSpeedReg = (byte *)0xffd8;
-
-/** CoCo high speed control register */
-byte *cocoHighSpeedReg = (byte *)0xffd9;
 
 /** Whether or not we are in RGB mode */
 byte _cocoRGBMode = 1;

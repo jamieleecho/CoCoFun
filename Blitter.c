@@ -12,9 +12,6 @@
 #define _Blitter_c
 
 
-#define BREAKOUT_SCORE_NUM_BYTES 4
-
-
 byte mmuBuffer[4];
 void BlitterInit() {
   memcpy(mmuBuffer, (byte *)0xffa4, sizeof(mmuBuffer));
@@ -22,10 +19,9 @@ void BlitterInit() {
 
 
 /** 
- * Disables interrupts and maps in the screen
+ * Maps in the screen
  */
 void BlitterMapScreen() {
-  asm { orcc      #$50 }
   *((byte *)0xffa4) = 0x30;
   *((byte *)0xffa5) = 0x31;
   *((byte *)0xffa6) = 0x32;
@@ -34,11 +30,10 @@ void BlitterMapScreen() {
 
 
 /**
- * Unmaps the screen and enabled interrupts
+ * Unmaps the screen
  */
 void BlitterUnmapScreen() {
   memcpy((byte *)0xffa4, mmuBuffer, sizeof(mmuBuffer));
-  asm { andcc     #$af }
 }
 
 
@@ -55,7 +50,6 @@ void BlitterDrawGraphics(byte *bitmap, byte x, byte y) {
       ldb  y
       std  XAXIS
 
-      orcc      #$50
       pshs      u
 
 * Setup registers to point to memory

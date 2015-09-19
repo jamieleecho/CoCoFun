@@ -14,13 +14,68 @@
 #include <coco.h>
 
 
-/** Register to write when reading the keyboard */
-byte *CoCoMiscKeyboardScanOutput = (byte *)0xff02;
+/** CoCo base palette register */
+#define cocoPaletteBaseReg ((byte *)0xffb0)
 
+/** CoCo high speed control register */
+#define cocoBorderRegister ((byte *)0xff9a)
+
+/** CoCo slow speed control register */
+#define cocoSlowSpeedReg ((byte *)0xffd8)
+
+/** CoCo high speed control register */
+#define cocoHighSpeedReg ((byte *)0xffd9)
+
+/** Register to write when reading the keyboard */
+#define CoCoMiscKeyboardScanOutput ((byte *)0xff02)
 
 /** Register to read when reading the keyboard */
-byte *CoCoMiscKeyboardScanInput = (byte *)0xff00;
+#define CoCoMiscKeyboardScanInput ((byte *)0xff00)
 
+/** PIA2 Control Register A*/
+#define CoCoMiscPIA2ControlRegisterA ((byte *)0xff21)
+
+/** PIA2 Data Register A*/
+#define CoCoMiscPIA2DataRegisterA ((byte *)0xff20)
+
+/** PIA2 Control Register B*/
+#define CoCoMiscPIA2ControlRegisterB ((byte *)0xff23)
+
+/** PIA2 Data Register B*/
+#define CoCoMiscPIA2DataRegisterB ((byte *)0xff22)
+
+/** PIA1 Control Register A*/
+#define CoCoMiscPIA1ControlRegisterA ((byte *)0xff01)
+
+/** PIA1 Data Register A*/
+#define CoCoMiscPIA1DataRegisterA ((byte *)0xff00)
+
+/** PIA1 Control Register B*/
+#define CoCoMiscPIA1ControlRegisterB ((byte *)0xff03)
+
+/** PIA1 Data Register B*/
+#define CoCoMiscPIA1DataRegisterB ((byte *)0xff02)
+
+/** IRQ Jump Vector address */
+#define CoCoMiscIRQJumpVector ((byte *)0x10c)
+
+/** FIRQ Jump Vector address */
+#define CoCoMiscFIRQJumpVector ((byte *)0x10f)
+
+/** GIME init 0 */
+#define CoCoMiscGIMEInit0 ((byte *)0xff90)
+
+/** GIME init 1*/
+#define CoCoMiscGIMEInit1 ((byte *)0xff91)
+
+/** GIME IRQ enable register */
+#define CoCoMiscGIMEIRQEnable ((byte *)0xff92)
+
+/** GIME FIRQ enable register */
+#define CoCoMiscGIMEFIRQEnable ((byte *)0xff93)
+
+/** GIME Timer */
+#define CoCoMiscGIMETimer ((unsigned *)0xff94)
 
 /**
  * @param value[in] largest number random() will return
