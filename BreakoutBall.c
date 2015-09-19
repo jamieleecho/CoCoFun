@@ -81,9 +81,6 @@ byte BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
 	|| ((b1 <= p1) && (bend >= p1))) {
       BlitterFillRectangle(lineBrickXPos << 1, lineBrickYPositions[ii], 5, 11, 0);
       lineBrickYPositions[ii] = 0xff;
-      breakoutBallSlopeX = (byte)random(3);
-      breakoutBallSlopeY = (byte)random(4) - 1;
-      BreakoutScoreIncrement(&breakoutScore, breakoutBallSlopeX);
       byte changeDirX = (byte)random(20);
       if (changeDirX > 2)
 	breakoutBallIncrementX = -1;
@@ -139,9 +136,10 @@ void BreakoutBallTick() {
 	    breakoutBallSlopeY--;
 	  else if (offset > 7)
 	    breakoutBallSlopeY++;
-	  if (breakoutBallSlopeY >= 0x80)
-	    breakoutBallSlopeY = 0;
-	  else if (breakoutBallSlopeY > 5)
+	  if (breakoutBallSlopeY >= 0x80) {
+	    breakoutBallSlopeY = 1;
+	    breakoutBallIncrementY = -breakoutBallIncrementY;
+	  } else if (breakoutBallSlopeY > 5)
 	    breakoutBallSlopeY = 5;
 
 	  breakoutBallIncrementX = 1;
