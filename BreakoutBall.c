@@ -44,7 +44,7 @@ void BreakoutBallDrawCount() {
   buffer[1] = ' ';
   buffer[2] = 0;
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
-				  14, 0, 270, 70, 1, buffer);
+		  14, 0, 270, 70, 1, buffer);
 }
 
 
@@ -93,7 +93,7 @@ byte BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
       
       // Change the slope
       byte changeSlopeX = (byte)random(21);
-      if ((changeSlopeX < 5) && (breakoutBallSlopeX > 1))
+      if ((changeSlopeX < 10) && (breakoutBallSlopeX > 1))
 	breakoutBallSlopeX--;
       else if ((changeSlopeX > 17) && (breakoutBallSlopeX < 5))
 	breakoutBallSlopeX++;

@@ -117,7 +117,7 @@ void BreakoutPlayGame() {
   BreakoutScoreReset(&breakoutScore);
   BreakoutBallReset();
   BricksReset();
-  breakoutNumberOfBalls = 9;
+  breakoutNumberOfBalls = 5;
   breakoutPaddlePosition = 72;
 
   // Draw the screen
@@ -183,13 +183,13 @@ void BreakoutControlPaddle() {
   // Move the paddle
   if (BreakoutLastDirection == BreakoutLastDirectionUp) {
     if (breakoutPaddlePosition > 0) {
-      BlitterFillRectangle(8, breakoutPaddlePosition + 37, 4, 2, 0);      
-      breakoutPaddlePosition -= 2;
+      BlitterFillRectangle(8, breakoutPaddlePosition + 36, 4, 3, 0);      
+      breakoutPaddlePosition -= 3;
     }
   } else if (BreakoutLastDirection == BreakoutLastDirectionDown) {
     if (breakoutPaddlePosition < 148) {
-      BlitterFillRectangle(8, breakoutPaddlePosition, 4, 2, 0);      
-      breakoutPaddlePosition += 2;
+      BlitterFillRectangle(8, breakoutPaddlePosition, 4, 3, 0);      
+      breakoutPaddlePosition += 3;
     }
   }
 
@@ -430,6 +430,10 @@ void BreakoutShowGameOver() {
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
 		  f, b, 120, y + 16, 1, "Game Over");
     
+  // Wait around a little so that the user does not make the game over disappear
+  // too quickly
+  CoCoMiscDelay(30000);
+
   waitkey(0);
 }
 
