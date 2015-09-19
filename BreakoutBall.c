@@ -226,7 +226,7 @@ void BreakoutBallTick() {
   if (numHit) {
     // Update the score, play a sound
     BreakoutDrawScore();      
-    SoundPlayAndWait(250, brickXSounds[lastHitX], brickXSounds[lastHitX], 128);
+    SoundPlay(250, brickXSounds[lastHitX], brickXSounds[lastHitX], 128);
 
     // Do we have to reset the board?
     if (numHit == 255) {

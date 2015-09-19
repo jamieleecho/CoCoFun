@@ -219,10 +219,7 @@ void BreakoutDrawScore() {
       break;
   buffer2[jj] = 0;
 
-  if (ii > 0)
-    BlitterDrawNumericText(buffer2 + ii, 121 + ii*5, 40);
-  else
-    BlitterDrawNumericText(buffer2, 121, 40);
+  BlitterDrawNumericText(buffer2 + ii, 121 + ii*5, 40);
   memcpy(breakoutLastDrawnScore, buffer, sizeof(breakoutLastDrawnScore));
 }
 

@@ -107,12 +107,61 @@ end_blit
 }
 
 
+/**
+ * Optimized routine for blitting numeric glyphs.
+ * @param bitmap[input] numeric glyph bitmap to draw
+ * @param x[input] x byte location
+ * @param y[input] y pixel location
+ */
+void BlitterDrawNumericGlyph(byte *bitmap, byte x, byte y) {
+  // Bounds check
+  if ((x > 155) || (y > 184))
+    return;
+  unsigned xx = x;
+
+  BlitterMapScreen();
+  asm {
+
+* Load the destination
+      lda  y
+      ldb  #160
+      mul
+      addd xx
+      addd #$8000
+      tfr d,x
+      ldy #8
+
+      pshs      u
+
+* Load the source
+      ldu bitmap
+
+* Transfer the rows
+BlitterDrawNumericGlyphLoop
+      ldd 0,u
+      std 0,x
+      ldd 2,u
+      std 2,x
+      lda 4,u
+      sta 4,x
+      leau 6,u
+      leax 160,x
+      leay -1,y
+      bne BlitterDrawNumericGlyphLoop
+
+      puls      u
+  }
+
+  BlitterUnmapScreen();
+}
+
+
 void BlitterDrawNumericText(char *text, byte x, byte y) {
   for(char c = *text++; c != 0; c = *text++) {
     if (c < '0') c = '0';
     if (c > '9') c = '9';
     c = c - '0';
-    BlitterDrawGraphics((byte *)GrafxDataNumberData + ((unsigned)49 * (unsigned)c), x, y);
+    BlitterDrawNumericGlyph((byte *)GrafxDataNumberData + ((unsigned)49 * (unsigned)c), x, y);
     x += 5;
   }
 }
