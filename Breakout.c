@@ -147,27 +147,19 @@ void BreakoutPlayGame() {
 
 
 void BreakoutControlPaddle() {
-  // Scan twice - weirdness with sound interrupt
-
   // Look for 'p' to pause the game
   *CoCoMiscKeyboardScanOutput = 0xfe;
-  byte pausePressed = (*CoCoMiscKeyboardScanInput == 0xfb);
-  *CoCoMiscKeyboardScanOutput = 0xfe;
-  pausePressed |= (*CoCoMiscKeyboardScanInput == 0xfb);
+  byte pausePressed = ((*CoCoMiscKeyboardScanInput & 0x4) == 0x0);
   if (pausePressed)
     BreakoutPauseGame();
     
   // Look for up arrow
   *CoCoMiscKeyboardScanOutput = 0xf7;
-  byte upPressed = (*CoCoMiscKeyboardScanInput == 0xf7);
-  *CoCoMiscKeyboardScanOutput = 0xf7;
-  upPressed |= (*CoCoMiscKeyboardScanInput == 0xf7);
+  byte upPressed = ((*CoCoMiscKeyboardScanInput & 0x8) == 0x0);
 
   // Look for down arrow
   *CoCoMiscKeyboardScanOutput = 0xef;
-  byte downPressed = (*CoCoMiscKeyboardScanInput == 0xf7);
-  *CoCoMiscKeyboardScanOutput = 0xef;
-  downPressed |= (*CoCoMiscKeyboardScanInput == 0xf7);
+  byte downPressed = ((*CoCoMiscKeyboardScanInput & 0x8) == 0x0);
 
   // Figure out the direction
   if (upPressed && downPressed) {
