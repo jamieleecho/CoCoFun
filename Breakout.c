@@ -20,9 +20,6 @@
 #include "CoCoMisc.h"
 #include "Sound.h"
 
-// Disable sound
-#define sound(a, b) { }
-
 #include "GrafxData.c"
 #include "FontData.c"
 #include "Bricks.c"

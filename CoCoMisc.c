@@ -20,13 +20,13 @@ byte _cocoRGBMode = 1;
 
 int random(int value) {
   asm {
-    pshs u
     ldd value
+    pshs u
     jsr $B4F4
     jsr $BF1F
     jsr $B3ED
-    std value
     puls u
+    std value
   }
   return value;
 }

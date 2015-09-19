@@ -21,7 +21,7 @@ byte brickXPositions[brickXPositionsSz] = {
 
 /** brick sounds */
 byte brickXSounds[brickXPositionsSz] = {
-  89, 108, 125, 133, 147, 159, 170
+  15, 14, 13, 12, 11, 10, 9
 };
 
 

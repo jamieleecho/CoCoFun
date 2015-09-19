@@ -52,9 +52,9 @@ void BreakoutBallMiss() {
   // Decrease the number of balls
   breakoutNumberOfBalls--;
   BreakoutBallDrawCount();
-  sound(89, 2);
-  sound(78, 3);
-  sound(58, 6);
+  SoundPlayAndWait(600, 16, 16, 192);
+  SoundPlayAndWait(900, 17, 17, 192);
+  SoundPlayAndWait(1800, 18, 18, 192);
 
   // Erase the displayed ball
   BlitterFillRectangle(breakoutBallPositionX 
@@ -68,7 +68,8 @@ void BreakoutBallMiss() {
 
 
 byte BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositions) {
-  // We are a little generous with hit detection here to reduce half destroyed bricks
+  // We are a little generous with hit detection here to reduce half
+  // destroyed bricks
   byte b1 = breakoutBallPositionY;
   byte bend = b1 + 6;
   byte numHit = 0;
@@ -80,10 +81,15 @@ byte BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
 	|| ((b1 <= p1) && (bend >= p1))) {
       BlitterFillRectangle(lineBrickXPos << 1, lineBrickYPositions[ii], 5, 11, 0);
       lineBrickYPositions[ii] = 0xff;
-      breakoutBallSlopeX = (byte)random(5);
-      breakoutBallSlopeY = (byte)random(5);
-      if (breakoutBallSlopeX & 1)
-		breakoutBallIncrementX = -1;
+      breakoutBallSlopeX = (byte)random(3);
+      breakoutBallSlopeY = (byte)random(4) - 1;
+      BreakoutScoreIncrement(&breakoutScore, breakoutBallSlopeX);
+      byte changeDirX = (byte)random(20);
+      if (changeDirX > 2)
+	breakoutBallIncrementX = -1;
+      byte changeDirY = (byte)random(20);
+      if (changeDirY > 18)
+	breakoutBallIncrementY = breakoutBallIncrementY * -1;
       breakoutBallCounterX = breakoutBallSlopeX;
       breakoutBallCounterY = breakoutBallSlopeY;
       BreakoutScoreIncrement(&breakoutScore, 10);
@@ -127,9 +133,17 @@ void BreakoutBallTick() {
 	// Was there a collision?
 	if (((p1 <= b1) && (pend >= b1))
 	    || ((b1 <= p1) && (bend >= p1))) {
-	  // sound(1, 1);
-	  breakoutBallSlopeX = (byte)random(5);
-	  breakoutBallSlopeY = (byte)random(5);
+	  SoundPlay(60, 1, 1, 64);
+	  byte offset = breakoutPaddlePosition - bend - 3 + 19;
+	  if (offset < -7)
+	    breakoutBallSlopeY--;
+	  else if (offset > 7)
+	    breakoutBallSlopeY++;
+	  if (breakoutBallSlopeY >= 0x80)
+	    breakoutBallSlopeY = 0;
+	  else if (breakoutBallSlopeY > 5)
+	    breakoutBallSlopeY = 5;
+
 	  breakoutBallIncrementX = 1;
 	} else {
 	  breakoutBallWasMissed = 1;
@@ -161,8 +175,10 @@ void BreakoutBallTick() {
   byte lastHitX = 0;
   for (byte ii=0; ii<brickXPositionsSz; ii++) {
     byte pos = brickXPositions[ii];
-    if ((breakoutBallPositionX >= (pos - 5)) && (breakoutBallPositionX < pos)) {
-      byte newNumHit = BreakoutBallCheckBrickCollision(pos, lineBrickYPositions[ii]);
+    if ((breakoutBallPositionX >= (pos - 5)) 
+	&& (breakoutBallPositionX < (pos + 2))) {
+      byte newNumHit = BreakoutBallCheckBrickCollision(pos,
+						       lineBrickYPositions[ii]);
       if (newNumHit)
 	lastHitX = ii;
       numHit |= newNumHit;
@@ -185,7 +201,7 @@ void BreakoutBallTick() {
   if (numHit) {
     // Update the score, play a sound
     BreakoutDrawScore();      
-    sound(brickXSounds[lastHitX], 1);
+    SoundPlayAndWait(250, brickXSounds[lastHitX], brickXSounds[lastHitX], 128);
 
     // Do we have to reset the board?
     if (numHit == 255) {
@@ -197,11 +213,12 @@ void BreakoutBallTick() {
 			   ? breakoutBallPositionY - 1 : 0, 12, 8, 0);
       BreakoutBallReset();	
       BricksRefresh();
-      BlitterDrawGraphics(GrafxDataBallData, breakoutBallPositionX, breakoutBallPositionY);
+      BlitterDrawGraphics(GrafxDataBallData, breakoutBallPositionX,
+			  breakoutBallPositionY);
       
-      sound(58, 2);
-      sound(78, 3);
-      sound(89, 6);
+      SoundPlayAndWait(600, 18, 18, 192);
+      SoundPlayAndWait(900, 17, 17, 192);
+      SoundPlayAndWait(1800, 16, 16, 192);
     }
   }
 }

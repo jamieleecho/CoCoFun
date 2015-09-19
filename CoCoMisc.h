@@ -83,7 +83,6 @@
  */
 int random(int value);
 
-
 /**
  * Reads the joystick.
  *

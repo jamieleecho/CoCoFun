@@ -12,6 +12,9 @@
 #define _BreakoutBall_h
 
 
+#include <coco.h>
+
+
 /** Ball X position */
 byte breakoutBallPositionX = 20;
 
@@ -36,29 +39,17 @@ byte breakoutBallCounterX = 5;
 /** Current position in slope */
 byte breakoutBallCounterY = 2;
 
-
-/**
- * @param value[in] range of random number
- * @return a random value on [1, value]
- */
-int random(int value);
-
-
 /** Resets the breakoutBall position to the default */
 void BreakoutBallReset();
-
 
 /** Initializes the breakoutBall position to the default */
 void BreakoutBallInit();
 
-
 /** Display the current number of balls */
 void BreakoutBallDrawCount();
 
-
 /** Invoked when a ball is missed */
 void BreakoutBallMiss();
-
 
 /**
  * Determines whether the ball is colliding with bricks in lineBrickYPositions.
@@ -68,13 +59,10 @@ void BreakoutBallMiss();
  */
 byte BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositions);
 
-
 /** Controls the breakoutBall motion */
 void BreakoutBallTick();
 
-
 /** Draw the breakout ball */
 void BreakoutBallRefresh();
-
 
 #endif
