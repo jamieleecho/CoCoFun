@@ -70,10 +70,10 @@ void BreakoutInit() {
   initCoCoSupport();
   setHighSpeed(1);
   BlitterInit();
-  
+
   // Black out the screen
-  hscreen(2);
   CoCoMiscPaletteFade(breakoutRGBColorPalette, breakoutCMPColorPalette, 0, 0);
+  hscreen(2);
   SoundInit();
   BlitterInitGrafxDataNumberData(GrafxDataNumberData);
 
