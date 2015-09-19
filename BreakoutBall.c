@@ -26,7 +26,7 @@ void BreakoutBallReset() {
   breakoutBallIncrementX = -1;
   breakoutBallIncrementY = 1;
   breakoutBallSlopeX = 1;
-  breakoutBallSlopeY = 5;
+  breakoutBallSlopeY = 3;
   breakoutBallCounterX = breakoutBallSlopeX;
   breakoutBallCounterY = breakoutBallSlopeY;
   breakoutBallWasMissed = 0;
@@ -81,12 +81,31 @@ byte BreakoutBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
 	|| ((b1 <= p1) && (bend >= p1))) {
       BlitterFillRectangle(lineBrickXPos << 1, lineBrickYPositions[ii], 5, 11, 0);
       lineBrickYPositions[ii] = 0xff;
-      byte changeDirX = (byte)random(20);
-      if (changeDirX > 2)
+
+      // Change direction? Favor not changing X direction and favor going towards
+      // paddle
+      byte changeDirX = (byte)random(21);
+      if (changeDirX > 4)
 	breakoutBallIncrementX = -1;
-      byte changeDirY = (byte)random(20);
+      byte changeDirY = (byte)random(21);
       if (changeDirY > 18)
 	breakoutBallIncrementY = breakoutBallIncrementY * -1;
+      
+      // Change the slope
+      byte changeSlopeX = (byte)random(21);
+      if ((changeSlopeX < 5) && (breakoutBallSlopeX > 1))
+	breakoutBallSlopeX--;
+      else if ((changeSlopeX > 17) && (breakoutBallSlopeX < 5))
+	breakoutBallSlopeX++;
+      
+      // Change the slope
+      byte changeSlopeY = (byte)random(21);
+      if ((changeSlopeY < 5) && (breakoutBallSlopeY > 1))
+	breakoutBallSlopeY--;
+      else if ((changeSlopeY > 17) && (breakoutBallSlopeY < 5))
+	breakoutBallSlopeY++;
+
+      // Update the counters
       breakoutBallCounterX = breakoutBallSlopeX;
       breakoutBallCounterY = breakoutBallSlopeY;
       BreakoutScoreIncrement(&breakoutScore, 10);
@@ -131,16 +150,24 @@ void BreakoutBallTick() {
 	if (((p1 <= b1) && (pend >= b1))
 	    || ((b1 <= p1) && (bend >= p1))) {
 	  SoundPlay(60, 1, 1, 64);
-	  byte offset = breakoutPaddlePosition - bend - 3 + 19;
-	  if (offset < -7)
-	    breakoutBallSlopeY--;
-	  else if (offset > 7)
-	    breakoutBallSlopeY++;
-	  if (breakoutBallSlopeY >= 0x80) {
-	    breakoutBallSlopeY = 1;
+	  int offset = ((int)breakoutBallPositionY - (int)breakoutPaddlePosition
+			+ 3 - 19);
+	  if (offset < -6) {
+	    breakoutBallSlopeY -=  breakoutBallIncrementY;
+	  } else if (offset > 6) {
+	    breakoutBallSlopeY += breakoutBallIncrementY;
+	  } else {	
+	    if (breakoutBallSlopeY > 1)
+	      breakoutBallSlopeY--;
+	  }
+	  if (breakoutBallSlopeY >= 0x80) {	    
+	    breakoutBallSlopeY = 2;
 	    breakoutBallIncrementY = -breakoutBallIncrementY;
-	  } else if (breakoutBallSlopeY > 5)
+	  } else if (breakoutBallSlopeY > 5) {
 	    breakoutBallSlopeY = 5;
+	    if (breakoutBallSlopeX > 1)
+	      breakoutBallSlopeX--;
+	  }
 
 	  breakoutBallIncrementX = 1;
 	} else {
