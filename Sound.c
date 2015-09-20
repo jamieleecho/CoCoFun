@@ -141,7 +141,7 @@ void SoundInit() {
   CoCoMiscFIRQJumpVector[2] = (byte)((unsigned)(SoundFirq)) & 0xff;
 
   // Enable FIRQ
-  *CoCoMiscGIMETimer = 448;
+  *CoCoMiscGIMETimer = 1790;
   *CoCoMiscGIMEInit0 = 0x5e;
   *CoCoMiscGIMEInit1 |= 0x20;
   *CoCoMiscGIMEFIRQEnable = 0x20;

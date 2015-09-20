@@ -52,9 +52,9 @@ void BreakoutBallMiss() {
   // Decrease the number of balls
   breakoutNumberOfBalls--;
   BreakoutBallDrawCount();
-  SoundPlayAndWait(600, 16, 16, 192);
-  SoundPlayAndWait(900, 17, 17, 192);
-  SoundPlayAndWait(1800, 18, 18, 192);
+  SoundPlayAndWait(600, 4, 4, 192);
+  SoundPlayAndWait(900, 5, 5, 192);
+  SoundPlayAndWait(1800, 6, 6, 192);
 
   // Erase the displayed ball
   BlitterFillRectangle(breakoutBallPositionX 
@@ -149,7 +149,7 @@ void BreakoutBallTick() {
 	// Was there a collision?
 	if (((p1 <= b1) && (pend >= b1))
 	    || ((b1 <= p1) && (bend >= p1))) {
-	  SoundPlay(60, 1, 1, 64);
+	  SoundPlay(30, 1, 1, 64);
 	  int offset = ((int)breakoutBallPositionY - (int)breakoutPaddlePosition
 			+ 3 - 19);
 	  if (offset < -6) {
@@ -201,7 +201,7 @@ void BreakoutBallTick() {
   for (byte ii=0; ii<brickXPositionsSz; ii++) {
     byte pos = brickXPositions[ii];
     if ((breakoutBallPositionX >= (pos - 5)) 
-	&& (breakoutBallPositionX < (pos + 2))) {
+	&& (breakoutBallPositionX < (pos + 4))) {
       byte newNumHit = BreakoutBallCheckBrickCollision(pos,
 						       lineBrickYPositions[ii]);
       if (newNumHit)
@@ -241,9 +241,9 @@ void BreakoutBallTick() {
       BlitterDrawGraphics(GrafxDataBallData, breakoutBallPositionX,
 			  breakoutBallPositionY);
       
-      SoundPlayAndWait(600, 18, 18, 192);
-      SoundPlayAndWait(900, 17, 17, 192);
-      SoundPlayAndWait(1800, 16, 16, 192);
+      SoundPlayAndWait(600, 4, 4, 192);
+      SoundPlayAndWait(900, 5, 5, 192);
+      SoundPlayAndWait(1800, 6, 6, 192);
     }
   }
 }
