@@ -5,11 +5,10 @@
 *.i
 cfg/*
 *.dsk
-!AsmGameFiles/*
+!Ancient/*
 *~
 #*
 .#*
-AsmGameFiles/Breakout.bin
 
 
 
