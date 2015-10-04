@@ -13,8 +13,7 @@ $(TARGET) : $(BREAKOUT_BAS) $(BREAKOUT_BIN)
 	decb copy $(BREAKOUT_BIN) $@,BREAKOUT.BIN
 	decb attr $@,BREAKOUT.BIN -2 -b
 
-$(BREAKOUT_BIN) : Breakout.c GrafxData.c BreakoutScore.c BreakoutBall.c Blitter.c Bricks.c \
-			   FontData.c BreakoutBall.c CoCoMisc.c Sound.c
+$(BREAKOUT_BIN) : Breakout.c GrafxData.c BreakoutScore.c BreakoutBall.c Blitter.c Bricks.c FontData.c BreakoutBall.c CoCoMisc.c Sound.c FixedPoint.c
 	cmoc $(CFLAGS) $< 
 
 %.bin : %.c

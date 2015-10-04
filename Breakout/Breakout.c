@@ -28,6 +28,7 @@
 #include "Blitter.c"
 #include "CoCoMisc.c"
 #include "Sound.c"
+#include "FixedPoint.c"
 
 
 /** Loop delay for performing screen fades */
@@ -58,6 +59,24 @@ char breakoutLastDrawnScore[7];
 
 
 int main() {
+#if 0
+  FixedPoint a, b, c, d, e, f;
+  FixedPointMake(&a, -1, 0x0);
+  FixedPointMake(&b, -1, 0xffff);
+  FixedPointAdd(&c, &a, &b);
+  FixedPointNegate(&d, &a);
+  FixedPointNegate(&e, &b);
+  FixedPointNegate(&f, &c);
+
+  printf("%x.%x\n", a.Whole, a.Decimal);
+  printf("%x.%x\n", b.Whole, b.Decimal);
+  printf("%x.%x\n", c.Whole, c.Decimal);
+  printf("%x.%x\n", d.Whole, d.Decimal);
+  printf("%x.%x\n", e.Whole, e.Decimal);
+  printf("%x.%x\n", f.Whole, f.Decimal);
+  waitkey(0);
+#endif
+
   BreakoutInit();
   BreakoutPlay();
 
