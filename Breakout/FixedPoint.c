@@ -14,7 +14,7 @@
 
 void FixedPointMake(FixedPoint *c, int whole, unsigned decimal) {
   c->Whole = whole;
-  c->Decimal = decimal;
+  c->Fraction = decimal;
 }
 
 
@@ -279,10 +279,124 @@ FixedPointAsmDone:
     puls u
   }
 
+  // Make result negative if needed
   c->Whole = ((int)results[2] << 8) + results[3];
-  c->Decimal = ((unsigned)results[4] << 8) + results[5];
+  c->Fraction = ((unsigned)results[4] << 8) + results[5];
   if (numNegatives & 1)
     FixedPointNegate(c, c);
+}
+
+
+void FixedPointDiv(FixedPoint *c, FixedPoint *a, FixedPoint *b) {
+  byte results[8], aa[8], bb[4];
+  byte numDivisorShifts = 0, numDividendShifts = 0;
+  memset(results, 0, sizeof(results));
+  memset(aa + 4, 0, sizeof(aa) - 4);
+
+  // Can't divide by zero, simply set c to zero
+  if ((a->Whole == 0) && (a->Fraction == 0)) {
+    memset(c, 0, sizeof(*c));
+    return;
+  }
+
+  // Convert all operands to positive, count number of negates
+  byte numNegatives = 0;
+  if (a->Whole < 0x0) {
+    FixedPointNegate((FixedPoint *)aa, a);
+    numNegatives++;
+  } else
+    memcpy(aa, (byte *)a, sizeof(aa));
+  if (b->Whole < 0x0) {
+    FixedPointNegate((FixedPoint *)bb, b);
+    numNegatives++;
+  } else
+    memcpy(bb, (byte *)b, sizeof(bb));
+
+  // Real work not even started yet. But if it were done, you'd be saying
+  // Gosh darn, I need some more of that!
+  asm {
+* The first thing we have to do is shift the divisor left until its most
+* significant bit is 1
+    leax bb
+FixedPointDivCheckDivisor:
+    lda ,x    
+    bgt FixedPointDivFixDividend
+    asl 3,x
+    rol 2,x
+    rol 1,x
+    rol ,x
+    inc numDivisorShifts
+    bra FixedPointDivCheckDivisor
+
+* We now have to fix the dividend so that its most significant bit is 1
+FixedPointDivFixDividend:
+    leax aa
+FixedPointDivCheckDividend:
+    lda ,x    
+    bgt FixedPointDivMainSetup
+    asl 3,x
+    rol 2,x
+    rol 1,x
+    rol ,x
+    inc numDividendShifts
+    bra FixedPointDivCheckDivisor
+
+* At this point our divisor and dividend are shift all the way left.
+* We must do the following while we have more dividend bits
+* 1. Shift quotient left
+* 2. If the most signifgicant bits of the divisor
+*     < most significant bits of the dividend
+*          Put 1 in the quotient
+*          subtract most signficant divisor bits from most significant dividend
+*          bits
+*     else
+*          Put 0 in the quotient
+* 3. Shift dividend left
+FixedPointDivMainSetup:
+  }
+
+  // Make result negative if needed
+  c->Whole = ((int)results[2] << 8) + results[3];
+  c->Fraction = ((unsigned)results[4] << 8) + results[5];
+  if (numNegatives & 1)
+    FixedPointNegate(c, c);
+}
+
+
+byte FixedPointEquals(FixedPoint *a, FixedPoint *b) {
+  return (a->Whole == b->Whole) && (a->Fraction == b->Fraction);
+}
+
+
+byte FixedPointGreaterThan(FixedPoint *a, FixedPoint *b) {
+  if (a->Whole > b->Whole) return TRUE;
+  if (a->Whole < b->Whole) return FALSE;
+  return (a->Whole >= 0) ? (a->Fraction > b->Fraction)
+    : (b->Fraction > a->Fraction);
+}
+
+
+byte FixedPointLessThan(FixedPoint *a, FixedPoint *b) {
+  if (a->Whole < b->Whole) return TRUE;
+  if (a->Whole > b->Whole) return FALSE;
+  return (a->Whole >= 0) ? (a->Fraction < b->Fraction)
+    : (b->Fraction < a->Fraction);
+}
+
+
+byte FixedPointGreaterThanOrEqualTo(FixedPoint *a, FixedPoint *b) {
+  if (a->Whole > b->Whole) return TRUE;
+  if (a->Whole < b->Whole) return FALSE;
+  return (a->Whole >= 0) ? (a->Fraction >= b->Fraction)
+    : (b->Fraction >= a->Fraction);
+}
+
+
+byte FixedPointLessThanOrEqualTo(FixedPoint *a, FixedPoint *b) {
+  if (a->Whole < b->Whole) return TRUE;
+  if (a->Whole > b->Whole) return FALSE;
+  return (a->Whole >= 0) ? (a->Fraction <= b->Fraction)
+    : (b->Fraction <= a->Fraction);
 }
 
 

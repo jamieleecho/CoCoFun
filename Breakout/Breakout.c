@@ -64,30 +64,30 @@ int main() {
   FixedPointMake(&a, 32, 0x8000);
   FixedPointMake(&b, 2, 0x0000);
   FixedPointMul(&c, &a, &b);
-  printf("%x.%x\n", a.Whole, a.Decimal);
-  printf("%x.%x\n", b.Whole, b.Decimal);
-  printf("%x.%x\n\n", c.Whole, c.Decimal);
+  printf("%x.%x\n", a.Whole, a.Fraction);
+  printf("%x.%x\n", b.Whole, b.Fraction);
+  printf("%x.%x\n\n", c.Whole, c.Fraction);
 
   FixedPointMake(&a, 0, 0x0);
   FixedPointMake(&b, 0, 0x1);
   FixedPointSub(&c, &a, &b);
-  printf("%x.%x\n", a.Whole, a.Decimal);
-  printf("%x.%x\n", b.Whole, b.Decimal);
-  printf("%x.%x\n\n", c.Whole, c.Decimal);
+  printf("%x.%x\n", a.Whole, a.Fraction);
+  printf("%x.%x\n", b.Whole, b.Fraction);
+  printf("%x.%x\n\n", c.Whole, c.Fraction);
 
   FixedPointMake(&a, -1, 0x0);
   FixedPointNegate(&b, &a);
   FixedPointNegate(&b, &b);
   FixedPointNegate(&b, &b);
-  printf("%x.%x\n", a.Whole, a.Decimal);
-  printf("%x.%x\n\n", b.Whole, b.Decimal);
+  printf("%x.%x\n", a.Whole, a.Fraction);
+  printf("%x.%x\n\n", b.Whole, b.Fraction);
 
   FixedPointMake(&a, -1, 0x0);
   FixedPointMake(&b, 32, 0x4000);
   FixedPointMul(&c, &a, &b);
-  printf("%x.%x\n", a.Whole, a.Decimal);
-  printf("%x.%x\n", b.Whole, b.Decimal);
-  printf("%x.%x\n\n", c.Whole, c.Decimal);
+  printf("%x.%x\n", a.Whole, a.Fraction);
+  printf("%x.%x\n", b.Whole, b.Fraction);
+  printf("%x.%x\n\n", c.Whole, c.Fraction);
 
   FixedPointMake(&a, -1, 0x0);
   FixedPointMake(&b, -1, 0xffff);
@@ -95,12 +95,12 @@ int main() {
   FixedPointNegate(&d, &a);
   FixedPointNegate(&e, &b);
   FixedPointNegate(&f, &c);
-  printf("%x.%x\n", a.Whole, a.Decimal);
-  printf("%x.%x\n", b.Whole, b.Decimal);
-  printf("%x.%x\n", c.Whole, c.Decimal);
-  printf("%x.%x\n", d.Whole, d.Decimal);
-  printf("%x.%x\n", e.Whole, e.Decimal);
-  printf("%x.%x\n\n", f.Whole, f.Decimal);
+  printf("%x.%x\n", a.Whole, a.Fraction);
+  printf("%x.%x\n", b.Whole, b.Fraction);
+  printf("%x.%x\n", c.Whole, c.Fraction);
+  printf("%x.%x\n", d.Whole, d.Fraction);
+  printf("%x.%x\n", e.Whole, e.Fraction);
+  printf("%x.%x\n\n", f.Whole, f.Fraction);
   waitkey(0);
 #endif
 

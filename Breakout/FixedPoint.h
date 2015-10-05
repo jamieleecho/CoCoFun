@@ -11,7 +11,7 @@
 
 typedef struct FixedPoint {
   int Whole;
-  unsigned Decimal;
+  unsigned Fraction;
 } FixedPoint;
 
 
@@ -57,5 +57,54 @@ void FixedPointSub(FixedPoint *c, FixedPoint *a, FixedPoint *b);
  */
 void FixedPointMul(FixedPoint *c, FixedPoint *a, FixedPoint *b);
 
+
+/**
+ * Returns *a / *b
+ * @param c[out] quotient
+ * @param a[in] dividend
+ * @param b[in] divisor
+ */
+void FixedPointDiv(FixedPoint *c, FixedPoint *a, FixedPoint *b);
+
+
+/**
+ * Returns *a == *b
+ * @param a[in] arg1
+ * @param b[in] arg2
+ * @return *a == *b
+ */
+byte FixedPointEquals(FixedPoint *a, FixedPoint *b);
+
+/**
+ * Returns *a > *b
+ * @param a[in] arg1
+ * @param b[in] arg2
+ * @return *a > *b
+ */
+byte FixedPointGreaterThan(FixedPoint *a, FixedPoint *b);
+
+/**
+ * Returns *a < *b
+ * @param a[in] arg1
+ * @param b[in] arg2
+ * @return *a < *b
+ */
+byte FixedPointLessThan(FixedPoint *a, FixedPoint *b);
+
+/**
+ * Returns *a >= *b
+ * @param a[in] arg1
+ * @param b[in] arg2
+ * @return *a >= *b
+ */
+byte FixedPointGreaterThanOrEqualTo(FixedPoint *a, FixedPoint *b);
+
+/**
+ * Returns *a <= *b
+ * @param a[in] arg1
+ * @param b[in] arg2
+ * @return *a <= *b
+ */
+byte FixedPointLessThanOrEqualTo(FixedPoint *a, FixedPoint *b);
 
 #endif
