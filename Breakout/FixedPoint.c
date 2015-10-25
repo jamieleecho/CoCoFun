@@ -289,7 +289,7 @@ FixedPointAsmDone:
 
 void FixedPointDiv(FixedPoint *c, FixedPoint *a, FixedPoint *b) {
   FixedPoint aa, bb;
-  byte results[8];
+  byte results[4];
   char numDivisorShifts = 0, numDividendShifts = 0;
   memset(results, 0, sizeof(results));
 
@@ -352,16 +352,19 @@ FixedPointDivCheckDividend:
 
 * At this point our divisor and dividend are shift all the way left.
 * We must do the following while we have more quotient bits
-* 1. Shift quotient left
-* 2. If the most significant bits of the divisor
+* 1. If the most significant bits of the divisor
 *     <= most significant bits of the dividend
-*          Put 1 in the quotient
-*          subtract most signficant divisor bits from most significant dividend bits       
+*          a. Put 1 in the quotient
 *     else
-*          Put 0 in the quotient
-* 3. Shift dividend left
+*          a. Put 0 in the quotient
+*          b. If we have more quotient bits left, shift dividend left
+*          c. Put 1 in the quotient
+* 2. subtract most signficant divisor bits from most significant dividend bits       
+* 3. while we have more quotient bits and there is a zero in the dividend
+*          a. shift the quotient left
+*          b. Shift the dividend left
 FixedPointDivMainSetup:
-    ldb #32      * B = max number of loops
+    ldb #47      * B = max number of loops
     subb numDividendShifts
     addb numDivisorShifts    
     leax aa      * X = dividend
@@ -370,38 +373,42 @@ FixedPointDivMainSetup:
     leau results * U = quotient
 
 FixedPointDivMainLoop:
-* Do we still have bits left?
+* Compare dividend to divisor
+    bsr FixedPointCompareDividendToDivisor
+
+* Branch if dividend too small
+    blo FixedPointDivDividendTooSmall
+
+* Put 1 in quotient, subtract divisor from dividend
+    lda #1
+    ora 3,u
+    sta 3,u
+    bra FixedPointSubtractAndShift
+
+FixedPointDivDividendTooSmall:
+    tstb
+    beq FixedPointDivMainLoopEnd
+    decb
+    bsr FixedPointShiftDividendLeft
+    bsr FixedPointShiftQuotientLeft
+
+FixedPointSubtractAndShift:
+    bsr FixedPointSubtractDivisorFromDividend
+
+FixedPointDivMainLoopRepeat:
+    lda ,x
+    bmi FixedPointDivMainLoop
+
     tstb
     beq FixedPointDivMainLoopEnd
     decb
 
-* Shift quotient left
-    bsr FixedPointShiftQuotientLeft
-
-* Compare dividend to divisor
-    bsr FixedPointCompareDividendToDivisor
-
-* Divisor too big, loop again
-    bls FixedPointDivMainLoopRepeat
-
-* Subtract divisor from dividend
-    lda #1
-    ora 7,u
-    sta 7,u
-    bsr FixedPointSubtractDivisorFromDividend
-
-FixedPointDivMainLoopRepeat:
     bsr FixedPointShiftDividendLeft
-
-* Repeat process
-    bra FixedPointDivMainLoop
+    bsr FixedPointShiftQuotientLeft
+    bra FixedPointDivMainLoopRepeat
 
 FixedPointShiftQuotientLeft:
-    asl 7,u
-    rol 6,u
-    rol 5,u
-    rol 4,u
-    rol 3,u
+    asl 3,u
     rol 2,u
     rol 1,u
     rol ,u
@@ -429,26 +436,47 @@ FixedPointCompareDividendToDivisor:
 FixedPointCompareDividendToDivisorDone:
     rts
 
+FixedPointSubtractNegateDivisor:
+    neg 3,y
+    bcs FixedPointSubtractNegateDivisorCom2
+    neg 2,y
+    bcs FixedPointSubtractNegateDivisorCom1
+    neg 1,y
+    bcs FixedPointSubtractNegateDivisorCom0
+    neg ,y
+    rts
+
+FixedPointSubtractNegateDivisorCom2:
+    com 2,y
+FixedPointSubtractNegateDivisorCom1:
+    com 1,y
+FixedPointSubtractNegateDivisorCom0:
+    com ,y
+    rts
+
 FixedPointSubtractDivisorFromDividend:
+    bsr FixedPointSubtractNegateDivisor
     lda 3,y
-    suba 3,x
+    adca 3,x
     sta 3,x
     lda 2,y
-    suba 2,x
+    adca 2,x
     sta 2,x
     lda 1,y
-    suba 1,x
+    adca 1,x
     sta 1,x
     lda ,y
-    suba ,x
+    adca ,x
     sta ,x
+    bsr FixedPointSubtractNegateDivisor
     rts
 
 FixedPointDivMainLoopEnd:
     puls u
   }
 
-  printf("*** %2x%2x%2x%2x.%2x%2x%2x%2x\n", results[0], results[1], results[2], results[3], results[4], results[5], results[6], results[7]);
+  printf("*** %2x%2x.%2x%2x ---- %d, %d\n", results[0], results[1], results[2], results[3],
+	 numDivisorShifts, numDividendShifts);
 
   // Make result negative if needed
   c->Whole = ((int)results[0] << 8) + results[1];
