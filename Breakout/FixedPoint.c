@@ -287,7 +287,7 @@ FixedPointAsmDone:
 }
 
 
-void FixedPointDiv(FixedPoint *c, FixedPoint *a, FixedPoint *b) {
+void FixedPointDiv(FixedPoint *c, FixedPoint *d, FixedPoint *a, FixedPoint *b) {
   // aa[0] = dividend, aa[1] = divisor, aa[2] = quotient
   FixedPoint aa[3];
   char numDivisorShifts = 0, numDividendShifts = 0;
@@ -378,10 +378,14 @@ FixedPointDivMainLoop:
 
 FixedPointDivDividendTooSmall:
     tstb
-    beq FixedPointDivMainLoopEnd
+    lbeq FixedPointDivMainLoopEnd
     decb
     bsr FixedPointShiftDividendLeft
     bsr FixedPointShiftQuotientLeft
+
+    lda #1
+    ora 11,x
+    sta 11,x
 
 FixedPointSubtractAndShift:
     bsr FixedPointSubtractDivisorFromDividend
@@ -412,16 +416,26 @@ FixedPointShiftDividendLeft:
     rol ,x
     rts
 
+FixedPointShiftDividendRight:
+    asr ,x
+    ror 1,x
+    ror 2,x
+    ror 3,x
+    rts
+
 FixedPointCompareDividendToDivisor:
     lda ,x 
     cmpa ,y
     bhi FixedPointCompareDividendToDivisorDone
+    blo FixedPointCompareDividendToDivisorDone
     lda 1,x 
     cmpa 1,y
     bhi FixedPointCompareDividendToDivisorDone
+    blo FixedPointCompareDividendToDivisorDone
     lda 2,x 
     cmpa 2,y
     bhi FixedPointCompareDividendToDivisorDone
+    blo FixedPointCompareDividendToDivisorDone
     lda 3,x 
     cmpa 3,y
 FixedPointCompareDividendToDivisorDone:
@@ -463,12 +477,23 @@ FixedPointSubtractDivisorFromDividend:
     rts
 
 FixedPointDivMainLoopEnd:
+    ldb numDividendShifts
+    beq FixedPointDivFixRemainderEnd
+FixedPointDivFixRemainder
+    bsr FixedPointShiftDividendRight
+    decb
+    beq FixedPointDivFixRemainder
+
+FixedPointDivFixRemainderEnd:    
   }
 
   // Make result negative if needed
   memcpy((byte *)c, (byte *)(aa + 2), sizeof(aa[2]));
-  if (numNegatives & 1)
+  memcpy((byte *)d, (byte *)(aa), sizeof(aa[0]));
+  if (numNegatives & 1) {
     FixedPointNegate(c, c);
+    FixedPointNegate(d, d);
+  }
 }
 
 

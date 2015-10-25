@@ -59,12 +59,13 @@ void FixedPointMul(FixedPoint *c, FixedPoint *a, FixedPoint *b);
 
 
 /**
- * Returns *a / *b
+ * Returns *a / *b and *a % *b
  * @param c[out] quotient
+ * @param d[out] remainder
  * @param a[in] dividend
  * @param b[in] divisor
  */
-void FixedPointDiv(FixedPoint *c, FixedPoint *a, FixedPoint *b);
+void FixedPointDiv(FixedPoint *c, FixedPoint *d, FixedPoint *a, FixedPoint *b);
 
 
 /**

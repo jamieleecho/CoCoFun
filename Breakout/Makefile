@@ -22,10 +22,16 @@ $(BREAKOUT_BIN) : Breakout.c GrafxData.c BreakoutScore.c BreakoutBall.c Blitter.
 clean :
 	rm -rf $(TARGET) *.bin *.i *.lst *.asm *.hex
 
-debug : $(TARGET)
+run : $(TARGET)
 	$(MESS) coco3 -rompath $(MESS_DIR)/roms -window -flop1 $(TARGET) -cfg_directory ../cfgs/rgb
 
-debug_cmp : $(TARGET)
+run_cmp : $(TARGET)
 	$(MESS) coco3 -rompath $(MESS_DIR)/roms -window -flop1 $(TARGET) -cfg_directory ../cfgs/cmp
+
+debug : $(TARGET)
+	$(MESS) coco3 -rompath $(MESS_DIR)/roms -window -flop1 $(TARGET) -cfg_directory ../cfgs/rgb -debug
+
+debug_cmp : $(TARGET)
+	$(MESS) coco3 -rompath $(MESS_DIR)/roms -window -flop1 $(TARGET) -cfg_directory ../cfgs/cmp -debug
 
 
