@@ -323,21 +323,18 @@ void FixedPointDiv(FixedPoint *c, FixedPoint *a, FixedPoint *b) {
 * The first thing we have to do is shift the divisor left until its most
 * significant bit is 1
     leax aa
-    leax 4,x
 FixedPointDivCheckDivisor:
-    lda ,x
+    lda 4,x
     bmi FixedPointDivFixDividend
-    asl 3,x
-    rol 2,x
-    rol 1,x
-    rol ,x
+    asl 7,x
+    rol 6,x
+    rol 5,x
+    rol 4,x
     inc numDivisorShifts
     bra FixedPointDivCheckDivisor
 
 * We now have to fix the dividend so that its most significant bit is 1
 FixedPointDivFixDividend:
-    leax aa
-FixedPointDivCheckDividend:
     lda ,x    
     bmi FixedPointDivMainSetup
     asl 3,x
@@ -345,7 +342,7 @@ FixedPointDivCheckDividend:
     rol 1,x
     rol ,x
     inc numDividendShifts
-    bra FixedPointDivCheckDividend
+    bra FixedPointDivFixDividend
 
 * At this point our divisor and dividend are shift all the way left.
 * We must do the following while we have more quotient bits
@@ -364,10 +361,7 @@ FixedPointDivMainSetup:
     ldb #16      * B = max number of loops
     subb numDividendShifts
     addb numDivisorShifts    
-    leax aa      * X = dividend
-    leay 4,x      * Y = divisor
-    pshs u
-    leau 8,x * U = quotient
+    leay 4,x     * Y = divisor
 
 FixedPointDivMainLoop:
 * Compare dividend to divisor
@@ -378,8 +372,8 @@ FixedPointDivMainLoop:
 
 * Put 1 in quotient, subtract divisor from dividend
     lda #1
-    ora 3,u
-    sta 3,u
+    ora 11,x
+    sta 11,x
     bra FixedPointSubtractAndShift
 
 FixedPointDivDividendTooSmall:
@@ -405,10 +399,10 @@ FixedPointDivMainLoopRepeat:
     bra FixedPointDivMainLoopRepeat
 
 FixedPointShiftQuotientLeft:
-    asl 3,u
-    rol 2,u
-    rol 1,u
-    rol ,u
+    asl 11,x
+    rol 10,x
+    rol 9,x
+    rol 8,x
     rts
 
 FixedPointShiftDividendLeft:
@@ -469,7 +463,6 @@ FixedPointSubtractDivisorFromDividend:
     rts
 
 FixedPointDivMainLoopEnd:
-    puls u
   }
 
   // Make result negative if needed
