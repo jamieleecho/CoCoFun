@@ -288,45 +288,42 @@ FixedPointAsmDone:
 
 
 void FixedPointDiv(FixedPoint *c, FixedPoint *a, FixedPoint *b) {
-  FixedPoint aa, bb;
-  byte results[4];
+  // aa[0] = dividend, aa[1] = divisor, aa[2] = quotient
+  FixedPoint aa[3];
   char numDivisorShifts = 0, numDividendShifts = 0;
-  memset(results, 0, sizeof(results));
+  memset((byte *)(aa + 2), 0, sizeof(aa[2]));
 
   // Convert all operands to positive, count number of negates
   byte numNegatives = 0;
   if (a->Whole < 0x0) {
-    FixedPointNegate(&aa, a);
+    FixedPointNegate(aa, a);
     numNegatives++;
   } else
-    memcpy((byte *)&aa, (byte *)a, sizeof(aa));
+    memcpy((byte *)aa, (byte *)a, sizeof(aa[0]));
   if (b->Whole < 0x0) {
-    FixedPointNegate(&bb, b);
+    FixedPointNegate((aa + 1), b);
     numNegatives++;
   } else
-    memcpy((byte *)&bb, (byte *)b, sizeof(bb));
+    memcpy((byte *)(aa + 1), (byte *)b, sizeof(aa[1]));
 
   // Can't divide by zero, simply set c to zero
-  if ((aa.Whole == 0) && (aa.Fraction == 0)) {
+  if ((aa[0].Whole == 0) && (aa[0].Fraction == 0)) {
     memset(c, 0, sizeof(*c));
     return;
   }
 
   // Result is zero, so return 0
-  if ((bb.Whole == 0) && (bb.Fraction == 0)) {
+  if ((aa[1].Whole == 0) && (aa[1].Fraction == 0)) {
     memset(c, 0, sizeof(*c));
     return;
   }
 
-  printf("*** %4x.%4x\n", aa.Whole, aa.Fraction);
-  printf("*** %4x.%4x\n", bb.Whole, bb.Fraction);
-
-  // Real work not even started yet. But if it were done, you'd be saying
-  // Gosh darn, I need some more of that!
+  // Note to self: Never ever do a div routine again
   asm {
 * The first thing we have to do is shift the divisor left until its most
 * significant bit is 1
-    leax bb
+    leax aa
+    leax 4,x
 FixedPointDivCheckDivisor:
     lda ,x
     bmi FixedPointDivFixDividend
@@ -368,9 +365,9 @@ FixedPointDivMainSetup:
     subb numDividendShifts
     addb numDivisorShifts    
     leax aa      * X = dividend
-    leay bb      * Y = divisor
+    leay 4,x      * Y = divisor
     pshs u
-    leau results * U = quotient
+    leau 8,x * U = quotient
 
 FixedPointDivMainLoop:
 * Compare dividend to divisor
@@ -475,12 +472,8 @@ FixedPointDivMainLoopEnd:
     puls u
   }
 
-  printf("*** %2x%2x.%2x%2x ---- %d, %d\n", results[0], results[1], results[2], results[3],
-	 numDivisorShifts, numDividendShifts);
-
   // Make result negative if needed
-  c->Whole = ((int)results[0] << 8) + results[1];
-  c->Fraction = ((unsigned)results[2] << 8) + results[3];
+  memcpy((byte *)c, (byte *)(aa + 2), sizeof(aa[2]));
   if (numNegatives & 1)
     FixedPointNegate(c, c);
 }
