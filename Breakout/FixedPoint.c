@@ -364,7 +364,7 @@ FixedPointDivCheckDividend:
 *          a. shift the quotient left
 *          b. Shift the dividend left
 FixedPointDivMainSetup:
-    ldb #47      * B = max number of loops
+    ldb #16      * B = max number of loops
     subb numDividendShifts
     addb numDivisorShifts    
     leax aa      * X = dividend
@@ -457,7 +457,7 @@ FixedPointSubtractNegateDivisorCom0:
 FixedPointSubtractDivisorFromDividend:
     bsr FixedPointSubtractNegateDivisor
     lda 3,y
-    adca 3,x
+    adda 3,x
     sta 3,x
     lda 2,y
     adca 2,x
