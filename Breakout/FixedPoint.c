@@ -355,7 +355,7 @@ FixedPointDivFixDividend:
 *          c. Put 1 in the quotient
 * 2. subtract most signficant divisor bits from most significant dividend bits       
 * 3. while we have more quotient bits and there is a zero in the dividend
-*          a. shift the quotient left
+*          a. Shift the quotient left
 *          b. Shift the dividend left
 FixedPointDivMainSetup:
     ldb #16      * B = max number of loops
