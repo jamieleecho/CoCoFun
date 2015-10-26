@@ -106,6 +106,14 @@ int main() {
   
   while(TRUE) {
     FixedPointMake(&a, 0x4000, 0x0);
+    FixedPointMake(&b, 0x3, 0x0);
+    FixedPointDiv(&c, &d, &a, &b);
+    printf("%x.%x\n", a.Whole, a.Fraction);
+    printf("%x.%x\n", b.Whole, b.Fraction);
+    printf("%x.%x    %x.%x\n\n", c.Whole, c.Fraction, d.Whole, d.Fraction);
+    waitkey(0);
+
+    FixedPointMake(&a, 0x4000, 0x0);
     FixedPointMake(&b, 0xc, 0x0);
     FixedPointDiv(&c, &d, &a, &b);
     printf("%x.%x\n", a.Whole, a.Fraction);

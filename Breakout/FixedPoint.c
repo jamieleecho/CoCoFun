@@ -369,12 +369,7 @@ FixedPointDivMainLoop:
 
 * Branch if dividend too small
     blo FixedPointDivDividendTooSmall
-
-* Put 1 in quotient, subtract divisor from dividend
-    lda #1
-    ora 11,x
-    sta 11,x
-    bra FixedPointSubtractAndShift
+    bra FixedPointDivPut1InQuotient
 
 FixedPointDivDividendTooSmall:
     tstb
@@ -383,6 +378,8 @@ FixedPointDivDividendTooSmall:
     bsr FixedPointShiftDividendLeft
     bsr FixedPointShiftQuotientLeft
 
+FixedPointDivPut1InQuotient:
+* Put 1 in quotient, subtract divisor from dividend
     lda #1
     ora 11,x
     sta 11,x
@@ -426,16 +423,13 @@ FixedPointShiftDividendRight:
 FixedPointCompareDividendToDivisor:
     lda ,x 
     cmpa ,y
-    bhi FixedPointCompareDividendToDivisorDone
-    blo FixedPointCompareDividendToDivisorDone
+    bne FixedPointCompareDividendToDivisorDone
     lda 1,x 
     cmpa 1,y
-    bhi FixedPointCompareDividendToDivisorDone
-    blo FixedPointCompareDividendToDivisorDone
+    bne FixedPointCompareDividendToDivisorDone
     lda 2,x 
     cmpa 2,y
-    bhi FixedPointCompareDividendToDivisorDone
-    blo FixedPointCompareDividendToDivisorDone
+    bne FixedPointCompareDividendToDivisorDone
     lda 3,x 
     cmpa 3,y
 FixedPointCompareDividendToDivisorDone:
