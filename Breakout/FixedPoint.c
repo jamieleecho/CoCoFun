@@ -361,7 +361,6 @@ FixedPointDivMainSetup:
     ldb #16      * B = max number of loops
     subb numDividendShifts
     addb numDivisorShifts    
-    leay 4,x     * Y = divisor
 
 FixedPointDivMainLoop:
 * Compare dividend to divisor
@@ -422,49 +421,49 @@ FixedPointShiftDividendRight:
 
 FixedPointCompareDividendToDivisor:
     lda ,x 
-    cmpa ,y
+    cmpa 4,x
     bne FixedPointCompareDividendToDivisorDone
     lda 1,x 
-    cmpa 1,y
+    cmpa 5,x
     bne FixedPointCompareDividendToDivisorDone
     lda 2,x 
-    cmpa 2,y
+    cmpa 6,x
     bne FixedPointCompareDividendToDivisorDone
     lda 3,x 
-    cmpa 3,y
+    cmpa 7,x
 FixedPointCompareDividendToDivisorDone:
     rts
 
 FixedPointSubtractNegateDivisor:
-    neg 3,y
+    neg 7,x
     bcs FixedPointSubtractNegateDivisorCom2
-    neg 2,y
+    neg 6,x
     bcs FixedPointSubtractNegateDivisorCom1
-    neg 1,y
+    neg 5,x
     bcs FixedPointSubtractNegateDivisorCom0
-    neg ,y
+    neg 4,x
     rts
 
 FixedPointSubtractNegateDivisorCom2:
-    com 2,y
+    com 6,x
 FixedPointSubtractNegateDivisorCom1:
-    com 1,y
+    com 5,x
 FixedPointSubtractNegateDivisorCom0:
-    com ,y
+    com 4,x
     rts
 
 FixedPointSubtractDivisorFromDividend:
     bsr FixedPointSubtractNegateDivisor
-    lda 3,y
+    lda 7,x
     adda 3,x
     sta 3,x
-    lda 2,y
+    lda 6,x
     adca 2,x
     sta 2,x
-    lda 1,y
+    lda 5,x
     adca 1,x
     sta 1,x
-    lda ,y
+    lda 4,x
     adca ,x
     sta ,x
     bsr FixedPointSubtractNegateDivisor
