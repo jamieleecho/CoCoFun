@@ -67,6 +67,7 @@ int main() {
   printf("%x.%x\n", a.Whole, a.Fraction);
   printf("%x.%x\n", b.Whole, b.Fraction);
   printf("%x.%x\n\n", c.Whole, c.Fraction);
+  waitkey(0);
 
   FixedPointMake(&a, 0, 0x0);
   FixedPointMake(&b, 0, 0x1);
@@ -74,6 +75,7 @@ int main() {
   printf("%x.%x\n", a.Whole, a.Fraction);
   printf("%x.%x\n", b.Whole, b.Fraction);
   printf("%x.%x\n\n", c.Whole, c.Fraction);
+  waitkey(0);
 
   FixedPointMake(&a, -1, 0x0);
   FixedPointNegate(&b, &a);
@@ -102,95 +104,94 @@ int main() {
   printf("%x.%x\n", e.Whole, e.Fraction);
   printf("%x.%x\n\n", f.Whole, f.Fraction);
   waitkey(0);
-
   
   while(TRUE) {
     FixedPointMake(&a, 0x4000, 0x0);
     FixedPointMake(&b, 0x3, 0x0);
-    FixedPointDiv(&c, &d, &a, &b);
+    FixedPointDiv(&c, &a, &b);
     printf("%x.%x\n", a.Whole, a.Fraction);
     printf("%x.%x\n", b.Whole, b.Fraction);
-    printf("%x.%x    %x.%x\n\n", c.Whole, c.Fraction, d.Whole, d.Fraction);
+    printf("%x.%x\n\n", c.Whole, c.Fraction);
     waitkey(0);
 
     FixedPointMake(&a, 0x4000, 0x0);
     FixedPointMake(&b, 0xc, 0x0);
-    FixedPointDiv(&c, &d, &a, &b);
+    FixedPointDiv(&c, &a, &b);
     printf("%x.%x\n", a.Whole, a.Fraction);
     printf("%x.%x\n", b.Whole, b.Fraction);
-    printf("%x.%x    %x.%x\n\n", c.Whole, c.Fraction, d.Whole, d.Fraction);
+    printf("%x.%x\n\n", c.Whole, c.Fraction);
     waitkey(0);
 
     FixedPointMake(&a, 111, 0x0);
     FixedPointMake(&b, 3, 0x0);
-    FixedPointDiv(&c, &d, &a, &b);
+    FixedPointDiv(&c, &a, &b);
     printf("%x.%x\n", a.Whole, a.Fraction);
     printf("%x.%x\n", b.Whole, b.Fraction);
-    printf("%x.%x    %x.%x\n\n", c.Whole, c.Fraction, d.Whole, d.Fraction);
+    printf("%x.%x\n\n", c.Whole, c.Fraction);
     waitkey(0);
 
     FixedPointMake(&a, 102, 0x0);
     FixedPointMake(&b, 3, 0x0);
-    FixedPointDiv(&c, &d, &a, &b);
+    FixedPointDiv(&c, &a, &b);
     printf("%x.%x\n", a.Whole, a.Fraction);
     printf("%x.%x\n", b.Whole, b.Fraction);
-    printf("%x.%x    %x.%x\n\n", c.Whole, c.Fraction, d.Whole, d.Fraction);
+    printf("%x.%x\n\n", c.Whole, c.Fraction);
     waitkey(0);
 
     FixedPointMake(&a, 11112, 0x0);
     FixedPointMake(&b, 3, 0x0);
-    FixedPointDiv(&c, &d, &a, &b);
+    FixedPointDiv(&c, &a, &b);
     printf("%x.%x\n", a.Whole, a.Fraction);
     printf("%x.%x\n", b.Whole, b.Fraction);
-    printf("%x.%x    %x.%x\n\n", c.Whole, c.Fraction, d.Whole, d.Fraction);
+    printf("%x.%x\n\n", c.Whole, c.Fraction);
     waitkey(0);
 
     FixedPointMake(&a, 0x7fff, 0x0);
     FixedPointMake(&b, 0x2, 0x0);
-    FixedPointDiv(&c, &d, &a, &b);
+    FixedPointDiv(&c, &a, &b);
     printf("%x.%x\n", a.Whole, a.Fraction);
     printf("%x.%x\n", b.Whole, b.Fraction);
-    printf("%x.%x    %x.%x\n\n", c.Whole, c.Fraction, d.Whole, d.Fraction);
+    printf("%x.%x\n\n", c.Whole, c.Fraction);
     waitkey(0);
 
     FixedPointMake(&a, 1, 0x0);
     FixedPointMake(&b, 3, 0x0);
-    FixedPointDiv(&c, &d, &a, &b);
+    FixedPointDiv(&c, &a, &b);
     printf("%x.%x\n", a.Whole, a.Fraction);
     printf("%x.%x\n", b.Whole, b.Fraction);
-    printf("%x.%x    %x.%x\n\n", c.Whole, c.Fraction, d.Whole, d.Fraction);
+    printf("%x.%x\n\n", c.Whole, c.Fraction);
     waitkey(0);
 
     FixedPointMake(&a, 0x7fff, 0x0);
     FixedPointMake(&b, 0x1, 0x0);
-    FixedPointDiv(&c, &d, &a, &b);
+    FixedPointDiv(&c, &a, &b);
     printf("%x.%x\n", a.Whole, a.Fraction);
     printf("%x.%x\n", b.Whole, b.Fraction);
-    printf("%x.%x    %x.%x\n\n", c.Whole, c.Fraction, d.Whole, d.Fraction);
+    printf("%x.%x\n\n", c.Whole, c.Fraction);
     waitkey(0);
     
     FixedPointMake(&a, 0x7ffe, 0x0);
     FixedPointMake(&b, 0x2, 0x0);
-    FixedPointDiv(&c, &d, &a, &b);
+    FixedPointDiv(&c, &a, &b);
     printf("%x.%x\n", a.Whole, a.Fraction);
     printf("%x.%x\n", b.Whole, b.Fraction);
-    printf("%x.%x    %x.%x\n\n", c.Whole, c.Fraction, d.Whole, d.Fraction);
+    printf("%x.%x\n\n", c.Whole, c.Fraction);
     waitkey(0);
     
     FixedPointMake(&a, 0x300, 0x0);
     FixedPointMake(&b, 0x30, 0x0);
-    FixedPointDiv(&c, &d, &a, &b);
+    FixedPointDiv(&c, &a, &b);
     printf("%x.%x\n", a.Whole, a.Fraction);
     printf("%x.%x\n", b.Whole, b.Fraction);
-    printf("%x.%x    %x.%x\n\n", c.Whole, c.Fraction, d.Whole, d.Fraction);
+    printf("%x.%x\n\n", c.Whole, c.Fraction);
     waitkey(0);
   
     FixedPointMake(&a, 0x3030, 0x6030);
     FixedPointMake(&b, 0x30, 0x0);
-    FixedPointDiv(&c, &d, &a, &b);
+    FixedPointDiv(&c, &a, &b);
     printf("%x.%x\n", a.Whole, a.Fraction);
     printf("%x.%x\n", b.Whole, b.Fraction);
-    printf("%x.%x    %x.%x\n\n", c.Whole, c.Fraction, d.Whole, d.Fraction);
+    printf("%x.%x\n\n", c.Whole, c.Fraction);
     waitkey(0);
   }
 #endif

@@ -20,52 +20,30 @@ void FixedPointMake(FixedPoint *c, int whole, unsigned decimal) {
 
 void FixedPointNegate(FixedPoint *c, FixedPoint *a) {
   asm {
-* Load src and dest into x and y
-    ldx a
-    ldy c
+* Transfer *a into *c
+    ldy a
+    ldx c
+    ldd ,y
+    std ,x
+    ldd 2,y
+    std 2,x
 
-* Negate LSB
-    ldd 2,x
-    negb
+    neg 3,x
+    bcs FixedPointNegateCom2
+    neg 2,x
+    bcs FixedPointNegateCom1
+    neg 1,x
+    bcs FixedPointNegateCom0
+    neg ,x
+    bra FixedPointNegateDone
 
-* If no carry, we do not have to worry about carrying
-    bcs FixedPointNegateNoCarry
-
-* Carry to next byte 
-    nega
-    bcs FixedPointNegateNoCarryLSW
-
-* Store result
-    std 2,y
-
-* Load next word
-    ldd ,x
-
-* Carry to next byte
-    negb
-    bcs FixedPointNegateNoCarryB2
-
-* Carry to next byte
-    nega
-    bra FixedPointNegateFinish
-
-* No need to worry about carrying here
-FixedPointNegateNoCarry:
-    coma
-
-FixedPointNegateNoCarryLSW:
-* Store result
-    std 2,y
-
-* Load next word
-    ldd ,x
-    comb
-FixedPointNegateNoCarryB2:
-    coma
-
-* Store final word
-FixedPointNegateFinish
-    std ,y
+FixedPointNegateCom2:
+    com 2,x
+FixedPointNegateCom1:
+    com 1,x
+FixedPointNegateCom0:
+    com ,x
+FixedPointNegateDone:
   }  
 }
 
@@ -73,24 +51,24 @@ FixedPointNegateFinish
 void FixedPointAdd(FixedPoint *c, FixedPoint *a, FixedPoint *b) {
   asm {
     ldx a
-    ldy b
-    clra
-    clrb
-    ldd 2,x
-    addd 2,y
-    ldx c
-    std 2,x
-    clra
-    clrb
-    bcc FixedPointAddSkipCarry
-    incb
+    ldy c
+    pshs u
+    ldu b
+    
+    lda 3,x
+    adda 3,u
+    sta 3,y
+    lda 2,x
+    adda 2,u
+    sta 2,y
+    lda 1,x
+    adda 1,u
+    sta 1,y
+    lda ,x
+    adda ,u
+    sta ,y
 
- FixedPointAddSkipCarry:
-    ldx a
-    addd ,x
-    addd ,y
-    ldx c
-    std ,x
+    puls u
   }
 }
 
@@ -287,7 +265,7 @@ FixedPointAsmDone:
 }
 
 
-void FixedPointDiv(FixedPoint *c, FixedPoint *d, FixedPoint *a, FixedPoint *b) {
+void FixedPointDiv(FixedPoint *c, FixedPoint *a, FixedPoint *b) {
   // aa[0] = dividend, aa[1] = divisor, aa[2] = quotient
   FixedPoint aa[3];
   char numDivisorShifts = 0, numDividendShifts = 0;
@@ -362,6 +340,10 @@ FixedPointDivMainSetup:
     subb numDividendShifts
     addb numDivisorShifts    
 
+    tstb
+    beq FixedPointDivMainLoopEnd
+    incb
+
 FixedPointDivMainLoop:
 * Compare dividend to divisor
     bsr FixedPointCompareDividendToDivisor
@@ -371,9 +353,8 @@ FixedPointDivMainLoop:
     bra FixedPointDivPut1InQuotient
 
 FixedPointDivDividendTooSmall:
-    tstb
-    lbeq FixedPointDivMainLoopEnd
     decb
+    beq FixedPointDivMainLoopEnd
     bsr FixedPointShiftDividendLeft
     bsr FixedPointShiftQuotientLeft
 
@@ -390,9 +371,8 @@ FixedPointDivMainLoopRepeat:
     lda ,x
     bmi FixedPointDivMainLoop
 
-    tstb
-    beq FixedPointDivMainLoopEnd
     decb
+    beq FixedPointDivMainLoopEnd
 
     bsr FixedPointShiftDividendLeft
     bsr FixedPointShiftQuotientLeft
@@ -410,13 +390,6 @@ FixedPointShiftDividendLeft:
     rol 2,x
     rol 1,x
     rol ,x
-    rts
-
-FixedPointShiftDividendRight:
-    asr ,x
-    ror 1,x
-    ror 2,x
-    ror 3,x
     rts
 
 FixedPointCompareDividendToDivisor:
@@ -470,22 +443,12 @@ FixedPointSubtractDivisorFromDividend:
     rts
 
 FixedPointDivMainLoopEnd:
-    ldb numDividendShifts
-    beq FixedPointDivFixRemainderEnd
-FixedPointDivFixRemainder
-    bsr FixedPointShiftDividendRight
-    decb
-    beq FixedPointDivFixRemainder
-
-FixedPointDivFixRemainderEnd:    
   }
 
   // Make result negative if needed
   memcpy((byte *)c, (byte *)(aa + 2), sizeof(aa[2]));
-  memcpy((byte *)d, (byte *)(aa), sizeof(aa[0]));
   if (numNegatives & 1) {
     FixedPointNegate(c, c);
-    FixedPointNegate(d, d);
   }
 }
 
