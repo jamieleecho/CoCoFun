@@ -462,7 +462,7 @@ FixedPointDivMainLoopEnd:
 void FixedPointMod(FixedPoint *c, FixedPoint *d, FixedPoint *a, FixedPoint *b) {
   // aa[0] = dividend, aa[1] = divisor, aa[2] = quotient
   FixedPoint aa[3];
-  char numDivisorShifts = 0, numDividendShifts = 0, numTotalShifts = 16;
+  char numDivisorShifts = 0, numDividendShifts = 0, numTotalShifts;
   memset((byte *)(aa + 2), 0, sizeof(aa[2]));
 
   // Convert all operands to positive, count number of negates
