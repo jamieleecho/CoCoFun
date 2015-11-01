@@ -16,11 +16,21 @@
 #include "FixedPoint.h"
 
 
-/** Ball X position */
-FixedPoint splinterBallPositionX = FixedPointInit(20, 0);
+/** Ball position */
+FixedPoint splinterBallPosition[2];
 
-/** Ball Y position */
-FixedPoint splinterBallPositionY = FixedPointInit(16, 0);
+/** Slope of the ball (x/y) on [0, 4] */
+FixedPoint splinterBallSlope = FixedPointInit(1, 0);
+
+/** Speed of the ball on [.25, 1] */
+FixedPoint splinterBallVelocity = FixedPointInit(0, 0x4000);
+
+/** 
+ * Amount to increment each iteration
+ * magnitude(splinterBallIncrementVector) * splinterBallVelocity
+ * == splinterBallVelocity
+ */
+FixedPoint splinterBallIncrementVector[2];
 
 /** Ball increment X amount - either +/-1 */
 sbyte splinterBallIncrementX = 1;
