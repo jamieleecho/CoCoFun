@@ -20,12 +20,23 @@
 byte splinterBallWasMissed = 0;
 
 
+/**
+ * Updates splinterBallIncrementVector with the current slope and whether
+ * or not we should be moving left and up.
+ *
+ * @param moveLeft[in] if true, ensure the ball will move left
+ * @param moveUp[in] if true, ensure the ball will move up
+ */
+void SplinterBallSetSlope(byte moveLeft, byte moveUp) {
+}
+
+
 void SplinterBallReset() {
   FixedPointSet(&splinterBallPosition[0], 40, 0);
   FixedPointSet(&splinterBallPosition[1], 3, 0);
 
-  splinterBallIncrementX = -1;
-  splinterBallIncrementY = 1;
+  FixedPointSet(&splinterBallIncrementVector[0], -1, 0);
+  FixedPointSet(&splinterBallIncrementVector[1], 1, 0);
   splinterBallSlopeX = 1;
   splinterBallSlopeY = 3;
   splinterBallCounterX = splinterBallSlopeX;
@@ -87,10 +98,10 @@ byte SplinterBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
       // paddle
       byte changeDirX = (byte)random(21);
       if (changeDirX > 4)
-	splinterBallIncrementX = -1;
+	splinterBallIncrementVector[0].Whole = -1;
       byte changeDirY = (byte)random(21);
       if (changeDirY > 18)
-	splinterBallIncrementY = splinterBallIncrementY * -1;
+	splinterBallIncrementVector[1].Whole = splinterBallIncrementVector[1].Whole * -1;
       
       // Change the slope
       byte changeSlopeX = (byte)random(21);
@@ -130,10 +141,10 @@ void SplinterBallTick() {
   // Move the ball in the X direction
   if (splinterBallCounterX > 0) {
     splinterBallCounterX--;
-    splinterBallPosition[0].Whole += splinterBallIncrementX;
+    splinterBallPosition[0].Whole += splinterBallIncrementVector[0].Whole;
 
     if (splinterBallPosition[0].Whole > 108) { 
-      splinterBallIncrementX = -1;
+      splinterBallIncrementVector[0].Whole = -1;
     } else if (splinterBallPosition[0].Whole < 7) {      
       if (splinterBallWasMissed) {
 	if (splinterBallPosition[0].Whole <= 0) {
@@ -154,23 +165,23 @@ void SplinterBallTick() {
 	  int offset = (splinterBallPosition[1].Whole - (int)splinterPaddlePosition
 			+ 3 - 19);
 	  if (offset < -6) {
-	    splinterBallSlopeY -=  splinterBallIncrementY;
+	    splinterBallSlopeY -=  (byte)splinterBallIncrementVector[1].Whole;
 	  } else if (offset > 6) {
-	    splinterBallSlopeY += splinterBallIncrementY;
+	    splinterBallSlopeY += (byte)splinterBallIncrementVector[1].Whole;
 	  } else {	
 	    if (splinterBallSlopeY > 1)
 	      splinterBallSlopeY--;
 	  }
 	  if (splinterBallSlopeY >= 0x80) {	    
 	    splinterBallSlopeY = 2;
-	    splinterBallIncrementY = -splinterBallIncrementY;
+	    splinterBallIncrementVector[1].Whole = -splinterBallIncrementVector[1].Whole;
 	  } else if (splinterBallSlopeY > 5) {
 	    splinterBallSlopeY = 5;
 	    if (splinterBallSlopeX > 1)
 	      splinterBallSlopeX--;
 	  }
 
-	  splinterBallIncrementX = 1;
+	  splinterBallIncrementVector[0].Whole = 1;
 	} else {
 	  splinterBallWasMissed = 1;
 	}
@@ -181,12 +192,12 @@ void SplinterBallTick() {
   // Move the ball in the Y direction
   if (splinterBallCounterY > 0) {
     splinterBallCounterY--;
-    splinterBallPosition[1].Whole += splinterBallIncrementY;
+    splinterBallPosition[1].Whole += splinterBallIncrementVector[1].Whole;
 
     if ((byte)splinterBallPosition[1].Whole > 181) {
-      splinterBallIncrementY = -1;  
+      splinterBallIncrementVector[1].Whole = -1;  
     } else if ((byte)splinterBallPosition[1].Whole < 2) {
-      splinterBallIncrementY = +1;  
+      splinterBallIncrementVector[1].Whole = +1;  
     }
   }
 
