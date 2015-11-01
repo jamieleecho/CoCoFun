@@ -132,21 +132,21 @@ void FixedPointMul(FixedPoint *c, FixedPoint *a, FixedPoint *b) {
     mul
     addd 5,u
     std 5,u
-    lbsr FixedPointCarry4
+    lbsr FixedPointMulCarry4
 
     lda 1,x
     ldb 3,y
     mul
     addd 4,u
     std 4,u
-    lbsr FixedPointCarry3
+    lbsr FixedPointMulCarry3
 
     lda ,x
     ldb 3,y
     mul
     addd 3,u
     std 3,u
-    lbsr FixedPointCarry2
+    lbsr FixedPointMulCarry2
 
 * Multiply second byte of y
     lda 3,x
@@ -154,28 +154,28 @@ void FixedPointMul(FixedPoint *c, FixedPoint *a, FixedPoint *b) {
     mul
     addd 5,u
     std 5,u
-    lbsr FixedPointCarry4
+    lbsr FixedPointMulCarry4
 
     lda 2,x
     ldb 2,y
     mul
     addd 4,u
     std 4,u
-    lbsr FixedPointCarry3
+    lbsr FixedPointMulCarry3
 
     lda 1,x
     ldb 2,y
     mul
     addd 3,u
     std 3,u
-    bsr FixedPointCarry2
+    bsr FixedPointMulCarry2
 
     lda ,x
     ldb 2,y
     mul
     addd 2,u
     std 2,u
-    bsr FixedPointCarry1
+    bsr FixedPointMulCarry1
 
 * Multiply third byte of y
     lda 3,x
@@ -183,28 +183,28 @@ void FixedPointMul(FixedPoint *c, FixedPoint *a, FixedPoint *b) {
     mul
     addd 4,u
     std 4,u
-    bsr FixedPointCarry3
+    bsr FixedPointMulCarry3
 
     lda 2,x
     ldb 1,y
     mul
     addd 3,u
     std 3,u
-    bsr FixedPointCarry2
+    bsr FixedPointMulCarry2
 
     lda 1,x
     ldb 1,y
     mul
     addd 2,u
     std 2,u
-    bsr FixedPointCarry1
+    bsr FixedPointMulCarry1
 
     lda ,x
     ldb 1,y
     mul
     addd 1,u
     std 1,u
-    bsr FixedPointCarry0
+    bsr FixedPointMulCarry0
 
 * Multiply fourth byte of y
     lda 3,x
@@ -212,21 +212,21 @@ void FixedPointMul(FixedPoint *c, FixedPoint *a, FixedPoint *b) {
     mul
     addd 3,u
     std 3,u
-    bsr FixedPointCarry3
+    bsr FixedPointMulCarry3
 
     lda 2,x
     ldb ,y
     mul
     addd 2,u
     std 2,u
-    bsr FixedPointCarry3
+    bsr FixedPointMulCarry3
 
     lda 1,x
     ldb ,y
     mul
     addd 1,u
     std 1,u
-    bsr FixedPointCarry0
+    bsr FixedPointMulCarry0
 
     lda ,x
     ldb ,y
@@ -234,45 +234,45 @@ void FixedPointMul(FixedPoint *c, FixedPoint *a, FixedPoint *b) {
     addd ,u
     std ,u
 
-    bra FixedPointAsmDone
+    bra FixedPointMulAsmDone
 
 *******************************************************************************
 * Routine for performing carry results on product
 *******************************************************************************
-FixedPointCarry8:
-    bcc FixedPointCarryDone
+FixedPointMulCarry8:
+    bcc FixedPointMulCarryDone
     inc 8,u
-FixedPointCarry7:
-    bcc FixedPointCarryDone
+FixedPointMulCarry7:
+    bcc FixedPointMulCarryDone
     inc 7,u
-FixedPointCarry6:
-    bcc FixedPointCarryDone
+FixedPointMulCarry6:
+    bcc FixedPointMulCarryDone
     inc 6,u
-FixedPointCarry5:
-    bcc FixedPointCarryDone
+FixedPointMulCarry5:
+    bcc FixedPointMulCarryDone
     inc 5,u
-FixedPointCarry4:
-    bcc FixedPointCarryDone
+FixedPointMulCarry4:
+    bcc FixedPointMulCarryDone
     inc 4,u
-FixedPointCarry3:
-    bcc FixedPointCarryDone
+FixedPointMulCarry3:
+    bcc FixedPointMulCarryDone
     inc 3,u
-FixedPointCarry2:
-    bcc FixedPointCarryDone
+FixedPointMulCarry2:
+    bcc FixedPointMulCarryDone
     inc 2,u
-FixedPointCarry1:
-    bcc FixedPointCarryDone
+FixedPointMulCarry1:
+    bcc FixedPointMulCarryDone
     inc 1,u
-FixedPointCarry0:
-    bcc FixedPointCarryDone
+FixedPointMulCarry0:
+    bcc FixedPointMulCarryDone
     inc ,u
-FixedPointCarryDone:
+FixedPointMulCarryDone:
     rts
 
 *******************************************************************************
 * Invoked when calculation is complete
 *******************************************************************************
-FixedPointAsmDone:
+FixedPointMulAsmDone:
     puls u
   }
 
@@ -632,6 +632,11 @@ FixedPointModMainLoopEnd5:
     memcpy((byte *)c, (byte *)(aa + 2), sizeof(aa[2]));
     memcpy((byte *)d, (byte *)(aa), sizeof(aa[0]));
   }
+
+  return;
+
+  // Force FixPointDiv to not get optimized away
+  FixedPointDiv(&aa[0], &aa[0], &aa[0]);
 }
 
 
@@ -679,9 +684,8 @@ FixedPoint *FixedPointCopy(FixedPoint *b, FixedPoint *a) {
 
 
 void FixedPointToA(char *buffer, FixedPoint *a) {
-  FixedPoint base = FixedPointInit(10000, 0);
-  FixedPoint base10 = FixedPointInit(10, 0);
   FixedPoint quotient, remainder;
+  byte powerIndex = 0;
 
   // Deal with negatives
   if (a->Whole < 0) {
@@ -704,12 +708,12 @@ void FixedPointToA(char *buffer, FixedPoint *a) {
   // Output the whole part
   byte nonZeroChars = 0;
   for(int ii=0; ii<5; ii++) {
-    FixedPointMod(&quotient, &remainder, &remainder, &base);
+    FixedPointMod(&quotient, &remainder, &remainder, FixedPointPowersOf10 + powerIndex);
     if (quotient.Whole > 0)
       nonZeroChars++;
     if (nonZeroChars > 0)
       *buffer++ = '0' + (byte)quotient.Whole;
-    FixedPointDiv(&base, &base, &base10);
+    powerIndex++;
   }
 
   if (nonZeroChars == 0)
@@ -726,14 +730,14 @@ void FixedPointToA(char *buffer, FixedPoint *a) {
   *buffer++ = '.';
   for(int ii=0; ii<4; ii++) {
 
-    FixedPointMod(&quotient, &remainder, &remainder, &base);
+    FixedPointMod(&quotient, &remainder, &remainder, FixedPointPowersOf10 + powerIndex);
     if (quotient.Whole > 0)
       zeroChars = 0;
     else
       zeroChars++;
       
     *buffer++ = '0' + (byte)quotient.Whole;
-    FixedPointDiv(&base, &base, &base10);
+    powerIndex++;
   }
   
   // Put the null character at the last non-zero char
@@ -763,8 +767,7 @@ void FixedPointParse(FixedPoint *a, char *buffer) {
 
   // Go through each character adding the digits
   byte sawDecimalPoint = FALSE;
-  FixedPoint base10 = FixedPointInit(10, 0);
-  FixedPoint base = FixedPointInit(1, 0);
+  int powerIndex = 5;
   FixedPoint tmp;
   for(c = *buffer++; ((c >= '0' && c <= '9') || (c == '.')) ; c = *buffer++) {
     if (c == '.') {
@@ -775,11 +778,13 @@ void FixedPointParse(FixedPoint *a, char *buffer) {
 
     FixedPointSet(&tmp, c - '0', 0);
     if (sawDecimalPoint) {
-      FixedPointDiv(&base, &base, &base10);
-      FixedPointMul(&tmp, &tmp, &base);
+      FixedPointMul(&tmp, &tmp, FixedPointPowersOf10 + powerIndex);
       FixedPointAdd(a, a, &tmp);
+      powerIndex++;
+      if (powerIndex >= sizeof(FixedPointPowersOf10)/sizeof(FixedPointPowersOf10[0]))
+	break;
     } else {
-      FixedPointMul(a, a, &base10);
+      FixedPointMul(a, a, FixedPointPowersOf10 + 3);
       FixedPointAdd(a, a, &tmp);
     }    
   }  

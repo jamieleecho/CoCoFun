@@ -59,64 +59,47 @@ char breakoutLastDrawnScore[7];
 
 
 int main() {
-#if 1
-  FixedPoint a, b, c, d, e = FixedPointInitE(), f;
   FixedPoint pi = FixedPointInitPi(), pi2 = FixedPointInitPiOver2();
   FixedPoint mpi = FixedPointInitMinusPi(), mpi2 = FixedPointInitMinusPiOver2();
   char buffer[12];
+  
+  FixedPoint tmp, tmp2;
+  FixedPointMul(&tmp, &pi, &mpi);
+  FixedPointToA(buffer, &tmp);
+  printf("%s\n", buffer);
 
-  FixedPointToA(buffer, &pi);
-  printf("*** %s     %x.%x\n", buffer, a.Whole, a.Fraction);
-  FixedPointToA(buffer, &pi2);
-  printf("*** %s     %x.%x\n", buffer, a.Whole, a.Fraction);
-  FixedPointToA(buffer, &mpi);
-  printf("*** %s     %x.%x\n", buffer, a.Whole, a.Fraction);
-  FixedPointToA(buffer, &mpi2);
-  printf("*** %s     %x.%x\n", buffer, a.Whole, a.Fraction);
-  FixedPointToA(buffer, &e);
-  printf("*** %s     %x.%x\n", buffer, a.Whole, a.Fraction);
+  FixedPointMul(&tmp, &mpi, &mpi);
+  FixedPointToA(buffer, &tmp);
+  printf("%s\n", buffer);
 
-  FixedPointParse(&a, " +3.14159 ");
-  FixedPointToA(buffer, &a);
-  printf("*** %s     %x.%x\n", buffer, a.Whole, a.Fraction);
-
-  FixedPointParse(&a, "\t -3.14159 ");
-  FixedPointToA(buffer, &a);
-  printf("*** %s     %x.%x\n", buffer, a.Whole, a.Fraction);
-
-  FixedPointParse(&a, " 1.570796326794897 ");
-  FixedPointToA(buffer, &a);
-  printf("*** %s     %x.%x\n", buffer, a.Whole, a.Fraction);
-
-  FixedPointParse(&a, "\t -1.570796326794897 ");
-  FixedPointToA(buffer, &a);
-  printf("*** %s     %x.%x\n", buffer, a.Whole, a.Fraction);
-
-  FixedPointParse(&a, "2.718281828459045 ");
-  FixedPointToA(buffer, &a);
-  printf("*** %s     %x.%x\n", buffer, a.Whole, a.Fraction);
-
-  FixedPointParse(&a, "\t .1 ");
-  FixedPointToA(buffer, &a);
-  printf("*** %s     %x.%x\n", buffer, a.Whole, a.Fraction);
-
-  FixedPointParse(&a, "\t .01 ");
-  FixedPointToA(buffer, &a);
-  printf("*** %s     %x.%x\n", buffer, a.Whole, a.Fraction);
-
-  FixedPointParse(&a, "\t .001 ");
-  FixedPointToA(buffer, &a);
-  printf("*** %s     %x.%x\n", buffer, a.Whole, a.Fraction);
-
-  FixedPointParse(&a, "\t .0001 ");
-  FixedPointToA(buffer, &a);
-  printf("*** %s     %x.%x\n", buffer, a.Whole, a.Fraction);
-
-  FixedPointParse(&a, "\t .00001 ");
-  FixedPointToA(buffer, &a);
-  printf("*** %s     %x.%x\n", buffer, a.Whole, a.Fraction);
+  FixedPointMul(&tmp, &pi2, &mpi2);
+  FixedPointToA(buffer, &tmp);
+  printf("%s\n", buffer);
   waitkey(0);
-#endif
+
+  FixedPointParse(&tmp, "12345.1234");
+  FixedPointParse(&tmp2, "2.1234");
+  FixedPointMul(&tmp, &tmp, &tmp2);
+  FixedPointToA(buffer, &tmp);
+  printf("%s\n", buffer);
+  waitkey(0);
+
+  for(unsigned int ii=1; ii<=0x4000; ii = ii << 1) {
+    for(unsigned int jj=1; jj<=0x4000; jj = jj << 1) {
+      unsigned ii2 = ii << 1;
+      unsigned jj2 = jj << 1;
+      FixedPoint tmp3, tmp4;
+      FixedPointSet(&tmp, ii, ii);
+      FixedPointSet(&tmp2, jj, jj);
+      FixedPointMul(&tmp3, &tmp, &tmp2);
+      FixedPointMul(&tmp4, &tmp2, &tmp);
+      if (!FixedPointEquals(&tmp3, &tmp4))
+	printf("Ooop!: %x.%x\n", ii2, jj2);
+      else
+	printf("%x.%x\n", ii2, jj2);
+    }
+  }
+  waitkey(0);
 
   BreakoutInit();
   BreakoutPlay();
