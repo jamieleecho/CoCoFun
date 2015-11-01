@@ -23,11 +23,11 @@ asm void FixedPointSet(FixedPoint *c, int whole, unsigned decimal) {
 }
 
 
-void FixedPointNegate(FixedPoint *c, FixedPoint *a) {
+asm void FixedPointNegate(FixedPoint *c, FixedPoint *a) {
   asm {
 * Transfer *a into *c
-    ldy a
-    ldx c
+    ldy 4,s
+    ldx 2,s
     ldd ,y
     std ,x
     ldd 2,y
