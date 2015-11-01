@@ -289,14 +289,15 @@ void FixedPointDiv(FixedPoint *c, FixedPoint *a, FixedPoint *b) {
   } else
     memcpy((byte *)(aa + 1), (byte *)b, sizeof(aa[1]));
 
-  // Can't divide by zero, simply set c to zero
-  if ((aa[0].Whole == 0) && (aa[0].Fraction == 0)) {
-    memset(c, 0, sizeof(*c));
+  // Can't divide by zero, set to big value
+  if ((aa[1].Whole == 0) && (aa[1].Fraction == 0)) {
+    c->Whole = (numNegatives & 1) ? -1 : 0x7fff;
+    c->Fraction = 0xffff;
     return;
   }
 
   // Result is zero, so return 0
-  if ((aa[1].Whole == 0) && (aa[1].Fraction == 0)) {
+  if ((aa[0].Whole == 0) && (aa[0].Fraction == 0)) {
     memset(c, 0, sizeof(*c));
     return;
   }
@@ -478,14 +479,15 @@ void FixedPointMod(FixedPoint *c, FixedPoint *d, FixedPoint *a, FixedPoint *b) {
   } else
     memcpy((byte *)(aa + 1), (byte *)b, sizeof(aa[1]));
 
-  // Can't divide by zero, simply set c to zero
-  if ((aa[0].Whole == 0) && (aa[0].Fraction == 0)) {
-    memset(c, 0, sizeof(*c));
+  // Can't divide by zero, set to big value
+  if ((aa[1].Whole == 0) && (aa[1].Fraction == 0)) {
+    c->Whole = (numNegatives & 1) ? -1 : 0x7fff;
+    c->Fraction = 0xffff;
     return;
   }
 
   // Result is zero, so return 0
-  if ((aa[1].Whole == 0) && (aa[1].Fraction == 0)) {
+  if ((aa[0].Whole == 0) && (aa[0].Fraction == 0)) {
     memset(c, 0, sizeof(*c));
     return;
   }

@@ -86,6 +86,19 @@ int main() {
 
   waitkey(0);
 
+  FixedPointSet(&a, 0, 0);
+  FixedPointDiv(&a, &a, &a);
+  FixedPointToA(buffer, &a);
+  printf("*** %s\n", buffer);
+
+  FixedPointSet(&a, -1, 0);
+  FixedPointSet(&b, 0, 0);
+  FixedPointDiv(&a, &a, &b);
+  FixedPointToA(buffer, &a);
+  printf("*** %s\n", buffer);
+
+  waitkey(0);
+
 #endif
 
   BreakoutInit();
