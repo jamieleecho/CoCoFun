@@ -13,19 +13,20 @@
 
 
 #include <coco.h>
+#include "FixedPoint.h"
 
 
 /** Ball X position */
-byte splinterBallPositionX = 20;
+FixedPoint splinterBallPositionX = FixedPointInit(20, 0);
 
 /** Ball Y position */
-byte splinterBallPositionY = 16;
+FixedPoint splinterBallPositionY = FixedPointInit(16, 0);
 
 /** Ball increment X amount - either +/-1 */
-byte splinterBallIncrementX = 1;
+sbyte splinterBallIncrementX = 1;
 
 /** Ball increment Y amount - either +/-1 */
-byte splinterBallIncrementY = 1;
+sbyte splinterBallIncrementY = 1;
 
 /** Maximum amount to add to X before resetting splinterBallCounterX */
 byte splinterBallSlopeX = 5;
