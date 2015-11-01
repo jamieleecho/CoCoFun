@@ -341,7 +341,7 @@ FixedPointDivMainSetup:
     addb numDivisorShifts    
 
     tstb
-    beq FixedPointDivMainLoopEnd
+    ble FixedPointDivMainLoopEnd
     incb
 
 FixedPointDivMainLoop:
