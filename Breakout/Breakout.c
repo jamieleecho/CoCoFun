@@ -84,22 +84,6 @@ int main() {
   printf("%s\n", buffer);
   waitkey(0);
 
-  for(unsigned int ii=1; ii<=0x4000; ii = ii << 1) {
-    for(unsigned int jj=1; jj<=0x4000; jj = jj << 1) {
-      unsigned ii2 = ii << 1;
-      unsigned jj2 = jj << 1;
-      FixedPoint tmp3, tmp4;
-      FixedPointSet(&tmp, ii, ii);
-      FixedPointSet(&tmp2, jj, jj);
-      FixedPointMul(&tmp3, &tmp, &tmp2);
-      FixedPointMul(&tmp4, &tmp2, &tmp);
-      if (!FixedPointEquals(&tmp3, &tmp4))
-	printf("Ooop!: %x.%x\n", ii2, jj2);
-      else
-	printf("%x.%x\n", ii2, jj2);
-    }
-  }
-  waitkey(0);
 
   BreakoutInit();
   BreakoutPlay();

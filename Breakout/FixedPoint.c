@@ -635,7 +635,7 @@ FixedPointModMainLoopEnd5:
 
   return;
 
-  // Force FixPointDiv to not get optimized away
+  // Force FixedPointDiv to not get optimized away
   FixedPointDiv(&aa[0], &aa[0], &aa[0]);
 }
 
