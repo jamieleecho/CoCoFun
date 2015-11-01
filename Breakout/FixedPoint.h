@@ -129,7 +129,6 @@ byte FixedPointGreaterThanOrEqualTo(FixedPoint *a, FixedPoint *b);
  */
 byte FixedPointLessThanOrEqualTo(FixedPoint *a, FixedPoint *b);
 
-
 /**
  * Copies a to b.
  * @param b[out] destination
@@ -140,9 +139,16 @@ FixedPoint *FixedPointCopy(FixedPoint *b, FixedPoint *a);
 
 /**
  * Creates an ascii decimal version of a.
- * @param buffer[out] output buffer of at least 11 bytes
+ * @param buffer[out] output buffer of at least 12 bytes
  * @param a[in] input
  */
 void FixedPointToA(char *buffer, FixedPoint *a);
+
+/**
+ * Parses buffer into a FixedPoint value.
+ * @param a[out] output parsed result
+ * @param a[in] input
+ */
+void FixedPointParse(FixedPoint *a, char *buffer);
 
 #endif

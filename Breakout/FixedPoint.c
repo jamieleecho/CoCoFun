@@ -741,6 +741,9 @@ void FixedPointToA(char *buffer, FixedPoint *a) {
     FixedPointDiv(&base, &base, &base10);
   }
 
+  if (nonZeroChars == 0)
+      *buffer++ = '0';
+
   // Return if there is no fractional part
   if (remainder.Fraction == 0) {
     *buffer++ = '\0';
@@ -764,5 +767,54 @@ void FixedPointToA(char *buffer, FixedPoint *a) {
   // Put the null character at the last non-zero char
   *(buffer - zeroChars) = '\0';
 }
+
+
+void FixedPointParse(FixedPoint *a, char *buffer) {
+  // Zero out a by default
+  FixedPointSet(a, 0, 0);
+
+  // Skip any whitespace in buffer
+  char c;
+  for(c = *buffer++; (c == ' ' || c == '\t' || c=='\0'); c = *buffer++);
+  if (c == '\0') return;
+
+  // First char may be + or -
+  byte resultIsNegative = FALSE;
+  if (c == '-') {
+    resultIsNegative = TRUE;
+  } else if (c == '+') {
+  } else if (c == '\0') {
+    return;
+  } else {
+    buffer--;
+  }
+
+  // Go through each character adding the digits
+  byte sawDecimalPoint = FALSE;
+  FixedPoint base10 = FixedPointInit(10, 0);
+  FixedPoint base = FixedPointInit(1, 0);
+  FixedPoint tmp;
+  for(c = *buffer++; ((c >= '0' && c <= '9') || (c == '.')) ; c = *buffer++) {
+    if (c == '.') {
+      if (sawDecimalPoint) break;
+      sawDecimalPoint = TRUE;
+      continue;
+    }
+
+    FixedPointSet(&tmp, c - '0', 0);
+    if (sawDecimalPoint) {
+      FixedPointDiv(&base, &base, &base10);
+      FixedPointMul(&tmp, &tmp, &base);
+      FixedPointAdd(a, a, &tmp);
+    } else {
+      FixedPointMul(a, a, &base10);
+      FixedPointAdd(a, a, &tmp);
+    }    
+  }
+  
+  if (resultIsNegative)
+    FixedPointNegate(a, a);
+}
+
 
 #endif

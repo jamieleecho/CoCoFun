@@ -63,12 +63,24 @@ int main() {
   FixedPoint a, b, c, d, e, f;
   char buffer[12];
 
-  FixedPointSet(&a, 100, 0);
-  FixedPointSet(&b, 10, 0x0000);
-  FixedPointMod(&c, &d, &a, &b);
-  printf("%x.%x\n", a.Whole, a.Fraction);
-  printf("%x.%x\n", b.Whole, b.Fraction);
-  printf("%x.%x    %x.%x\n\n", c.Whole, c.Fraction, d.Whole, d.Fraction);
+  FixedPointParse(&a, "7");
+  FixedPointToA(buffer, &a);
+  printf("*** %s\n", buffer);
+  waitkey(0);
+
+  FixedPointParse(&a, "-7");
+  FixedPointToA(buffer, &a);
+  printf("*** %s\n", buffer);
+  waitkey(0);
+
+  FixedPointParse(&a, "2345");
+  FixedPointToA(buffer, &a);
+  printf("*** %s\n", buffer);
+  waitkey(0);
+
+  FixedPointParse(&a, "3.14159");
+  FixedPointToA(buffer, &a);
+  printf("*** %s\n", buffer);
   waitkey(0);
 
   FixedPointSet(&a, -12345, 56789);
