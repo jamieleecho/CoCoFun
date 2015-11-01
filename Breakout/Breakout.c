@@ -59,32 +59,6 @@ char breakoutLastDrawnScore[7];
 
 
 int main() {
-  FixedPoint pi = FixedPointInitPi(), pi2 = FixedPointInitPiOver2();
-  FixedPoint mpi = FixedPointInitMinusPi(), mpi2 = FixedPointInitMinusPiOver2();
-  char buffer[12];
-  
-  FixedPoint tmp, tmp2;
-  FixedPointMul(&tmp, &pi, &mpi);
-  FixedPointToA(buffer, &tmp);
-  printf("%s\n", buffer);
-
-  FixedPointMul(&tmp, &mpi, &mpi);
-  FixedPointToA(buffer, &tmp);
-  printf("%s\n", buffer);
-
-  FixedPointMul(&tmp, &pi2, &mpi2);
-  FixedPointToA(buffer, &tmp);
-  printf("%s\n", buffer);
-  waitkey(0);
-
-  FixedPointParse(&tmp, "12345.1234");
-  FixedPointParse(&tmp2, "2.1234");
-  FixedPointMul(&tmp, &tmp, &tmp2);
-  FixedPointToA(buffer, &tmp);
-  printf("%s\n", buffer);
-  waitkey(0);
-
-
   BreakoutInit();
   BreakoutPlay();
 
