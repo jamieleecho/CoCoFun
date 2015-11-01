@@ -53,12 +53,12 @@ FixedPointNegateDone:
 }
 
 
-void FixedPointAdd(FixedPoint *c, FixedPoint *a, FixedPoint *b) {
+asm void FixedPointAdd(FixedPoint *c, FixedPoint *a, FixedPoint *b) {
   asm {
-    ldx a
-    ldy c
     pshs u
-    ldu b
+    ldx 6,s
+    ldy 4,s
+    ldu 8,s
     
     lda 3,x
     adda 3,u
