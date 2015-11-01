@@ -61,6 +61,35 @@ char breakoutLastDrawnScore[7];
 int main() {
 #if 1
   FixedPoint a, b, c, d, e, f;
+  char buffer[12];
+
+  FixedPointSet(&a, 100, 0);
+  FixedPointSet(&b, 10, 0x0000);
+  FixedPointMod(&c, &d, &a, &b);
+  printf("%x.%x\n", a.Whole, a.Fraction);
+  printf("%x.%x\n", b.Whole, b.Fraction);
+  printf("%x.%x    %x.%x\n\n", c.Whole, c.Fraction, d.Whole, d.Fraction);
+  waitkey(0);
+
+  FixedPointSet(&a, -12345, 56789);
+  FixedPointToA(buffer, &a);
+  printf("*** %s\n", buffer);
+  waitkey(0);
+
+  FixedPointSet(&a, 10, 0);
+  FixedPointToA(buffer, &a);
+  printf("*** %s\n", buffer);
+  waitkey(0);
+
+  FixedPointSet(&a, 10, 0x8000);
+  FixedPointToA(buffer, &a);
+  printf("*** %s\n", buffer);
+  waitkey(0);
+
+  FixedPointSet(&a, 32109, 0x8888);
+  FixedPointToA(buffer, &a);
+  printf("*** %s\n", buffer);
+  waitkey(0);
 
   FixedPointSet(&a, 10, 0);
   FixedPointSet(&b, 3, 0x8000);

@@ -530,8 +530,8 @@ FixedPointModMainSetup:
     addb numDivisorShifts    
     stb numTotalShifts    
     subb #15
-
-    lbeq FixedPointModMainLoopEnd
+    
+    lble FixedPointModMainLoopEnd
     inc numTotalShifts
 
 FixedPointModMainLoop:
@@ -710,5 +710,59 @@ byte FixedPointLessThanOrEqualTo(FixedPoint *a, FixedPoint *b) {
     : (b->Fraction <= a->Fraction);
 }
 
+
+FixedPoint *FixedPointCopy(FixedPoint *b, FixedPoint *a) {
+  memcpy((byte *)b, (byte *)a, sizeof(*a));
+  return b;
+}
+
+
+void FixedPointToA(char *buffer, FixedPoint *a) {
+  FixedPoint base = FixedPointInit(10000, 0);
+  FixedPoint base10 = FixedPointInit(10, 0);
+  FixedPoint quotient, remainder;
+
+  // Deal with negatives
+  if (a->Whole < 0) {
+    FixedPointNegate(&remainder, a);
+    *buffer++ = '-';
+  } else {
+    FixedPointCopy(&remainder, a);
+  }
+
+  // Output the whole part
+  byte nonZeroChars = 0;
+  for(int ii=0; ii<5; ii++) {
+    FixedPointMod(&quotient, &remainder, &remainder, &base);
+    if (quotient.Whole > 0)
+      nonZeroChars++;
+    if (nonZeroChars > 0)
+      *buffer++ = '0' + (byte)quotient.Whole;
+    FixedPointDiv(&base, &base, &base10);
+  }
+
+  // Return if there is no fractional part
+  if (remainder.Fraction == 0) {
+    *buffer++ = '\0';
+    return;
+  }
+
+  // Deal with the fractional part
+  byte zeroChars = 1;  
+  *buffer++ = '.';
+  for(int ii=0; ii<4; ii++) {
+    FixedPointMod(&quotient, &remainder, &remainder, &base);
+    if (quotient.Whole > 0)
+      zeroChars = 0;
+    else
+      zeroChars++;
+      
+    *buffer++ = '0' + (byte)quotient.Whole;
+    FixedPointDiv(&base, &base, &base10);
+  }
+  
+  // Put the null character at the last non-zero char
+  *(buffer - zeroChars) = '\0';
+}
 
 #endif

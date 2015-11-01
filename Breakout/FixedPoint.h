@@ -9,11 +9,23 @@
 #ifndef _FixedPoint_h
 #define _FixedPoint_h
 
+
+/** FixedPoint data structure */
 typedef struct FixedPoint {
+  /** Whole part */
   int Whole;
+
+  /** Fractional Part */
   unsigned Fraction;
 } FixedPoint;
 
+
+/** 
+ * For initializing FixedPoint numbers.
+ * @param w[in] whole part
+ * @param f[in] fractional part
+ */
+#define FixedPointInit(w, f) { (w), (f) }
 
 /**
  * Returns a new FixedPoint containing whole.fraction
@@ -116,5 +128,21 @@ byte FixedPointGreaterThanOrEqualTo(FixedPoint *a, FixedPoint *b);
  * @return *a <= *b
  */
 byte FixedPointLessThanOrEqualTo(FixedPoint *a, FixedPoint *b);
+
+
+/**
+ * Copies a to b.
+ * @param b[out] destination
+ * @param a[in] source
+ * @return b
+ */
+FixedPoint *FixedPointCopy(FixedPoint *b, FixedPoint *a);
+
+/**
+ * Creates an ascii decimal version of a.
+ * @param buffer[out] output buffer of at least 11 bytes
+ * @param a[in] input
+ */
+void FixedPointToA(char *buffer, FixedPoint *a);
 
 #endif
