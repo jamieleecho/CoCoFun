@@ -13,6 +13,7 @@
   the author.
 */
 
+#pragma org 0x4000
 #include <cmoc.h>
 #include <coco.h>
 

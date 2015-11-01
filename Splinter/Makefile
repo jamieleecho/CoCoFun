@@ -8,10 +8,10 @@ MESS=$(MESS_DIR)/mess64
 $(TARGET) : $(SPLINTER_BAS) $(SPLINTER_BIN)
 	rm -f $@
 	decb dskini $@
-	decb copy $(SPLINTER_BAS) $@,SPLINTER.BAS -t
-	decb attr $@,SPLINTER.BAS -0
 	decb copy $(SPLINTER_BAS) $@,"*.BAS" -t
 	decb attr $@,"*.BAS" -0
+	decb copy $(SPLINTER_BAS) $@,SPLINTER.BAS -t
+	decb attr $@,SPLINTER.BAS -0
 	decb copy $(SPLINTER_BIN) $@,SPLINTER.BIN
 	decb attr $@,SPLINTER.BIN -2 -b
 

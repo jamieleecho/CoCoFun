@@ -8,6 +8,8 @@ MESS=$(MESS_DIR)/mess64
 $(TARGET) : $(RICK_BAS) $(RICK_BIN)
 	rm -f $@
 	decb dskini $@
+	decb copy $(RICK_BAS) $@,"*.BAS" -t
+	decb attr $@,"*.BAS" -0
 	decb copy $(RICK_BAS) $@,RICK.BAS -t
 	decb attr $@,RICK.BAS -0
 	decb copy $(RICK_BIN) $@,RICK.BIN
@@ -26,10 +28,17 @@ $(RICK_BIN) : Rick.c
 clean :
 	rm -rf $(TARGET) $(RICK_BIN) *.i *.lst Rick.asm *.hex
 
-debug : $(TARGET)
+run : $(TARGET)
 	$(MESS) coco3 -rompath $(MESS_DIR)/roms -window -flop1 $(TARGET) -cfg_directory ../cfgs/rgb
 
-debug_cmp : $(TARGET)
+run_cmp : $(TARGET)
 	$(MESS) coco3 -rompath $(MESS_DIR)/roms -window -flop1 $(TARGET) -cfg_directory ../cfgs/cmp
+
+debug : $(TARGET)
+	$(MESS) coco3 -rompath $(MESS_DIR)/roms -window -flop1 $(TARGET) -cfg_directory ../cfgs/rgb -debug
+
+debug_cmp : $(TARGET)
+	$(MESS) coco3 -rompath $(MESS_DIR)/roms -window -flop1 $(TARGET) -cfg_directory ../cfgs/cmp -debug
+
 
 

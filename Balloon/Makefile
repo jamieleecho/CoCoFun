@@ -8,6 +8,8 @@ MESS=$(MESS_DIR)/mess64
 $(TARGET) : $(BALLOON_BAS) $(BALLOON_BIN)
 	rm -f $@
 	decb dskini $@
+	decb copy $(BALLOON_BAS) $@,"*.BAS" -t
+	decb attr $@,"*.BAS" -0
 	decb copy $(BALLOON_BAS) $@,BALLOON.BAS -t
 	decb attr $@,BALLOON.BAS -0
 	decb copy $(BALLOON_BIN) $@,BALLOON.BIN
@@ -30,10 +32,16 @@ $(BALLOON_BIN) : Balloon.c
 clean :
 	rm -rf $(TARGET) $(BALLOON_BIN) *.i *.lst *.asm *.hex
 
-debug : $(TARGET)
+run : $(TARGET)
 	$(MESS) coco3 -rompath $(MESS_DIR)/roms -window -flop1 $(TARGET) -cfg_directory ../cfgs/rgb
 
-debug_cmp : $(TARGET)
+run_cmp : $(TARGET)
 	$(MESS) coco3 -rompath $(MESS_DIR)/roms -window -flop1 $(TARGET) -cfg_directory ../cfgs/cmp
+
+debug : $(TARGET)
+	$(MESS) coco3 -rompath $(MESS_DIR)/roms -window -flop1 $(TARGET) -cfg_directory ../cfgs/rgb -debug
+
+debug_cmp : $(TARGET)
+	$(MESS) coco3 -rompath $(MESS_DIR)/roms -window -flop1 $(TARGET) -cfg_directory ../cfgs/cmp -debug
 
 
