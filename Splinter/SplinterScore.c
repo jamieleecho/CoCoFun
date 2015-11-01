@@ -1,31 +1,31 @@
 /*
-  BreakoutScore.c
+  SplinterScore.c
   
   This software is for demonstration purposes only. Use at your own
   risk.
 
-  Represents the score in a Breakout game.
+  Represents the score in a Splinter game.
 */
 
 
-#ifndef _BreakoutScore_c
-#define _BreakoutScore_c
+#ifndef _SplinterScore_c
+#define _SplinterScore_c
 
 
-#include "BreakoutScore.h"
+#include "SplinterScore.h"
 
 
-void BreakoutScoreInit(BreakoutScore *score) {
+void SplinterScoreInit(SplinterScore *score) {
   memset(score, 0, sizeof(*score));
 }
 
 
-void BreakoutScoreReset(BreakoutScore *score) {
+void SplinterScoreReset(SplinterScore *score) {
   memset(score, 0, sizeof(*score));
 }
 
 
-void BreakoutScoreIncrement(BreakoutScore *score, byte amount) {
+void SplinterScoreIncrement(SplinterScore *score, byte amount) {
     asm {
       ldx  score
       lda amount
@@ -43,7 +43,7 @@ NextDigit lda  ,-x
 }
 
 
-void BreakoutScoreFormat(BreakoutScore *score, char *dst) {
+void SplinterScoreFormat(SplinterScore *score, char *dst) {
   for(byte ii=1; ii<BREAKOUT_SCORE_NUM_BYTES; ii++) {
     dst[2 * (ii - 1)] = ((score->score[ii] >> 4) & 0xf) + '0';
     dst[2 * (ii - 1) + 1] = (score->score[ii] & 0xf) + '0';

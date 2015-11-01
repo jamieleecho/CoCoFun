@@ -1,64 +1,65 @@
 /*
-  Breakout.h
+  Splinter.h
   
   This software is for demonstration purposes only. Use at your own
   risk.
 */
 
 
-#ifndef _Breakout_h
-#define _Breakout_h
+#ifndef _Splinter_h
+#define _Splinter_h
 
+#include "SplinterScore.h"
 
 /** No motion */
-#define BreakoutLastDirectionNone (0)
+#define SplinterLastDirectionNone (0)
 
 /** Moving up */
-#define BreakoutLastDirectionUp (1)
+#define SplinterLastDirectionUp (1)
 
 /** Moving down */
-#define BreakoutLastDirectionDown (2)
+#define SplinterLastDirectionDown (2)
 
 /** Last direction of the paddle */
-byte BreakoutLastDirection;
+byte SplinterLastDirection;
 
 /** First direction of the paddle when both keys are detected */
-byte BreakoutFirstDirection;
+byte SplinterFirstDirection;
 
-/** Score during a breakout game */
-BreakoutScore breakoutScore;
+/** Score during a splinter game */
+SplinterScore splinterScore;
 
-/** Initializes Breakout */
-void BreakoutInit();
+/** Initializes Splinter */
+void SplinterInit();
 
 /** Show the title screen */
-void BreakoutShowMonitorScreen();
+void SplinterShowMonitorScreen();
 
 /** Draws the current score on the screen */
-void BreakoutDrawScore();
+void SplinterDrawScore();
 
 /** Video game loop resides here */
-void BreakoutPlay();
+void SplinterPlay();
 
-/** Video game loop for one game of breakout */
-void BreakoutPlayGame();
+/** Video game loop for one game of splinter */
+void SplinterPlayGame();
 
 /** Moves the paddle up and down based on the joystick */
-void BreakoutControlPaddle();
+void SplinterControlPaddle();
 
 /** Pause the game */
-void BreakoutPauseGame();
+void SplinterPauseGame();
 
 /** 
  * Draws a bordered screen with the given.
  * @param b background color [0, 15]
  * @param f foreground color [0, 15]
  */
-void BreakoutDrawBorderedScreen(byte f, byte b);
+void SplinterDrawBorderedScreen(byte f, byte b);
 
 
 /** Shows the title screen */
-void BreakoutShowTitleScreen();
+void SplinterShowTitleScreen();
 
 
 /**
@@ -68,7 +69,7 @@ void BreakoutShowTitleScreen();
  * @param b background color [0, 15]
  * @param f foreground color [0, 15]
  */
-void BreakoutDrawDialogBox(unsigned ww, unsigned hh, byte f, byte b);
+void SplinterDrawDialogBox(unsigned ww, unsigned hh, byte f, byte b);
 
 
 /**
@@ -77,14 +78,14 @@ void BreakoutDrawDialogBox(unsigned ww, unsigned hh, byte f, byte b);
  * @param hh[in] height in character coordinates
  * @param b background color [0, 15]
  */
-void BreakoutEraseDialogBox(unsigned ww, unsigned hh, byte b);
+void SplinterEraseDialogBox(unsigned ww, unsigned hh, byte b);
 
 
 /** Tells the user the game is over */
-void BreakoutShowGameOver();
+void SplinterShowGameOver();
 
 
-/** Refresh the breakout board */
-void BreakoutRefresh();
+/** Refresh the splinter board */
+void SplinterRefresh();
 
 #endif

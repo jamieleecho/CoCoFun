@@ -1,38 +1,38 @@
 /*
-  BreakoutScore.h
+  SplinterScore.h
   
   This software is for demonstration purposes only. Use at your own
   risk.
 
-  Represents the score in a Breakout game.
+  Represents the score in a Splinter game.
 */
 
 
-#ifndef _BreakoutScore_h
-#define _BreakoutScore_h
+#ifndef _SplinterScore_h
+#define _SplinterScore_h
 
 
-#define BREAKOUT_SCORE_NUM_BYTES 4
+#define SPLINTER_SCORE_NUM_BYTES 4
 
 
 /** Score data structure */
-typedef struct BreakoutScore {
-  unsigned byte score[BREAKOUT_SCORE_NUM_BYTES];
-} BreakoutScore;
+typedef struct SplinterScore {
+  unsigned byte score[SPLINTER_SCORE_NUM_BYTES];
+} SplinterScore;
 
 
 /**
  * Initialized score to zero.
  * @param score[in/out] score to initialize to zero.
  */
-void BreakoutScoreInit(BreakoutScore *score);
+void SplinterScoreInit(SplinterScore *score);
 
 
 /**
  * Sets score to zero
  * @param score[in/out] score to set to zero
  */
-void BreakoutScoreReset(BreakoutScore *score);
+void SplinterScoreReset(SplinterScore *score);
 
 
 /**
@@ -40,7 +40,7 @@ void BreakoutScoreReset(BreakoutScore *score);
  * @param score[in/out] score to set to zero
  * @param amount[in] amount to increment score on [0-99].
  */
-void BreakoutScoreIncrement(BreakoutScore *score, byte amount);
+void SplinterScoreIncrement(SplinterScore *score, byte amount);
 
 
 /**
@@ -48,7 +48,7 @@ void BreakoutScoreIncrement(BreakoutScore *score, byte amount);
  * @param score[in] score to format
  * @param dst[out] destination location that must contain at least 7 bytes
  */
-void BreakoutScoreFormat(BreakoutScore *score, char *dst);
+void SplinterScoreFormat(SplinterScore *score, char *dst);
 
 
 #endif
