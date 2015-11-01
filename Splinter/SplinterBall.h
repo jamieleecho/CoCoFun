@@ -32,18 +32,6 @@ FixedPoint splinterBallVelocity = FixedPointInit(0, 0x4000);
  */
 FixedPoint splinterBallIncrementVector[2];
 
-/** Maximum amount to add to X before resetting splinterBallCounterX */
-byte splinterBallSlopeX = 5;
-
-/** Maximum amount to add to Y before resetting splinterBallCounterY */
-byte splinterBallSlopeY = 2;
-
-/** Current position in slope */
-byte splinterBallCounterX = 5;
-
-/** Current position in slope */
-byte splinterBallCounterY = 2;
-
 /** Resets the splinterBall position to the default */
 void SplinterBallReset();
 

@@ -20,6 +20,62 @@
 byte splinterBallWasMissed = 0;
 
 
+/** 2.0 */
+FixedPoint splinterBall2 = FixedPointInit(2, 0x0000);
+
+/** 1.0 */
+FixedPoint splinterBall1 = FixedPointInit(1, 0x0000);
+
+
+/** .75 */
+FixedPoint splinterBallPoint75 = FixedPointInit(0, 0xc000);
+
+
+/** .5 */
+FixedPoint splinterBallPoint5 = FixedPointInit(0, 0x8000);
+
+
+/** .25 */
+FixedPoint splinterBallPoint25 = FixedPointInit(0, 0x4000);
+
+
+/**
+ * Approximates the sqrt of a.
+ * @param b[out] output
+ * @param a[in] input on [0, 4]
+ */
+void SplinterBallSqrt(FixedPoint *b, FixedPoint *a) {
+  FixedPoint tmp;
+  FixedPointCopy(b, (a->Whole < 1) ? &splinterBallPoint5 : &splinterBall2);
+
+  char buffer[12];
+  FixedPointToA(buffer, &a[0]);
+
+  for(byte ii=0; ii<3; ii++) {
+    FixedPointDiv(&tmp, a, b);
+    FixedPointAdd(&tmp, b, &tmp);
+    FixedPointMul(b, &tmp, &splinterBallPoint5);
+  }
+}
+
+
+/**
+ * Normalizes a
+ * @param b[out] output
+ * @param a[in] input
+ */
+void SplinterBallNormalize(FixedPoint b[2], FixedPoint a[2]) {
+  FixedPoint tmp[2];
+  FixedPointMul(&tmp[0], &a[0], &a[0]);
+  FixedPointMul(&tmp[1], &a[1], &a[1]);
+  FixedPointAdd(&tmp[0], &tmp[0], &tmp[1]);
+  SplinterBallSqrt(&tmp[1], &tmp[0]);
+
+  FixedPointDiv(&b[0], &a[0], &tmp[1]);
+  FixedPointDiv(&b[1], &a[1], &tmp[1]);
+}
+
+
 /**
  * Updates splinterBallIncrementVector with the current slope and whether
  * or not we should be moving left and up.
@@ -28,19 +84,30 @@ byte splinterBallWasMissed = 0;
  * @param moveUp[in] if true, ensure the ball will move up
  */
 void SplinterBallSetSlope(byte moveLeft, byte moveUp) {
+  if (moveLeft)
+    FixedPointNegate(&splinterBallIncrementVector[0], &splinterBall1);
+  else
+    FixedPointCopy(&splinterBallIncrementVector[0], &splinterBall1);
+
+  if (moveUp)
+    FixedPointNegate(&splinterBallIncrementVector[1], &splinterBallSlope);
+  else
+    FixedPointCopy(&splinterBallIncrementVector[1], &splinterBallSlope);
+  SplinterBallNormalize(splinterBallIncrementVector, splinterBallIncrementVector);
+
+  FixedPointMul(&splinterBallIncrementVector[0], &splinterBallIncrementVector[0], &splinterBallVelocity);
+  FixedPointMul(&splinterBallIncrementVector[1], &splinterBallIncrementVector[1], &splinterBallVelocity);
 }
 
 
 void SplinterBallReset() {
   FixedPointSet(&splinterBallPosition[0], 40, 0);
   FixedPointSet(&splinterBallPosition[1], 3, 0);
+  FixedPointCopy(&splinterBallVelocity, &splinterBallPoint75);
+  FixedPointCopy(&splinterBallSlope, &splinterBall2);
 
-  FixedPointSet(&splinterBallIncrementVector[0], -1, 0);
-  FixedPointSet(&splinterBallIncrementVector[1], 1, 0);
-  splinterBallSlopeX = 1;
-  splinterBallSlopeY = 3;
-  splinterBallCounterX = splinterBallSlopeX;
-  splinterBallCounterY = splinterBallSlopeY;
+  SplinterBallSetSlope(TRUE, FALSE);
+  
   splinterBallWasMissed = 0;
 }
 
@@ -96,31 +163,7 @@ byte SplinterBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
 
       // Change direction? Favor not changing X direction and favor going towards
       // paddle
-      byte changeDirX = (byte)random(21);
-      if (changeDirX > 4)
-	splinterBallIncrementVector[0].Whole = -1;
-      byte changeDirY = (byte)random(21);
-      if (changeDirY > 18)
-	splinterBallIncrementVector[1].Whole = splinterBallIncrementVector[1].Whole * -1;
-      
-      // Change the slope
-      byte changeSlopeX = (byte)random(21);
-      if ((changeSlopeX < 10) && (splinterBallSlopeX > 1))
-	splinterBallSlopeX--;
-      else if ((changeSlopeX > 17) && (splinterBallSlopeX < 5))
-	splinterBallSlopeX++;
-      
-      // Change the slope
-      byte changeSlopeY = (byte)random(21);
-      if ((changeSlopeY < 5) && (splinterBallSlopeY > 1))
-	splinterBallSlopeY--;
-      else if ((changeSlopeY > 17) && (splinterBallSlopeY < 5))
-	splinterBallSlopeY++;
-
-      // Update the counters
-      splinterBallCounterX = splinterBallSlopeX;
-      splinterBallCounterY = splinterBallSlopeY;
-      SplinterScoreIncrement(&splinterScore, 10);
+      FixedPointNegate(&splinterBallIncrementVector[0], &splinterBallIncrementVector[0]);  
       numHit++;
       
       // Remove the brick - if none left, reset the level
@@ -138,20 +181,23 @@ void SplinterBallTick() {
   byte oldX = (byte)splinterBallPosition[0].Whole;
   byte oldY = (byte)splinterBallPosition[1].Whole;
 
-  // Move the ball in the X direction
-  if (splinterBallCounterX > 0) {
-    splinterBallCounterX--;
-    splinterBallPosition[0].Whole += splinterBallIncrementVector[0].Whole;
+  // Move the ball
+  FixedPointAdd(&splinterBallPosition[0], &splinterBallPosition[0], &splinterBallIncrementVector[0]);
+  FixedPointAdd(&splinterBallPosition[1], &splinterBallPosition[1], &splinterBallIncrementVector[1]);
 
-    if (splinterBallPosition[0].Whole > 108) { 
-      splinterBallIncrementVector[0].Whole = -1;
-    } else if (splinterBallPosition[0].Whole < 7) {      
-      if (splinterBallWasMissed) {
-	if (splinterBallPosition[0].Whole <= 0) {
-	  SplinterBallMiss();
-	  return;
-	}
-      } else {	
+  // Did we hit the right side of the screen?
+  if (splinterBallPosition[0].Whole > 108) { 
+    FixedPointNegate(&splinterBallIncrementVector[0], &splinterBallIncrementVector[0]);
+  }
+  
+  // Are we hitting the left end of the screen?
+  else if (splinterBallPosition[0].Whole < 7) {      
+    if (splinterBallWasMissed) {
+      if (splinterBallPosition[0].Whole <= 0) {
+	SplinterBallMiss();
+	return;
+      }
+    } else {	
 	// Check collision with the paddle       
 	byte p1 = (splinterPaddlePosition < 7) ? 0 : (splinterPaddlePosition - 8);
 	byte b1 = (byte)splinterBallPosition[1].Whole - 1;
@@ -165,46 +211,26 @@ void SplinterBallTick() {
 	  int offset = (splinterBallPosition[1].Whole - (int)splinterPaddlePosition
 			+ 3 - 19);
 	  if (offset < -6) {
-	    splinterBallSlopeY -=  (byte)splinterBallIncrementVector[1].Whole;
+	    FixedPointNegate(&splinterBallIncrementVector[0], &splinterBallIncrementVector[0]);
 	  } else if (offset > 6) {
-	    splinterBallSlopeY += (byte)splinterBallIncrementVector[1].Whole;
+	    FixedPointNegate(&splinterBallIncrementVector[0], &splinterBallIncrementVector[0]);
 	  } else {	
-	    if (splinterBallSlopeY > 1)
-	      splinterBallSlopeY--;
+	    FixedPointNegate(&splinterBallIncrementVector[0], &splinterBallIncrementVector[0]);
 	  }
-	  if (splinterBallSlopeY >= 0x80) {	    
-	    splinterBallSlopeY = 2;
-	    splinterBallIncrementVector[1].Whole = -splinterBallIncrementVector[1].Whole;
-	  } else if (splinterBallSlopeY > 5) {
-	    splinterBallSlopeY = 5;
-	    if (splinterBallSlopeX > 1)
-	      splinterBallSlopeX--;
-	  }
-
-	  splinterBallIncrementVector[0].Whole = 1;
 	} else {
 	  splinterBallWasMissed = 1;
 	}
-      }
-    }
-  }
-  
-  // Move the ball in the Y direction
-  if (splinterBallCounterY > 0) {
-    splinterBallCounterY--;
-    splinterBallPosition[1].Whole += splinterBallIncrementVector[1].Whole;
-
-    if ((byte)splinterBallPosition[1].Whole > 181) {
-      splinterBallIncrementVector[1].Whole = -1;  
-    } else if ((byte)splinterBallPosition[1].Whole < 2) {
-      splinterBallIncrementVector[1].Whole = +1;  
     }
   }
 
-  // Reset the slope counters if needed
-  if ((splinterBallCounterX == 0) && (splinterBallCounterY == 0)) {
-    splinterBallCounterX = splinterBallSlopeX;
-    splinterBallCounterY = splinterBallSlopeY;
+  // Did we hit the bottom of the screen?
+  if ((byte)splinterBallPosition[1].Whole > 181) {
+    FixedPointNegate(&splinterBallIncrementVector[1], &splinterBallIncrementVector[1]);
+  }
+
+  // Did we hit the top of the screen?
+  else if ((byte)splinterBallPosition[1].Whole < 2) {
+    FixedPointNegate(&splinterBallIncrementVector[1], &splinterBallIncrementVector[1]);
   }
 
   // Check collisions with bricks
@@ -253,9 +279,9 @@ void SplinterBallTick() {
       BlitterDrawGraphics(GrafxDataBallData, (byte)splinterBallPosition[0].Whole,
 			  (byte)splinterBallPosition[1].Whole);
       
-      SoundPlayAndWait(600, 4, 4, 192);
+      SoundPlayAndWait(600, 6, 6, 192);
       SoundPlayAndWait(900, 5, 5, 192);
-      SoundPlayAndWait(1800, 6, 6, 192);
+      SoundPlayAndWait(1800, 4, 4, 192);
     }
   }
 }
