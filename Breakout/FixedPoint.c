@@ -12,7 +12,7 @@
 #include "FixedPoint.h"
 
 
-void FixedPointMake(FixedPoint *c, int whole, unsigned decimal) {
+void FixedPointSet(FixedPoint *c, int whole, unsigned decimal) {
   c->Whole = whole;
   c->Fraction = decimal;
 }
@@ -346,7 +346,7 @@ FixedPointDivMainSetup:
 
 FixedPointDivMainLoop:
 * Compare dividend to divisor
-    bsr FixedPointCompareDividendToDivisor
+    bsr FixedPointDivCompareDividendToDivisor
 
 * Branch if dividend too small
     blo FixedPointDivDividendTooSmall
@@ -355,8 +355,8 @@ FixedPointDivMainLoop:
 FixedPointDivDividendTooSmall:
     decb
     beq FixedPointDivMainLoopEnd
-    bsr FixedPointShiftDividendLeft
-    bsr FixedPointShiftQuotientLeft
+    bsr FixedPointDivShiftDividendLeft
+    bsr FixedPointDivShiftQuotientLeft
 
 FixedPointDivPut1InQuotient:
 * Put 1 in quotient, subtract divisor from dividend
@@ -364,8 +364,8 @@ FixedPointDivPut1InQuotient:
     ora 11,x
     sta 11,x
 
-FixedPointSubtractAndShift:
-    bsr FixedPointSubtractDivisorFromDividend
+FixedPointDivSubtractAndShift:
+    bsr FixedPointDivSubtractDivisorFromDividend
 
 FixedPointDivMainLoopRepeat:
     lda ,x
@@ -374,59 +374,59 @@ FixedPointDivMainLoopRepeat:
     decb
     beq FixedPointDivMainLoopEnd
 
-    bsr FixedPointShiftDividendLeft
-    bsr FixedPointShiftQuotientLeft
+    bsr FixedPointDivShiftDividendLeft
+    bsr FixedPointDivShiftQuotientLeft
     bra FixedPointDivMainLoopRepeat
 
-FixedPointShiftQuotientLeft:
+FixedPointDivShiftQuotientLeft:
     asl 11,x
     rol 10,x
     rol 9,x
     rol 8,x
     rts
 
-FixedPointShiftDividendLeft:
+FixedPointDivShiftDividendLeft:
     asl 3,x
     rol 2,x
     rol 1,x
     rol ,x
     rts
 
-FixedPointCompareDividendToDivisor:
+FixedPointDivCompareDividendToDivisor:
     lda ,x 
     cmpa 4,x
-    bne FixedPointCompareDividendToDivisorDone
+    bne FixedPointDivCompareDividendToDivisorDone
     lda 1,x 
     cmpa 5,x
-    bne FixedPointCompareDividendToDivisorDone
+    bne FixedPointDivCompareDividendToDivisorDone
     lda 2,x 
     cmpa 6,x
-    bne FixedPointCompareDividendToDivisorDone
+    bne FixedPointDivCompareDividendToDivisorDone
     lda 3,x 
     cmpa 7,x
-FixedPointCompareDividendToDivisorDone:
+FixedPointDivCompareDividendToDivisorDone:
     rts
 
-FixedPointSubtractNegateDivisor:
+FixedPointDivSubtractNegateDivisor:
     neg 7,x
-    bcs FixedPointSubtractNegateDivisorCom2
+    bcs FixedPointDivSubtractNegateDivisorCom2
     neg 6,x
-    bcs FixedPointSubtractNegateDivisorCom1
+    bcs FixedPointDivSubtractNegateDivisorCom1
     neg 5,x
-    bcs FixedPointSubtractNegateDivisorCom0
+    bcs FixedPointDivSubtractNegateDivisorCom0
     neg 4,x
     rts
 
-FixedPointSubtractNegateDivisorCom2:
+FixedPointDivSubtractNegateDivisorCom2:
     com 6,x
-FixedPointSubtractNegateDivisorCom1:
+FixedPointDivSubtractNegateDivisorCom1:
     com 5,x
-FixedPointSubtractNegateDivisorCom0:
+FixedPointDivSubtractNegateDivisorCom0:
     com 4,x
     rts
 
-FixedPointSubtractDivisorFromDividend:
-    bsr FixedPointSubtractNegateDivisor
+FixedPointDivSubtractDivisorFromDividend:
+    bsr FixedPointDivSubtractNegateDivisor
     lda 7,x
     adda 3,x
     sta 3,x
@@ -439,16 +439,237 @@ FixedPointSubtractDivisorFromDividend:
     lda 4,x
     adca ,x
     sta ,x
-    bsr FixedPointSubtractNegateDivisor
+    bsr FixedPointDivSubtractNegateDivisor
     rts
 
 FixedPointDivMainLoopEnd:
   }
 
-  // Make result negative if needed
-  memcpy((byte *)c, (byte *)(aa + 2), sizeof(aa[2]));
+  // Transfer data, making result negative if needed
   if (numNegatives & 1) {
-    FixedPointNegate(c, c);
+    FixedPointNegate(c, aa + 2);
+  } else {
+    memcpy((byte *)c, (byte *)(aa + 2), sizeof(aa[2]));
+  }
+}
+
+
+void FixedPointMod(FixedPoint *c, FixedPoint *d, FixedPoint *a, FixedPoint *b) {
+  // aa[0] = dividend, aa[1] = divisor, aa[2] = quotient
+  FixedPoint aa[3];
+  char numDivisorShifts = 0, numDividendShifts = 0, numTotalShifts = 16;
+  memset((byte *)(aa + 2), 0, sizeof(aa[2]));
+
+  // Convert all operands to positive, count number of negates
+  byte numNegatives = 0;
+  if (a->Whole < 0x0) {
+    FixedPointNegate(aa, a);
+    numNegatives++;
+  } else
+    memcpy((byte *)aa, (byte *)a, sizeof(aa[0]));
+  if (b->Whole < 0x0) {
+    FixedPointNegate((aa + 1), b);
+    numNegatives++;
+  } else
+    memcpy((byte *)(aa + 1), (byte *)b, sizeof(aa[1]));
+
+  // Can't divide by zero, simply set c to zero
+  if ((aa[0].Whole == 0) && (aa[0].Fraction == 0)) {
+    memset(c, 0, sizeof(*c));
+    return;
+  }
+
+  // Result is zero, so return 0
+  if ((aa[1].Whole == 0) && (aa[1].Fraction == 0)) {
+    memset(c, 0, sizeof(*c));
+    return;
+  }
+
+  // Note to self: Never ever do a div routine again
+  asm {
+* The first thing we have to do is shift the divisor left until its most
+* significant bit is 1
+    leax aa
+FixedPointModCheckDivisor:
+    lda 4,x
+    bmi FixedPointModFixDividend
+    asl 7,x
+    rol 6,x
+    rol 5,x
+    rol 4,x
+    inc numDivisorShifts
+    bra FixedPointModCheckDivisor
+
+* We now have to fix the dividend so that its most significant bit is 1
+FixedPointModFixDividend:
+    lda ,x    
+    bmi FixedPointModMainSetup
+    asl 3,x
+    rol 2,x
+    rol 1,x
+    rol ,x
+    inc numDividendShifts
+    bra FixedPointModFixDividend
+
+* At this point our divisor and dividend are shift all the way left.
+* We must do the following while we have more quotient bits
+* 1. If the most significant bits of the divisor
+*     <= most significant bits of the dividend
+*          a. Put 1 in the quotient
+*     else
+*          a. Put 0 in the quotient
+*          b. If we have more quotient bits left, shift dividend left
+*          c. Put 1 in the quotient
+* 2. subtract most signficant divisor bits from most significant dividend bits       
+* 3. while we have more quotient bits and there is a zero in the dividend
+*          a. Shift the quotient left
+*          b. Shift the dividend left
+FixedPointModMainSetup:
+    ldb #16      * B = max number of loops
+    subb numDividendShifts
+    addb numDivisorShifts    
+    stb numTotalShifts    
+    subb #15
+
+    lbeq FixedPointModMainLoopEnd
+    inc numTotalShifts
+
+FixedPointModMainLoop:
+* Compare dividend to divisor
+    bsr FixedPointModCompareDividendToDivisor
+
+* Branch if dividend too small
+    blo FixedPointModDividendTooSmall
+    bra FixedPointModPut1InQuotient
+
+FixedPointModDividendTooSmall:
+    dec numTotalShifts    
+    decb
+    beq FixedPointModMainLoopEnd
+    bsr FixedPointModShiftDividendLeft
+    bsr FixedPointModShiftQuotientLeft
+
+FixedPointModPut1InQuotient:
+* Put 1 in quotient, subtract divisor from dividend
+    lda #1
+    ora 11,x
+    sta 11,x
+
+FixedPointModSubtractAndShift:
+    bsr FixedPointModSubtractDivisorFromDividend
+
+FixedPointModMainLoopRepeat:
+    lda ,x
+    bmi FixedPointModMainLoop
+
+    dec numTotalShifts    
+    decb
+    beq FixedPointModMainLoopEnd
+
+    bsr FixedPointModShiftDividendLeft
+    bsr FixedPointModShiftQuotientLeft
+    bra FixedPointModMainLoopRepeat
+
+FixedPointModShiftQuotientLeft:
+    asl 11,x
+    rol 10,x
+    rol 9,x
+    rol 8,x
+    rts
+
+FixedPointModShiftDividendLeft:
+    asl 3,x
+    rol 2,x
+    rol 1,x
+    rol ,x
+    rts
+
+FixedPointModCompareDividendToDivisor:
+    lda ,x 
+    cmpa 4,x
+    bne FixedPointModCompareDividendToDivisorDone
+    lda 1,x 
+    cmpa 5,x
+    bne FixedPointModCompareDividendToDivisorDone
+    lda 2,x 
+    cmpa 6,x
+    bne FixedPointModCompareDividendToDivisorDone
+    lda 3,x 
+    cmpa 7,x
+FixedPointModCompareDividendToDivisorDone:
+    rts
+
+FixedPointModSubtractNegateDivisor:
+    neg 7,x
+    bcs FixedPointModSubtractNegateDivisorCom2
+    neg 6,x
+    bcs FixedPointModSubtractNegateDivisorCom1
+    neg 5,x
+    bcs FixedPointModSubtractNegateDivisorCom0
+    neg 4,x
+    rts
+
+FixedPointModSubtractNegateDivisorCom2:
+    com 6,x
+FixedPointModSubtractNegateDivisorCom1:
+    com 5,x
+FixedPointModSubtractNegateDivisorCom0:
+    com 4,x
+    rts
+
+FixedPointModSubtractDivisorFromDividend:
+    bsr FixedPointModSubtractNegateDivisor
+    lda 7,x
+    adda 3,x
+    sta 3,x
+    lda 6,x
+    adca 2,x
+    sta 2,x
+    lda 5,x
+    adca 1,x
+    sta 1,x
+    lda 4,x
+    adca ,x
+    sta ,x
+    bsr FixedPointModSubtractNegateDivisor
+    rts
+
+* Shift the quotient into the proper place
+FixedPointModMainLoopEnd:
+    ldb numTotalShifts
+    beq FixedPointModMainLoopEnd3
+FixedPointModMainLoopEnd2:
+    bsr FixedPointModShiftQuotientLeft
+    decb
+    bne FixedPointModMainLoopEnd2
+
+* Shift the remainder into the proper place
+FixedPointModMainLoopEnd3:
+    ldb #16
+    addb numDivisorShifts    
+    subb numTotalShifts
+    beq FixedPointModMainLoopEnd5
+FixedPointModMainLoopEnd4:
+    asr ,x
+    ror 1,x
+    ror 2,x
+    ror 3,x
+    lda #$7f
+    anda ,x
+    sta ,x
+    decb
+    bne FixedPointModMainLoopEnd4
+   
+FixedPointModMainLoopEnd5:
+  }
+
+  // Transfer data, making result negative if needed
+  if (numNegatives & 1) {
+    FixedPointNegate(d, aa);
+    FixedPointNegate(c, aa + 2);
+  } else {
+    memcpy((byte *)c, (byte *)(aa + 2), sizeof(aa[2]));
+    memcpy((byte *)d, (byte *)(aa), sizeof(aa[0]));
   }
 }
 

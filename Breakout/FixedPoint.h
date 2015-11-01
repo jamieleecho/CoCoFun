@@ -21,7 +21,7 @@ typedef struct FixedPoint {
  * @param whole[in] whole
  * @param decimal[in] fraction
  */
-void FixedPointMake(FixedPoint *c, int whole, unsigned decimal);
+void FixedPointSet(FixedPoint *c, int whole, unsigned decimal);
 
 
 /**
@@ -59,12 +59,22 @@ void FixedPointMul(FixedPoint *c, FixedPoint *a, FixedPoint *b);
 
 
 /**
- * Returns *a / *b and *a % *b
+ * Returns *a / *b
  * @param c[out] quotient
  * @param a[in] dividend
  * @param b[in] divisor
  */
 void FixedPointDiv(FixedPoint *c, FixedPoint *a, FixedPoint *b);
+
+
+/**
+ * Returns *a / *b and *a % *b
+ * @param c[out] quotient
+ * @param d[out] mod
+ * @param a[in] dividend
+ * @param b[in] divisor
+ */
+void FixedPointMod(FixedPoint *c, FixedPoint *d, FixedPoint *a, FixedPoint *b);
 
 
 /**
