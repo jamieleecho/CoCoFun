@@ -12,6 +12,20 @@
 #include "FixedPoint.h"
 
 
+/** Table holding powers of 10 */
+FixedPoint FixedPointPowersOf10[] = {
+  FixedPointInit(10000, 0),
+  FixedPointInit(1000, 0),
+  FixedPointInit(100, 0),
+  FixedPointInit(10, 0),
+  FixedPointInit(1, 0),
+  FixedPointInit(0, 0x1999),
+  FixedPointInit(0, 0x28f),
+  FixedPointInit(0, 0x41),
+  FixedPointInit(0, 0x6)
+};
+
+
 asm void FixedPointSet(FixedPoint *c, int whole, unsigned decimal) {
   asm {
     ldx     2,s             variable c
@@ -64,13 +78,13 @@ asm void FixedPointAdd(FixedPoint *c, FixedPoint *a, FixedPoint *b) {
     adda 3,u
     sta 3,y
     lda 2,x
-    adda 2,u
+    adca 2,u
     sta 2,y
     lda 1,x
-    adda 1,u
+    adca 1,u
     sta 1,y
     lda ,x
-    adda ,u
+    adca ,u
     sta ,y
 
     puls u
@@ -291,8 +305,10 @@ void FixedPointDiv(FixedPoint *c, FixedPoint *a, FixedPoint *b) {
 
   // Can't divide by zero, set to big value
   if ((aa[1].Whole == 0) && (aa[1].Fraction == 0)) {
-    c->Whole = (numNegatives & 1) ? -1 : 0x7fff;
+    c->Whole = 0x7fff;
     c->Fraction = 0xffff;
+    if (numNegatives & 1)
+      FixedPointNegate(c, c);
     return;
   }
 
@@ -481,8 +497,10 @@ void FixedPointMod(FixedPoint *c, FixedPoint *d, FixedPoint *a, FixedPoint *b) {
 
   // Can't divide by zero, set to big value
   if ((aa[1].Whole == 0) && (aa[1].Fraction == 0)) {
-    c->Whole = (numNegatives & 1) ? -1 : 0x7fff;
+    c->Whole = 0x7fff;
     c->Fraction = 0xffff;
+    if (numNegatives & 1)
+      FixedPointNegate(c, c);
     return;
   }
 
@@ -673,6 +691,16 @@ void FixedPointToA(char *buffer, FixedPoint *a) {
     FixedPointCopy(&remainder, a);
   }
 
+  // Deal with rounding errors
+  if (remainder.Fraction > 0xfff9) {    
+    if (remainder.Whole = 0x7fff) {
+      strcpy(buffer, "32768");
+      return;
+    }
+    remainder.Whole++;
+    remainder.Fraction = 0;
+  }
+
   // Output the whole part
   byte nonZeroChars = 0;
   for(int ii=0; ii<5; ii++) {
@@ -697,6 +725,7 @@ void FixedPointToA(char *buffer, FixedPoint *a) {
   byte zeroChars = 1;  
   *buffer++ = '.';
   for(int ii=0; ii<4; ii++) {
+
     FixedPointMod(&quotient, &remainder, &remainder, &base);
     if (quotient.Whole > 0)
       zeroChars = 0;
@@ -753,8 +782,8 @@ void FixedPointParse(FixedPoint *a, char *buffer) {
       FixedPointMul(a, a, &base10);
       FixedPointAdd(a, a, &tmp);
     }    
-  }
-  
+  }  
+
   if (resultIsNegative)
     FixedPointNegate(a, a);
 }

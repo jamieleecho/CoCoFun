@@ -27,6 +27,31 @@ typedef struct FixedPoint {
  */
 #define FixedPointInit(w, f) { (w), (f) }
 
+/** 
+ * Initize the FixedPoint number to pi
+ */
+#define FixedPointInitPi() { 3, 0x2434 }
+
+/** 
+ * Initize the FixedPoint number to -pi
+ */
+#define FixedPointInitMinusPi() { 0xfffc, 0xdbcc }
+
+/** 
+ * Initize the FixedPoint number to pi/2
+ */
+#define FixedPointInitPiOver2() { 1, 0x9210 }
+
+/** 
+ * Initize the FixedPoint number to -pi/2
+ */
+#define FixedPointInitMinusPiOver2() { 0xfffe, 0x6df0 }
+
+/** 
+ * Initize the FixedPoint number to e
+ */
+#define FixedPointInitE() { 2, 0xb7d2 }
+
 /**
  * Returns a new FixedPoint containing whole.fraction
  * @param c[out] whole.fraction
