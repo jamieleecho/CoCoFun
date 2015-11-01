@@ -536,7 +536,7 @@ FixedPointModMainSetup:
 
 FixedPointModMainLoop:
 * Compare dividend to divisor
-    bsr FixedPointModCompareDividendToDivisor
+    lbsr FixedPointDivCompareDividendToDivisor
 
 * Branch if dividend too small
     blo FixedPointModDividendTooSmall
@@ -546,8 +546,8 @@ FixedPointModDividendTooSmall:
     dec numTotalShifts    
     decb
     beq FixedPointModMainLoopEnd
-    bsr FixedPointModShiftDividendLeft
-    bsr FixedPointModShiftQuotientLeft
+    lbsr FixedPointDivShiftDividendLeft
+    lbsr FixedPointDivShiftQuotientLeft
 
 FixedPointModPut1InQuotient:
 * Put 1 in quotient, subtract divisor from dividend
@@ -556,7 +556,7 @@ FixedPointModPut1InQuotient:
     sta 11,x
 
 FixedPointModSubtractAndShift:
-    bsr FixedPointModSubtractDivisorFromDividend
+    lbsr FixedPointDivSubtractDivisorFromDividend
 
 FixedPointModMainLoopRepeat:
     lda ,x
@@ -566,80 +566,16 @@ FixedPointModMainLoopRepeat:
     decb
     beq FixedPointModMainLoopEnd
 
-    bsr FixedPointModShiftDividendLeft
-    bsr FixedPointModShiftQuotientLeft
+    lbsr FixedPointDivShiftDividendLeft
+    lbsr FixedPointDivShiftQuotientLeft
     bra FixedPointModMainLoopRepeat
-
-FixedPointModShiftQuotientLeft:
-    asl 11,x
-    rol 10,x
-    rol 9,x
-    rol 8,x
-    rts
-
-FixedPointModShiftDividendLeft:
-    asl 3,x
-    rol 2,x
-    rol 1,x
-    rol ,x
-    rts
-
-FixedPointModCompareDividendToDivisor:
-    lda ,x 
-    cmpa 4,x
-    bne FixedPointModCompareDividendToDivisorDone
-    lda 1,x 
-    cmpa 5,x
-    bne FixedPointModCompareDividendToDivisorDone
-    lda 2,x 
-    cmpa 6,x
-    bne FixedPointModCompareDividendToDivisorDone
-    lda 3,x 
-    cmpa 7,x
-FixedPointModCompareDividendToDivisorDone:
-    rts
-
-FixedPointModSubtractNegateDivisor:
-    neg 7,x
-    bcs FixedPointModSubtractNegateDivisorCom2
-    neg 6,x
-    bcs FixedPointModSubtractNegateDivisorCom1
-    neg 5,x
-    bcs FixedPointModSubtractNegateDivisorCom0
-    neg 4,x
-    rts
-
-FixedPointModSubtractNegateDivisorCom2:
-    com 6,x
-FixedPointModSubtractNegateDivisorCom1:
-    com 5,x
-FixedPointModSubtractNegateDivisorCom0:
-    com 4,x
-    rts
-
-FixedPointModSubtractDivisorFromDividend:
-    bsr FixedPointModSubtractNegateDivisor
-    lda 7,x
-    adda 3,x
-    sta 3,x
-    lda 6,x
-    adca 2,x
-    sta 2,x
-    lda 5,x
-    adca 1,x
-    sta 1,x
-    lda 4,x
-    adca ,x
-    sta ,x
-    bsr FixedPointModSubtractNegateDivisor
-    rts
 
 * Shift the quotient into the proper place
 FixedPointModMainLoopEnd:
     ldb numTotalShifts
     beq FixedPointModMainLoopEnd3
 FixedPointModMainLoopEnd2:
-    bsr FixedPointModShiftQuotientLeft
+    lbsr FixedPointDivShiftQuotientLeft
     decb
     bne FixedPointModMainLoopEnd2
 
