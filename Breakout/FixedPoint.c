@@ -12,9 +12,14 @@
 #include "FixedPoint.h"
 
 
-void FixedPointSet(FixedPoint *c, int whole, unsigned decimal) {
-  c->Whole = whole;
-  c->Fraction = decimal;
+asm void FixedPointSet(FixedPoint *c, int whole, unsigned decimal) {
+  asm {
+    ldx     2,s             variable c
+    ldd     4,s             variable whole
+    std     ,x
+    ldd     6,s             variable decimal
+    std     2,x
+  }
 }
 
 
