@@ -172,8 +172,17 @@ void FixedPointToA(char *buffer, FixedPoint *a);
 /**
  * Parses buffer into a FixedPoint value.
  * @param a[out] output parsed result
- * @param a[in] input
+ * @param buffer[in] input
  */
 void FixedPointParse(FixedPoint *a, char *buffer);
+
+
+/**
+ * Returns the square root of b
+ * @param a[out] square root of b
+ * @param b[in] input value
+ */
+void FixedPointSqrt(FixedPoint *a, FixedPoint *b);
+
 
 #endif

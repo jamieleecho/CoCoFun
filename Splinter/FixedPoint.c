@@ -26,6 +26,10 @@ FixedPoint FixedPointPowersOf10[] = {
 };
 
 
+/** .5 */
+FixedPoint FixedPointPoint5 = FixedPointInit(0, 0x8000);
+
+
 asm void FixedPointSet(FixedPoint *c, int whole, unsigned decimal) {
   asm {
     ldx     2,s             variable c
@@ -686,62 +690,72 @@ FixedPoint *FixedPointCopy(FixedPoint *b, FixedPoint *a) {
 void FixedPointToA(char *buffer, FixedPoint *a) {
   FixedPoint quotient, remainder;
   byte powerIndex = 0;
+  char *startBuffer = buffer;
 
   // Deal with negatives
-  if (a->Whole < 0) {
+  byte isNegative = (a->Whole < 0);
+  if (isNegative) {
     FixedPointNegate(&remainder, a);
     *buffer++ = '-';
   } else {
     FixedPointCopy(&remainder, a);
   }
 
-  // Deal with rounding errors
-  if (remainder.Fraction > 0xfff9) {    
-    if (remainder.Whole = 0x7fff) {
-      strcpy(buffer, "32768");
-      return;
-    }
-    remainder.Whole++;
-    remainder.Fraction = 0;
-  }
-
   // Output the whole part
-  byte nonZeroChars = 0;
-  for(int ii=0; ii<5; ii++) {
+  for(byte ii=0; ii<5; ii++) {
     FixedPointMod(&quotient, &remainder, &remainder, FixedPointPowersOf10 + powerIndex);
-    if (quotient.Whole > 0)
-      nonZeroChars++;
-    if (nonZeroChars > 0)
-      *buffer++ = '0' + (byte)quotient.Whole;
-    powerIndex++;
-  }
-
-  if (nonZeroChars == 0)
-      *buffer++ = '0';
-
-  // Return if there is no fractional part
-  if (remainder.Fraction == 0) {
-    *buffer++ = '\0';
-    return;
-  }
-
-  // Deal with the fractional part
-  byte zeroChars = 1;  
-  *buffer++ = '.';
-  for(int ii=0; ii<4; ii++) {
-
-    FixedPointMod(&quotient, &remainder, &remainder, FixedPointPowersOf10 + powerIndex);
-    if (quotient.Whole > 0)
-      zeroChars = 0;
-    else
-      zeroChars++;
-      
     *buffer++ = '0' + (byte)quotient.Whole;
     powerIndex++;
   }
+
+  // Deal with the fractional part
+  if (remainder.Fraction != 0) {
+    *buffer++ = '.';
+    for(byte ii=0; ii<4; ii++) {
+      FixedPointMod(&quotient, &remainder, &remainder, FixedPointPowersOf10 + powerIndex);
+      
+      // Deal with round off error.
+      if (quotient.Whole > 9) {
+	// This becomes 0 and we carry 1 all the way up
+	quotient.Whole = 0;
+	for(char *ptr = buffer - 1; ptr >= startBuffer; ptr--) {
+	  char c = *ptr;
+	  if ((c == '.') || (c == '-')) continue;
+	  c = c + 1;
+	  if (c <= '9') {
+	    *ptr = c;
+	    break;
+	  }
+	  
+	  c = '0';
+	  *ptr = c;
+	}
+      }
+      
+      *buffer++ = '0' + (byte)quotient.Whole;
+      powerIndex++;
+    }
+
+    // Rewind buffer to the point to the last non-zero char
+    for(buffer--; (buffer > startBuffer) && (*buffer == '0'); buffer--);
+    buffer += (*buffer == '.') ? 0 : 1;
+  }
   
-  // Put the null character at the last non-zero char
-  *(buffer - zeroChars) = '\0';
+  // Find the first non-zero char
+  char *ptr = startBuffer;
+  char *ptr2 = buffer - 1;
+  for(; (ptr < ptr2) && (*ptr == '0' || *ptr == '-'); ptr++);
+  if (*ptr == '.') ptr--; // make sure we show 0.1 not .1
+
+  // Copy the text to the beginning
+  byte numChars = (byte)(buffer - ptr);
+  if (isNegative) {
+    memcpy(startBuffer + 1, ptr, numChars);
+    startBuffer[numChars + 1] = '\0';  
+  } else {
+    memcpy(startBuffer, ptr, numChars);
+    startBuffer[numChars] = '\0';
+  }
 }
 
 
@@ -791,6 +805,56 @@ void FixedPointParse(FixedPoint *a, char *buffer) {
 
   if (resultIsNegative)
     FixedPointNegate(a, a);
+}
+
+
+void FixedPointSqrt(FixedPoint *a, FixedPoint *b) {
+  // Can't deal with negatives :(
+  if (b->Whole < 0) {
+    FixedPointSet(a, 0x7fff, 0xffff);
+    return;
+  }
+
+  // Make sure zero is exact
+  if ((b->Whole == 0) && (b->Fraction == 0)) {
+    FixedPointSet(a, 0x0, 0x0);
+    return;
+  }
+
+  // Compute a good estimate for the square root of b. The basic idea is to
+  // approximate log base 2, divide that result by 2 and then raise that to the
+  // power of 2.
+  int whole;
+  unsigned fraction;
+  byte numBits = 0;
+  if (b->Whole > 0) {
+    whole = b->Whole;
+    fraction = 0;
+    do {
+      numBits++;
+      whole = whole >> 1;
+    } while(whole > 0);
+    numBits = 1 + (numBits >> 1);
+    whole = 1 << numBits;
+  } else {
+    whole = 0;
+    fraction = b->Fraction;
+    while((fraction & 0x8000) == 0x0) {
+      numBits++;
+      fraction = fraction << 1;
+    }
+    numBits = (numBits >> 1);
+    fraction = (unsigned)0x8000 >> numBits;
+  }
+
+  // Use Newton Rhapson to compute sqrt
+  FixedPointSet(a, whole, fraction);
+  FixedPoint c;
+  for(byte ii=0; ii<4; ii++) {
+    FixedPointDiv(&c, b, a);
+    FixedPointAdd(&c, &c, a);    
+    FixedPointMul(a, &c, &FixedPointPoint5);
+  }
 }
 
 
