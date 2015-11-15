@@ -39,7 +39,7 @@ void Vector2dAdd(Vector2d *a, Vector2d *b, Vector3d *c);
  * @param b[in] quantity
  * @param c[in] subtractand
  */
-void Vector2dSub(Vector2d *a, Vector2d *b, Vector3d *c);
+void Vector2dSub(Vector2d *a, Vector2d *b, Vector2d *c);
 
 
 /**
@@ -48,7 +48,7 @@ void Vector2dSub(Vector2d *a, Vector2d *b, Vector3d *c);
  * @paran b[in] scalar multiplier
  * @param c[in] vector to multiply
  */
-void Vector2dMul(Vector2d *a, FixedPoint *b, Vector3d *c);
+void Vector2dMul(Vector2d *a, FixedPoint *b, Vector2d *c);
 
 
 /**
@@ -57,81 +57,23 @@ void Vector2dMul(Vector2d *a, FixedPoint *b, Vector3d *c);
  * @paran b[in] scalar multiplier
  * @param c[in] vector to multiply
  */
-void Vector2dMul(Vector2d *a, FixedPoint *b, Vector3d *c);
-
-/** 
- * For initializing FixedPoint numbers.
- * @param w[in] whole part
- * @param f[in] fractional part
- */
-#define FixedPointInit(w, f) { (w), (f) }
-
-/** 
- * Initize the FixedPoint number to pi
- */
-#define FixedPointInitPi() { 3, 0x2434 }
-
-/** 
- * Initize the FixedPoint number to -pi
- */
-#define FixedPointInitMinusPi() { 0xfffc, 0xdbcc }
-
-/** 
- * Initize the FixedPoint number to pi/2
- */
-#define FixedPointInitPiOver2() { 1, 0x9210 }
-
-/** 
- * Initize the FixedPoint number to -pi/2
- */
-#define FixedPointInitMinusPiOver2() { 0xfffe, 0x6df0 }
-
-/** 
- * Initize the FixedPoint number to e
- */
-#define FixedPointInitE() { 2, 0xb7d2 }
-
-/**
- * Returns a new FixedPoint containing whole.fraction
- * @param c[out] whole.fraction
- * @param whole[in] whole
- * @param decimal[in] fraction
- */
-void FixedPointSet(FixedPoint *c, int whole, unsigned decimal);
+void Vector2dDot(FixedPoint *a, Vector2d *b, Vector2d *c);
 
 
 /**
- * @param c[out] -input
- * @param a[in] input
+ * Computes a unit vector from b
+ * @param a[out] unit vector
+ * @paran b[in] non-zero input vector
  */
-void FixedPointNegate(FixedPoint *c, FixedPoint *a);
+void Vector2dUnit(Vector2d *a, Vector2d *b);
 
 
 /**
- * Returns *a + *b
- * @param c[out] sum
- * @param a[in] addened 1
- * @param b[in] addened 2
+ * Computes the length of b.
+ * @param a[out] length of b
+ * @param b[in] input vector
  */
-void FixedPointAdd(FixedPoint *c, FixedPoint *a, FixedPoint *b);
-
-
-/**
- * Returns *a - *b
- * @param c[out] difference
- * @param a[in] minuend
- * @param b[in] subtrahend
- */
-void FixedPointSub(FixedPoint *c, FixedPoint *a, FixedPoint *b);
-
-
-/**
- * Returns *a * *b
- * @param c[out] product
- * @param a[in] multiplicand
- * @param b[in] multiplicand
- */
-void FixedPointMul(FixedPoint *c, FixedPoint *a, FixedPoint *b);
+void Vector2dLength(FixedPoint *a, Vector2d *b);
 
 
 #endif
