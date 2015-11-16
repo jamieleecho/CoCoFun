@@ -30,7 +30,7 @@ void Vector2dZero(Vector2d *a);
  * @param b[in] addend
  * @param c[in] addend
  */
-void Vector2dAdd(Vector2d *a, Vector2d *b, Vector3d *c);
+void Vector2dAdd(Vector2d *a, Vector2d *b, Vector2d *c);
 
 
 /**

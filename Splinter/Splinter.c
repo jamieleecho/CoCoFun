@@ -19,6 +19,7 @@
 #include "Blitter.h"
 #include "CoCoMisc.h"
 #include "Sound.h"
+#include "Vector2d.h"
 
 #include "GrafxData.c"
 #include "FontData.c"
@@ -29,6 +30,7 @@
 #include "CoCoMisc.c"
 #include "Sound.c"
 #include "FixedPoint.c"
+#include "Vector2d.c"
 
 
 /** Loop delay for performing screen fades */
