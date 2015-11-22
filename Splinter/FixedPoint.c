@@ -172,14 +172,14 @@ void FixedPointMul(FixedPoint *c, FixedPoint *a, FixedPoint *b) {
     mul
     addd 3,u
     std 3,u
-    bsr FixedPointMulCarry2
+    lbsr FixedPointMulCarry2
 
     lda ,x
     ldb 2,y
     mul
     addd 2,u
     std 2,u
-    bsr FixedPointMulCarry1
+    lbsr FixedPointMulCarry1
 
 * Multiply third byte of y
     lda 3,x
@@ -216,14 +216,14 @@ void FixedPointMul(FixedPoint *c, FixedPoint *a, FixedPoint *b) {
     mul
     addd 3,u
     std 3,u
-    bsr FixedPointMulCarry3
+    bsr FixedPointMulCarry2
 
     lda 2,x
     ldb ,y
     mul
     addd 2,u
     std 2,u
-    bsr FixedPointMulCarry3
+    bsr FixedPointMulCarry1
 
     lda 1,x
     ldb ,y
@@ -245,31 +245,49 @@ void FixedPointMul(FixedPoint *c, FixedPoint *a, FixedPoint *b) {
 *******************************************************************************
 FixedPointMulCarry8:
     bcc FixedPointMulCarryDone
-    inc 8,u
+    lda 8,u
+    adda #1
+    sta 8,u
 FixedPointMulCarry7:
     bcc FixedPointMulCarryDone
-    inc 7,u
+    lda 7,u
+    adda #1
+    sta 7,u
 FixedPointMulCarry6:
     bcc FixedPointMulCarryDone
-    inc 6,u
+    lda 6,u
+    adda #1
+    sta 6,u
 FixedPointMulCarry5:
     bcc FixedPointMulCarryDone
-    inc 5,u
+    lda 5,u
+    adda #1
+    sta 5,u
 FixedPointMulCarry4:
     bcc FixedPointMulCarryDone
-    inc 4,u
+    lda 4,u
+    adda #1
+    sta 4,u
 FixedPointMulCarry3:
     bcc FixedPointMulCarryDone
-    inc 3,u
+    lda 3,u
+    adda #1
+    sta 3,u
 FixedPointMulCarry2:
     bcc FixedPointMulCarryDone
-    inc 2,u
+    lda 2,u
+    adda #1
+    sta 2,u
 FixedPointMulCarry1:
     bcc FixedPointMulCarryDone
-    inc 1,u
+    lda 1,u
+    adda #1
+    sta 1,u
 FixedPointMulCarry0:
     bcc FixedPointMulCarryDone
-    inc ,u
+    lda ,u
+    adda #1
+    sta ,u
 FixedPointMulCarryDone:
     rts
 

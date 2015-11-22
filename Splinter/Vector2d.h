@@ -61,11 +61,11 @@ void Vector2dDot(FixedPoint *a, Vector2d *b, Vector2d *c);
 
 
 /**
- * Computes a unit vector from b
- * @param a[out] unit vector
+ * Computes a normalized vector from b
+ * @param a[out] unit vector (must not be an alias of b)
  * @paran b[in] non-zero input vector
  */
-void Vector2dUnit(Vector2d *a, Vector2d *b);
+void Vector2dNormalize(Vector2d *a, Vector2d *b);
 
 
 /**
@@ -75,5 +75,21 @@ void Vector2dUnit(Vector2d *a, Vector2d *b);
  */
 void Vector2dLength(FixedPoint *a, Vector2d *b);
 
+
+/**
+ * Computes the reflection vector of b off of n
+ * @param a[out] reflection of b off of n
+ * @param b[in] vector to reflect
+ * @param n[in] normalized vector
+ */
+void Vector2dReflectionVector(Vector2d *a, Vector2d *b, Vector2d *n);
+
+
+/**
+ * Creates an ASCII representation of a.
+ * @param buffer[out] output buffer with at least 28 bytes
+ * @param a[in] source
+ */
+void Vector2dToA(char *buffer, Vector2d *a);
 
 #endif

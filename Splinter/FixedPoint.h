@@ -179,7 +179,7 @@ void FixedPointParse(FixedPoint *a, char *buffer);
 
 /**
  * Returns the square root of b
- * @param a[out] square root of b
+ * @param a[out] square root of b (must not be an alias of b)
  * @param b[in] input value
  */
 void FixedPointSqrt(FixedPoint *a, FixedPoint *b);

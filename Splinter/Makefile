@@ -15,7 +15,7 @@ $(TARGET) : $(SPLINTER_BAS) $(SPLINTER_BIN)
 	decb copy $(SPLINTER_BIN) $@,SPLINTER.BIN
 	decb attr $@,SPLINTER.BIN -2 -b
 
-$(SPLINTER_BIN) : Splinter.c GrafxData.c SplinterScore.c SplinterBall.c Blitter.c Bricks.c FontData.c SplinterBall.c CoCoMisc.c Sound.c FixedPoint.c
+$(SPLINTER_BIN) : Splinter.c GrafxData.c SplinterScore.c SplinterBall.c Blitter.c Bricks.c FontData.c SplinterBall.c CoCoMisc.c Sound.c FixedPoint.c Vector2d.c
 	cmoc $(CFLAGS) $< 
 
 %.bin : %.c
