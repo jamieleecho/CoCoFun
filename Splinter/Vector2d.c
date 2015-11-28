@@ -45,12 +45,14 @@ void Vector2dDot(FixedPoint *a, Vector2d *b, Vector2d *c) {
 
 
 void Vector2dNormalize(Vector2d *a, Vector2d *b) {
-  FixedPointMul(&(a->data), &(b->data),  &(b->data));
-  FixedPointMul(&(a->data[1]), &(b->data[1]),  &(b->data[1]));
+  Vector2d tmp;
+  memcpy(&tmp, b, sizeof(tmp));
+  FixedPointMul(&(a->data), &(tmp.data),  &(tmp.data));
+  FixedPointMul(&(a->data[1]), &(tmp.data[1]),  &(tmp.data[1]));
   FixedPointAdd(&(a->data[1]), &(a->data),  &(a->data[1]));
   FixedPointSqrt(&(a->data), &(a->data[1]));
-  FixedPointDiv(&(a->data[1]), &(b->data[1]), &(a->data));
-  FixedPointDiv(&(a->data), &(b->data), &(a->data));
+  FixedPointDiv(&(a->data[1]), &(tmp.data[1]), &(a->data));
+  FixedPointDiv(&(a->data), &(tmp.data), &(a->data));
 }
 
 

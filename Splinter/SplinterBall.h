@@ -14,10 +14,11 @@
 
 #include <coco.h>
 #include "FixedPoint.h"
+#include "Vector2d.h"
 
 
 /** Ball position */
-FixedPoint splinterBallPosition[2];
+Vector2d splinterBallPosition;
 
 /** Slope of the ball (x/y) on [0, 4] */
 FixedPoint splinterBallSlope = FixedPointInit(1, 0);
@@ -30,7 +31,7 @@ FixedPoint splinterBallVelocity = FixedPointInit(0, 0x4000);
  * magnitude(splinterBallIncrementVector) * splinterBallVelocity
  * == splinterBallVelocity
  */
-FixedPoint splinterBallIncrementVector[2];
+Vector2d splinterBallIncrementVector;
 
 /** Resets the splinterBall position to the default */
 void SplinterBallReset();

@@ -40,43 +40,6 @@ FixedPoint splinterBallPoint25 = FixedPointInit(0, 0x4000);
 
 
 /**
- * Approximates the sqrt of a.
- * @param b[out] output
- * @param a[in] input on [0, 4]
- */
-void SplinterBallSqrt(FixedPoint *b, FixedPoint *a) {
-  FixedPoint tmp;
-  FixedPointCopy(b, (a->Whole < 1) ? &splinterBallPoint5 : &splinterBall2);
-
-  char buffer[12];
-  FixedPointToA(buffer, &a[0]);
-
-  for(byte ii=0; ii<3; ii++) {
-    FixedPointDiv(&tmp, a, b);
-    FixedPointAdd(&tmp, b, &tmp);
-    FixedPointMul(b, &tmp, &splinterBallPoint5);
-  }
-}
-
-
-/**
- * Normalizes a
- * @param b[out] output
- * @param a[in] input
- */
-void SplinterBallNormalize(FixedPoint b[2], FixedPoint a[2]) {
-  FixedPoint tmp[2];
-  FixedPointMul(&tmp[0], &a[0], &a[0]);
-  FixedPointMul(&tmp[1], &a[1], &a[1]);
-  FixedPointAdd(&tmp[0], &tmp[0], &tmp[1]);
-  SplinterBallSqrt(&tmp[1], &tmp[0]);
-
-  FixedPointDiv(&b[0], &a[0], &tmp[1]);
-  FixedPointDiv(&b[1], &a[1], &tmp[1]);
-}
-
-
-/**
  * Updates splinterBallIncrementVector with the current slope and whether
  * or not we should be moving left and up.
  *
@@ -85,24 +48,26 @@ void SplinterBallNormalize(FixedPoint b[2], FixedPoint a[2]) {
  */
 void SplinterBallSetSlope(byte moveLeft, byte moveUp) {
   if (moveLeft)
-    FixedPointNegate(&splinterBallIncrementVector[0], &splinterBall1);
+    FixedPointNegate(&(splinterBallIncrementVector.data[0]), &splinterBall1);
   else
-    FixedPointCopy(&splinterBallIncrementVector[0], &splinterBall1);
+    FixedPointCopy(&(splinterBallIncrementVector.data[0]), &splinterBall1);
 
   if (moveUp)
-    FixedPointNegate(&splinterBallIncrementVector[1], &splinterBallSlope);
+    FixedPointNegate(&(splinterBallIncrementVector.data[1]), &splinterBallSlope);
   else
-    FixedPointCopy(&splinterBallIncrementVector[1], &splinterBallSlope);
-  SplinterBallNormalize(splinterBallIncrementVector, splinterBallIncrementVector);
+    FixedPointCopy(&(splinterBallIncrementVector.data[1]), &splinterBallSlope);
+  Vector2dNormalize(&splinterBallIncrementVector, &splinterBallIncrementVector);
 
-  FixedPointMul(&splinterBallIncrementVector[0], &splinterBallIncrementVector[0], &splinterBallVelocity);
-  FixedPointMul(&splinterBallIncrementVector[1], &splinterBallIncrementVector[1], &splinterBallVelocity);
+  FixedPointMul(&(splinterBallIncrementVector.data[0]),
+		&(splinterBallIncrementVector.data[0]), &splinterBallVelocity);
+  FixedPointMul(&(splinterBallIncrementVector.data[1]),
+		&(splinterBallIncrementVector.data[1]), &splinterBallVelocity);
 }
 
 
 void SplinterBallReset() {
-  FixedPointSet(&splinterBallPosition[0], 40, 0);
-  FixedPointSet(&splinterBallPosition[1], 3, 0);
+  FixedPointSet(&(splinterBallPosition.data[0]), 40, 0);
+  FixedPointSet(&(splinterBallPosition.data[1]), 3, 0);
   FixedPointCopy(&splinterBallVelocity, &splinterBallPoint75);
   FixedPointCopy(&splinterBallSlope, &splinterBall2);
 
@@ -136,10 +101,10 @@ void SplinterBallMiss() {
   SoundPlayAndWait(1800, 6, 6, 192);
 
   // Erase the displayed ball
-  BlitterFillRectangle(splinterBallPosition[0].Whole 
-		       ? (splinterBallPosition[0].Whole << 1) - 2 : 0,
-		       splinterBallPosition[1].Whole
-		       ? splinterBallPosition[1].Whole - 1 : 0, 12, 8, 0);
+  BlitterFillRectangle((splinterBallPosition.data[0]).Whole 
+		       ? (splinterBallPosition.data[0].Whole << 1) - 2 : 0,
+		       splinterBallPosition.data[1].Whole
+		       ? splinterBallPosition.data[1].Whole - 1 : 0, 12, 8, 0);
 
   // Reset the ball location
   SplinterBallReset();
@@ -149,7 +114,7 @@ void SplinterBallMiss() {
 byte SplinterBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositions) {
   // We are a little generous with hit detection here to reduce half
   // destroyed bricks
-  byte b1 = (byte)splinterBallPosition[1].Whole;
+  byte b1 = (byte)splinterBallPosition.data[1].Whole;
   byte bend = b1 + 6;
   byte numHit = 0;
   for(byte ii=0; ii<brickYPositionsSz; ii++) {    
@@ -163,7 +128,8 @@ byte SplinterBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
 
       // Change direction? Favor not changing X direction and favor going towards
       // paddle
-      FixedPointNegate(&splinterBallIncrementVector[0], &splinterBallIncrementVector[0]);  
+      FixedPointNegate(&splinterBallIncrementVector.data[0],
+		       &splinterBallIncrementVector.data[0]);  
       numHit++;
       
       // Remove the brick - if none left, reset the level
@@ -178,29 +144,30 @@ byte SplinterBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
 
 
 void SplinterBallTick() {
-  byte oldX = (byte)splinterBallPosition[0].Whole;
-  byte oldY = (byte)splinterBallPosition[1].Whole;
+  byte oldX = (byte)splinterBallPosition.data[0].Whole;
+  byte oldY = (byte)splinterBallPosition.data[1].Whole;
 
   // Move the ball
-  FixedPointAdd(&splinterBallPosition[0], &splinterBallPosition[0], &splinterBallIncrementVector[0]);
-  FixedPointAdd(&splinterBallPosition[1], &splinterBallPosition[1], &splinterBallIncrementVector[1]);
+  Vector2dAdd(&splinterBallPosition, &splinterBallPosition,
+	      &splinterBallIncrementVector);
 
   // Did we hit the right side of the screen?
-  if (splinterBallPosition[0].Whole > 108) { 
-    FixedPointNegate(&splinterBallIncrementVector[0], &splinterBallIncrementVector[0]);
+  if (splinterBallPosition.data[0].Whole > 108) { 
+    FixedPointNegate(&splinterBallIncrementVector.data[0],
+		     &splinterBallIncrementVector.data[0]);
   }
   
   // Are we hitting the left end of the screen?
-  else if (splinterBallPosition[0].Whole < 7) {      
+  else if (splinterBallPosition.data[0].Whole < 7) {      
     if (splinterBallWasMissed) {
-      if (splinterBallPosition[0].Whole <= 0) {
+      if (splinterBallPosition.data[0].Whole <= 0) {
 	SplinterBallMiss();
 	return;
       }
     } else {	
 	// Check collision with the paddle       
 	byte p1 = (splinterPaddlePosition < 7) ? 0 : (splinterPaddlePosition - 8);
-	byte b1 = (byte)splinterBallPosition[1].Whole - 1;
+	byte b1 = (byte)splinterBallPosition.data[1].Whole - 1;
 	byte pend = (splinterPaddlePosition < 8) ? p1 + 45 : p1 + 51;
 	byte bend = b1 + 6;
 	
@@ -208,14 +175,18 @@ void SplinterBallTick() {
 	if (((p1 <= b1) && (pend >= b1))
 	    || ((b1 <= p1) && (bend >= p1))) {
 	  SoundPlay(30, 1, 1, 64);
-	  int offset = (splinterBallPosition[1].Whole - (int)splinterPaddlePosition
+	  int offset = (splinterBallPosition.data[1].Whole
+			- (int)splinterPaddlePosition
 			+ 3 - 19);
 	  if (offset < -6) {
-	    FixedPointNegate(&splinterBallIncrementVector[0], &splinterBallIncrementVector[0]);
+	    FixedPointNegate(&splinterBallIncrementVector.data[0],
+			     &splinterBallIncrementVector.data[0]);
 	  } else if (offset > 6) {
-	    FixedPointNegate(&splinterBallIncrementVector[0], &splinterBallIncrementVector[0]);
+	    FixedPointNegate(&splinterBallIncrementVector.data[0],
+			     &splinterBallIncrementVector.data[0]);
 	  } else {	
-	    FixedPointNegate(&splinterBallIncrementVector[0], &splinterBallIncrementVector[0]);
+	    FixedPointNegate(&splinterBallIncrementVector.data[0],
+			     &splinterBallIncrementVector.data[0]);
 	  }
 	} else {
 	  splinterBallWasMissed = 1;
@@ -224,13 +195,15 @@ void SplinterBallTick() {
   }
 
   // Did we hit the bottom of the screen?
-  if ((byte)splinterBallPosition[1].Whole > 181) {
-    FixedPointNegate(&splinterBallIncrementVector[1], &splinterBallIncrementVector[1]);
+  if ((byte)splinterBallPosition.data[1].Whole > 181) {
+    FixedPointNegate(&splinterBallIncrementVector.data[1],
+		     &splinterBallIncrementVector.data[1]);
   }
 
   // Did we hit the top of the screen?
-  else if ((byte)splinterBallPosition[1].Whole < 2) {
-    FixedPointNegate(&splinterBallIncrementVector[1], &splinterBallIncrementVector[1]);
+  else if ((byte)splinterBallPosition.data[1].Whole < 2) {
+    FixedPointNegate(&splinterBallIncrementVector.data[1],
+		     &splinterBallIncrementVector.data[1]);
   }
 
   // Check collisions with bricks
@@ -238,8 +211,8 @@ void SplinterBallTick() {
   byte lastHitX = 0;
   for (byte ii=0; ii<brickXPositionsSz; ii++) {
     byte pos = brickXPositions[ii];
-    if ((splinterBallPosition[0].Whole >= (pos - 5)) 
-	&& (splinterBallPosition[0].Whole < (pos + 4))) {
+    if ((splinterBallPosition.data[0].Whole >= (pos - 5)) 
+	&& (splinterBallPosition.data[0].Whole < (pos + 4))) {
       byte newNumHit = SplinterBallCheckBrickCollision(pos,
 						       lineBrickYPositions[ii]);
       if (newNumHit)
@@ -250,15 +223,17 @@ void SplinterBallTick() {
 
   // Erase the part of the ball the will not be reset  
   byte xx = (oldX << 1);
-  byte offsetX = ((byte)splinterBallPosition[0].Whole < oldX) ? 6 : 0;
-  byte offsetY = ((byte)splinterBallPosition[1].Whole < oldY) ? 5 : 0;
-  if ((byte)splinterBallPosition[0].Whole != oldX)
+  byte offsetX = ((byte)splinterBallPosition.data[0].Whole < oldX) ? 6 : 0;
+  byte offsetY = ((byte)splinterBallPosition.data[1].Whole < oldY) ? 5 : 0;
+  if ((byte)splinterBallPosition.data[0].Whole != oldX)
     BlitterFillRectangle(xx + offsetX, oldY, 2, 6, 0);
-  if ((byte)splinterBallPosition[1].Whole != oldY)
+  if ((byte)splinterBallPosition.data[1].Whole != oldY)
     BlitterFillRectangle(xx, oldY + offsetY, 8, 1, 0);
 
   // Draw the graphics
-  BlitterDrawGraphics(GrafxDataBallData, (byte)splinterBallPosition[0].Whole, (byte)splinterBallPosition[1].Whole);
+  BlitterDrawGraphics(GrafxDataBallData,
+		      (byte)splinterBallPosition.data[0].Whole,
+		      (byte)splinterBallPosition.data[1].Whole);
 
   // Play a sound if we hit any bricks
   if (numHit) {
@@ -270,14 +245,16 @@ void SplinterBallTick() {
     if (numHit == 255) {
       BricksReset();
       
-      BlitterFillRectangle(splinterBallPosition[0].Whole 
-			   ? ((byte)splinterBallPosition[0].Whole << 1) - 2 : 0,
-			   (byte)splinterBallPosition[1].Whole
-			   ? (byte)splinterBallPosition[1].Whole - 1 : 0, 12, 8, 0);
+      BlitterFillRectangle(splinterBallPosition.data[0].Whole 
+			   ? ((byte)splinterBallPosition.data[0].Whole<<1)-2 : 0,
+			   (byte)splinterBallPosition.data[1].Whole
+			   ? (byte)splinterBallPosition.data[1].Whole-1
+			   : 0, 12, 8, 0);
       SplinterBallReset();	
       BricksRefresh();
-      BlitterDrawGraphics(GrafxDataBallData, (byte)splinterBallPosition[0].Whole,
-			  (byte)splinterBallPosition[1].Whole);
+      BlitterDrawGraphics(GrafxDataBallData,
+			  (byte)splinterBallPosition.data[0].Whole,
+			  (byte)splinterBallPosition.data[1].Whole);
       
       SoundPlayAndWait(600, 6, 6, 192);
       SoundPlayAndWait(900, 5, 5, 192);
@@ -288,7 +265,9 @@ void SplinterBallTick() {
 
 
 void SplinterBallRefresh() {
-  BlitterDrawGraphics(GrafxDataBallData, (byte)splinterBallPosition[0].Whole, (byte)splinterBallPosition[1].Whole);
+  BlitterDrawGraphics(GrafxDataBallData,
+		      (byte)splinterBallPosition.data[0].Whole,
+		      (byte)splinterBallPosition.data[1].Whole);
 }
 
 

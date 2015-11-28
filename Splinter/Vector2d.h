@@ -62,7 +62,7 @@ void Vector2dDot(FixedPoint *a, Vector2d *b, Vector2d *c);
 
 /**
  * Computes a normalized vector from b
- * @param a[out] unit vector (must not be an alias of b)
+ * @param a[out] unit vector
  * @paran b[in] non-zero input vector
  */
 void Vector2dNormalize(Vector2d *a, Vector2d *b);
