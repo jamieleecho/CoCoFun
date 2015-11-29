@@ -61,6 +61,7 @@ char splinterLastDrawnScore[7];
 
 
 int main() {
+  FixedPointInitialize();
   SplinterInit();
   SplinterPlay();
 

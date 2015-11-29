@@ -10,6 +10,7 @@
 #define _FixedPoint_c
 
 #include "FixedPoint.h"
+#include "cmoc.h"
 
 
 /** Table holding powers of 10 */
@@ -25,9 +26,74 @@ FixedPoint FixedPointPowersOf10[] = {
   FixedPointInit(0, 0x6)
 };
 
+/** -1 */
+FixedPoint FixedPointMinusOne = FixedPointInit(-1, 0);
+
+/** 0 */
+FixedPoint FixedPointZero = FixedPointInit(0, 0);
+
+/** Pi */
+FixedPoint FixedPointPi;
+
+/** Pi/2 */
+FixedPoint FixedPointPi_2;
+
+/** Pi/4 */
+FixedPoint FixedPointPi_4;
+
+/** -Pi */
+FixedPoint FixedPointMinusPi;
+
+/** -Pi/2 */
+FixedPoint FixedPointMinusPi_2;
+
+/** -Pi/4 */
+FixedPoint FixedPointMinusPi_4;
 
 /** .5 */
 FixedPoint FixedPointPoint5 = FixedPointInit(0, 0x8000);
+
+/** Table holding sin coefficients */
+FixedPoint FixedPointSinCoefficients[3];
+
+/** Table holding cos coefficients */
+FixedPoint FixedPointCosCoefficients[3];
+
+
+void FixedPointInitialize() {
+  // Initialize constants
+  FixedPointParse(&FixedPointPi, "3.14159");
+  FixedPointMul(&FixedPointPi_2, &FixedPointPi, &FixedPointPoint5);
+  FixedPointMul(&FixedPointPi_4, &FixedPointPi_2, &FixedPointPoint5);
+  FixedPointNegate(&FixedPointMinusPi, &FixedPointPi);
+  FixedPointNegate(&FixedPointMinusPi_2, &FixedPointPi_2);
+  FixedPointNegate(&FixedPointMinusPi_4, &FixedPointPi_4);
+
+  // Initialize sin
+  FixedPoint tmp = FixedPointInit(-6, 0);
+  FixedPointDiv(&(FixedPointSinCoefficients[0]), 
+		&(FixedPointPowersOf10[4]),
+		&tmp);
+  FixedPointSet(&tmp, 120, 0);
+  FixedPointDiv(&(FixedPointSinCoefficients[1]), 
+		&(FixedPointPowersOf10[4]),
+		&tmp);
+  FixedPointSet(&tmp, -5040, 0);
+  FixedPointDiv(&(FixedPointSinCoefficients[2]), 
+		&(FixedPointPowersOf10[4]),
+		&tmp);
+
+  // Initialize cos
+  FixedPointSet(&tmp, -2, 0);
+  FixedPointDiv(&FixedPointCosCoefficients[0],
+ 		&(FixedPointPowersOf10[4]), &tmp);
+  FixedPointSet(&tmp, 24, 0);
+  FixedPointDiv(&FixedPointCosCoefficients[1],
+ 		&(FixedPointPowersOf10[4]), &tmp);
+  FixedPointSet(&tmp, -720, 0);
+  FixedPointDiv(&FixedPointCosCoefficients[2],
+ 		&(FixedPointPowersOf10[4]), &tmp);
+}
 
 
 asm void FixedPointSet(FixedPoint *c, int whole, unsigned decimal) {
@@ -852,7 +918,7 @@ void FixedPointSqrt(FixedPoint *a, FixedPoint *b) {
       numBits++;
       whole = whole >> 1;
     } while(whole > 0);
-    numBits = 1 + (numBits >> 1);
+   numBits = 1 + (numBits >> 1);
     whole = 1 << numBits;
   } else {
     whole = 0;
@@ -873,6 +939,115 @@ void FixedPointSqrt(FixedPoint *a, FixedPoint *b) {
     FixedPointAdd(&c, &c, a);    
     FixedPointMul(a, &c, &FixedPointPoint5);
   }
+}
+
+
+void FixedPointSin(FixedPoint *a, FixedPoint *b) {
+  // If b is negative, make it positive and reverse the result later
+  FixedPoint newb;
+  byte negateAnswer;
+  if (FixedPointLessThan(b, &FixedPointZero)) {
+    FixedPointNegate(&newb, b);
+    negateAnswer = TRUE;
+  } else {
+    memcpy(&newb, b, sizeof(newb));
+    negateAnswer = FALSE;
+  }
+
+  // If newb is greater than pi/2, then figure out the quadrant
+  FixedPoint tmp;
+  if (FixedPointGreaterThan(&newb, &FixedPointPi_2)) {
+    FixedPointMod(&tmp, &newb, &newb, &FixedPointPi_2);
+    byte quadrant = (byte)(tmp.Whole & 3);
+
+    if (quadrant == 1) {
+      FixedPointSub(&newb, &FixedPointPi_2, &newb);
+    } else if (quadrant == 2) {
+      negateAnswer = negateAnswer ^ TRUE;
+    } else if (quadrant == 3) {
+      FixedPointSub(&newb, &FixedPointPi_2, &newb);
+      negateAnswer = negateAnswer ^ TRUE;
+    }
+  }
+
+  // x - 
+  FixedPoint bb, bbb;
+  memcpy(a, &newb, sizeof(newb));
+
+  // x^3/6 + 
+  FixedPointMul(&bb, &newb, &newb);
+  FixedPointMul(&bbb, &bb, &newb);
+  FixedPointMul(&tmp, &bbb, &(FixedPointSinCoefficients[0]));
+  FixedPointAdd(a, a, &tmp);
+
+  // x^5/120 -
+  FixedPointMul(&bbb, &bb, &bbb);
+  FixedPointMul(&tmp, &bbb, &(FixedPointSinCoefficients[1]));
+  FixedPointAdd(a, a, &tmp);
+
+  // x^7/5040
+  FixedPointMul(&bbb, &bb, &bbb);
+  FixedPointMul(&tmp, &bbb, &(FixedPointSinCoefficients[2]));
+  FixedPointAdd(a, a, &tmp);
+
+  if (negateAnswer)
+    FixedPointNegate(a, a);
+}
+
+
+void FixedPointCos(FixedPoint *a, FixedPoint *b) {
+  // If b is negative, make it positive and reverse the result later
+  FixedPoint newb;
+  if (FixedPointLessThan(b, &FixedPointZero)) {
+    FixedPointNegate(&newb, b);
+  } else {
+    memcpy(&newb, b, sizeof(newb));
+  }
+
+  // If newb is greater than pi/2, then figure out the quadrant
+  FixedPoint tmp;  
+  byte negateAnswer;
+  if (FixedPointGreaterThan(&newb, &FixedPointPi_2)) {
+    FixedPointMod(&tmp, &newb, &newb, &FixedPointPi_2);
+    byte quadrant = (byte)(tmp.Whole & 3);
+
+    if (quadrant == 1) {
+      FixedPointSub(&newb, &FixedPointPi_2, &newb);
+      negateAnswer = TRUE;
+    } else if (quadrant == 2) {
+      negateAnswer = TRUE;
+    } else if (quadrant == 3) {
+      FixedPointSub(&newb, &FixedPointPi_2, &newb);
+      negateAnswer = FALSE;
+    } else {
+      negateAnswer = FALSE;
+    }
+
+  } else {
+    negateAnswer = FALSE;
+  }
+
+  // 1 -
+  FixedPoint bb;
+  memcpy(a, &(FixedPointPowersOf10[4]), sizeof(tmp));
+
+  // b^2/2 + 
+  FixedPointMul(&bb, &newb, &newb);
+  FixedPointMul(&tmp, &bb, &(FixedPointCosCoefficients[0]));
+  FixedPointAdd(a, a, &tmp);
+
+  // b^4/24 -
+  FixedPointMul(&newb, &bb, &bb);
+  FixedPointMul(&tmp, &newb, &(FixedPointCosCoefficients[1]));
+  FixedPointAdd(a, a, &tmp);
+
+  // b^6/720
+  FixedPointMul(&newb, &newb, &bb);
+  FixedPointMul(&tmp, &newb, &(FixedPointCosCoefficients[2]));
+  FixedPointAdd(a, a, &tmp);
+
+  if (negateAnswer)
+    FixedPointNegate(a, a);
 }
 
 

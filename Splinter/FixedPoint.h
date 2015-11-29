@@ -20,6 +20,10 @@ typedef struct FixedPoint {
 } FixedPoint;
 
 
+/** Must be invoked before using other FixedPoint functions. */
+void FixedPointInitialize();
+
+
 /** 
  * For initializing FixedPoint numbers.
  * @param w[in] whole part
@@ -183,6 +187,22 @@ void FixedPointParse(FixedPoint *a, char *buffer);
  * @param b[in] input value
  */
 void FixedPointSqrt(FixedPoint *a, FixedPoint *b);
+
+
+/**
+ * Computes sin(b)
+ * @param a[out] sin(b)
+ * @param b[in] input value
+ */
+void FixedPointSin(FixedPoint *a, FixedPoint *b);
+
+
+/**
+ * Computes cos(b)
+ * @param a[out] cos(b)
+ * @param b[in] input value
+ */
+void FixedPointCos(FixedPoint *a, FixedPoint *b);
 
 
 #endif
