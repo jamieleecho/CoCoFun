@@ -25,7 +25,7 @@ void Vector2dAdd(Vector2d *a, Vector2d *b, Vector2d *c) {
 
 
 void Vector2dSub(Vector2d *a, Vector2d *b, Vector2d *c) {
-  FixedPointSub(&(a->data), &(b->data), &(c->data));
+  FixedPointSub(&(a->data[0]), &(b->data[0]), &(c->data[0]));
   FixedPointSub(&(a->data[1]), &(b->data[1]), &(c->data[1]));
 }
 
@@ -67,10 +67,11 @@ void Vector2dLength(FixedPoint *a, Vector2d *b) {
 
 void Vector2dReflectionVector(Vector2d *a, Vector2d *b, Vector2d *n) {
   FixedPoint tmp1;
+  Vector2d tmp2;
   Vector2dDot(&tmp1, b, n);
   FixedPointAdd(&tmp1, &tmp1, &tmp1);
-  Vector2dMul(a, &tmp1, n);
-  Vector2dSub(a, b, a);
+  Vector2dMul(&tmp2, &tmp1, n);
+  Vector2dSub(a, b, &tmp2);
 }
 
 

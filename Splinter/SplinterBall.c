@@ -39,6 +39,32 @@ FixedPoint splinterBallPoint5 = FixedPointInit(0, 0x8000);
 FixedPoint splinterBallPoint25 = FixedPointInit(0, 0x4000);
 
 
+/** Top normal */
+Vector2d splinterBallTopNormal;
+
+/** Bottom normal */
+Vector2d splinterBallBottomNormal;
+
+/** Right normal */
+Vector2d splinterBallRightNormal;
+
+/** Left normal */
+Vector2d splinterBallLeftNormal;
+
+
+void SplinterBallInit() {
+  FixedPointSet(&splinterBallTopNormal.data[0], 0, 0);
+  FixedPointSet(&splinterBallTopNormal.data[1], 1, 0);
+  FixedPointSet(&splinterBallBottomNormal.data[0], 0, 0);
+  FixedPointSet(&splinterBallBottomNormal.data[1], -1, 0);
+  FixedPointSet(&splinterBallRightNormal.data[0], -1, 0);
+  FixedPointSet(&splinterBallRightNormal.data[1], 0, 0);
+  FixedPointSet(&splinterBallLeftNormal.data[0], -1, 0);
+  FixedPointSet(&splinterBallLeftNormal.data[1], 0, 0);
+  SplinterBallReset();
+}
+
+
 /**
  * Updates splinterBallIncrementVector with the current slope and whether
  * or not we should be moving left and up.
@@ -77,11 +103,6 @@ void SplinterBallReset() {
 }
 
 
-void SplinterBallInit() {
-  SplinterBallReset();
-}
-
-
 void SplinterBallDrawCount() {
   char buffer[4];
   buffer[0] = splinterNumberOfBalls + '0';
@@ -111,7 +132,9 @@ void SplinterBallMiss() {
 }
 
 
-byte SplinterBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositions) {
+byte SplinterBallCheckBrickCollision(byte lineBrickXPos,
+				     byte *lineBrickYPositions,
+				     byte alreadyHit) {
   // We are a little generous with hit detection here to reduce half
   // destroyed bricks
   byte b1 = (byte)splinterBallPosition.data[1].Whole;
@@ -126,10 +149,19 @@ byte SplinterBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositio
       BlitterFillRectangle(lineBrickXPos << 1, lineBrickYPositions[ii], 5, 11, 0);
       lineBrickYPositions[ii] = 0xff;
 
-      // Change direction? Favor not changing X direction and favor going towards
-      // paddle
-      FixedPointNegate(&splinterBallIncrementVector.data[0],
-		       &splinterBallIncrementVector.data[0]);  
+      if (!alreadyHit) {
+	char buffer[40];
+	Vector2dToA(buffer, &splinterBallIncrementVector);
+	BlitterDrawText(FontDataFontIndex, FontDataFontData,
+			14, 0, 0, 0, 1, buffer);
+	Vector2dReflectionVector(&splinterBallIncrementVector,
+				 &splinterBallIncrementVector,
+				 &splinterBallRightNormal);
+	Vector2dToA(buffer, &splinterBallIncrementVector);
+	BlitterDrawText(FontDataFontIndex, FontDataFontData,
+			14, 0, 0, 8, 1, buffer);
+	waitkey(0);
+      }
       numHit++;
       
       // Remove the brick - if none left, reset the level
@@ -214,7 +246,8 @@ void SplinterBallTick() {
     if ((splinterBallPosition.data[0].Whole >= (pos - 5)) 
 	&& (splinterBallPosition.data[0].Whole < (pos + 4))) {
       byte newNumHit = SplinterBallCheckBrickCollision(pos,
-						       lineBrickYPositions[ii]);
+						       lineBrickYPositions[ii],
+						       numHit);
       if (newNumHit)
 	lastHitX = ii;
       numHit |= newNumHit;

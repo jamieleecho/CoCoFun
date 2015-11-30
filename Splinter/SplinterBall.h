@@ -33,6 +33,9 @@ FixedPoint splinterBallVelocity = FixedPointInit(0, 0x4000);
  */
 Vector2d splinterBallIncrementVector;
 
+/** Must be invoked before invoking other SplinterBallFunctions. */
+void SplinterBallInit();
+
 /** Resets the splinterBall position to the default */
 void SplinterBallReset();
 
@@ -49,9 +52,12 @@ void SplinterBallMiss();
  * Determines whether the ball is colliding with bricks in lineBrickYPositions.
  * @param lineBrickXPos[in] x position of bricks
  * @param lineBrickYPositions[in/out] Y positions of a line of bricks.
+ * @param alreadyHit whether or not a collision was previously made
  * @return number of bricks we hit - 255 means that we cleared the screen.
  */
-byte SplinterBallCheckBrickCollision(byte lineBrickXPos, byte *lineBrickYPositions);
+byte SplinterBallCheckBrickCollision(byte lineBrickXPos,
+				     byte *lineBrickYPositions,
+				     byte alreadyHit);
 
 /** Controls the splinterBall motion */
 void SplinterBallTick();
