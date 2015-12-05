@@ -75,16 +75,14 @@ void Vector2dReflectionVector(Vector2d *a, Vector2d *b, Vector2d *n) {
 }
 
 
-void Vector2dToA(char *buffer, Vector2d *a) {
+char *Vector2dToA(char *buffer, Vector2d *a) {
   *buffer++ = '[';
-  FixedPointToA(buffer, &(a->data));
-  buffer = buffer + strlen(buffer);
-  *buffer++ = ';';
+  buffer = FixedPointToA(buffer, &(a->data));
   *buffer++ = ' ';
-  FixedPointToA(buffer, &(a->data[1]));
-  buffer = buffer + strlen(buffer);
+  buffer = FixedPointToA(buffer, &(a->data[1]));
   *buffer++ = ']';
   *buffer++ = '\0';
+  return buffer;
 }
 
 

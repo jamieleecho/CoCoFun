@@ -90,6 +90,6 @@ void Vector2dReflectionVector(Vector2d *a, Vector2d *b, Vector2d *n);
  * @param buffer[out] output buffer with at least 28 bytes
  * @param a[in] source
  */
-void Vector2dToA(char *buffer, Vector2d *a);
+char *Vector2dToA(char *buffer, Vector2d *a);
 
 #endif

@@ -61,35 +61,6 @@ char splinterLastDrawnScore[7];
 
 
 int main() {
-  Vector2d a, b, n;
-  FixedPointParse(&(b.data[0]), ".3355");
-  FixedPointParse(&(b.data[1]), ".6709");
-  FixedPointParse(&(n.data[0]), "-1");
-  FixedPointParse(&(n.data[1]), ".5");
-  Vector2dReflectionVector(&b, &b, &n);
-  char buffer[40];
-  Vector2dToA(buffer, &b);
-  printf(buffer);
-  waitkey(0);
-
-  Vector2dSub(&b, &b, &n);
-  Vector2dToA(buffer, &b);
-  printf(buffer);
-  waitkey(0);
-
-  FixedPoint xx = FixedPointInit(3, 800);
-  FixedPoint yy = FixedPointInit(1, 80);
-  FixedPoint zz = FixedPointInit(1, 80);
-  FixedPointNegate(&xx, &xx);
-  FixedPointToA(buffer, &xx);
-  printf(buffer);
-  waitkey(0);
-
-  FixedPointSub(&xx, &xx, &xx);
-  FixedPointToA(buffer, &xx);
-  printf(buffer);
-  waitkey(0);
-
   SplinterInit();
   SplinterPlay();
 

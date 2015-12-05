@@ -171,7 +171,7 @@ FixedPoint *FixedPointCopy(FixedPoint *b, FixedPoint *a);
  * @param buffer[out] output buffer of at least 12 bytes
  * @param a[in] input
  */
-void FixedPointToA(char *buffer, FixedPoint *a);
+char *FixedPointToA(char *buffer, FixedPoint *a);
 
 /**
  * Parses buffer into a FixedPoint value.

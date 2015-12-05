@@ -150,17 +150,9 @@ byte SplinterBallCheckBrickCollision(byte lineBrickXPos,
       lineBrickYPositions[ii] = 0xff;
 
       if (!alreadyHit) {
-	char buffer[40];
-	Vector2dToA(buffer, &splinterBallIncrementVector);
-	BlitterDrawText(FontDataFontIndex, FontDataFontData,
-			14, 0, 0, 0, 1, buffer);
 	Vector2dReflectionVector(&splinterBallIncrementVector,
 				 &splinterBallIncrementVector,
 				 &splinterBallRightNormal);
-	Vector2dToA(buffer, &splinterBallIncrementVector);
-	BlitterDrawText(FontDataFontIndex, FontDataFontData,
-			14, 0, 0, 8, 1, buffer);
-	waitkey(0);
       }
       numHit++;
       

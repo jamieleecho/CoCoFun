@@ -163,8 +163,9 @@ asm void FixedPointAdd(FixedPoint *c, FixedPoint *a, FixedPoint *b) {
 
 
 void FixedPointSub(FixedPoint *c, FixedPoint *a, FixedPoint *b) {
-  FixedPointNegate(c, b);
-  FixedPointAdd(c, a, c);
+  FixedPoint tmp;
+  FixedPointNegate(&tmp, b);
+  FixedPointAdd(c, a, &tmp);
 }
 
 
@@ -771,7 +772,7 @@ FixedPoint *FixedPointCopy(FixedPoint *b, FixedPoint *a) {
 }
 
 
-void FixedPointToA(char *buffer, FixedPoint *a) {
+char *FixedPointToA(char *buffer, FixedPoint *a) {
   FixedPoint quotient, remainder;
   byte powerIndex = 0;
   char *startBuffer = buffer;
@@ -787,7 +788,8 @@ void FixedPointToA(char *buffer, FixedPoint *a) {
 
   // Output the whole part
   for(byte ii=0; ii<5; ii++) {
-    FixedPointMod(&quotient, &remainder, &remainder, FixedPointPowersOf10 + powerIndex);
+    FixedPointMod(&quotient, &remainder, &remainder,
+		  FixedPointPowersOf10 + powerIndex);
     *buffer++ = '0' + (byte)quotient.Whole;
     powerIndex++;
   }
@@ -796,7 +798,8 @@ void FixedPointToA(char *buffer, FixedPoint *a) {
   if (remainder.Fraction != 0) {
     *buffer++ = '.';
     for(byte ii=0; ii<4; ii++) {
-      FixedPointMod(&quotient, &remainder, &remainder, FixedPointPowersOf10 + powerIndex);
+      FixedPointMod(&quotient, &remainder, &remainder,
+		    FixedPointPowersOf10 + powerIndex);
       
       // Deal with round off error.
       if (quotient.Whole > 9) {
@@ -832,13 +835,15 @@ void FixedPointToA(char *buffer, FixedPoint *a) {
   if (*ptr == '.') ptr--; // make sure we show 0.1 not .1
 
   // Copy the text to the beginning
-  byte numChars = (byte)(buffer - ptr);
+  byte numChars = (byte)(buffer - ptr) + 1;
   if (isNegative) {
     memcpy(startBuffer + 1, ptr, numChars);
     startBuffer[numChars + 1] = '\0';  
+    return startBuffer + numChars;
   } else {
     memcpy(startBuffer, ptr, numChars);
     startBuffer[numChars] = '\0';
+    return startBuffer + numChars - 1;
   }
 }
 
