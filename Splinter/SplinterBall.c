@@ -51,6 +51,9 @@ Vector2d splinterBallRightNormal;
 /** Left normal */
 Vector2d splinterBallLeftNormal;
 
+/** Normals used to compute bounce off paddle */
+Vector2d splinterBallPaddleNormals[8];
+
 
 void SplinterBallInit() {
   FixedPointSet(&splinterBallTopNormal.data[0], 0, 0);
@@ -61,6 +64,39 @@ void SplinterBallInit() {
   FixedPointSet(&splinterBallRightNormal.data[1], 0, 0);
   FixedPointSet(&splinterBallLeftNormal.data[0], -1, 0);
   FixedPointSet(&splinterBallLeftNormal.data[1], 0, 0);
+
+  FixedPoint radius = FixedPointInit(1, 0);
+  FixedPoint angle =  FixedPointInit(30, 0); // in degrees
+  FixedPoint one80 = FixedPointInit(180, 0);
+  FixedPoint degreesToRadians = FixedPointInitPi();
+  FixedPointDiv(&degreesToRadians, &degreesToRadians, &one80);
+  FixedPointMul(&angle, &angle, &degreesToRadians);
+  FixedPoint numIncrements = FixedPointInit(3, 0);
+  FixedPoint angleIncrement;
+  FixedPointDiv(&angleIncrement, &angle, &numIncrements);
+  FixedPoint currentTopAngle = FixedPointInit(0, 0);
+  FixedPoint currentBottomAngle = FixedPointInit(0, 0);
+  for(byte ii=0; ii<4; ii++) {
+    byte topIndex = 3 - ii;
+    byte bottomIndex = 4 + ii;
+
+    // Fill out the top vector
+    Vector2d tmpVector;
+    FixedPointCos((&tmpVector.data[0]), &currentTopAngle);
+    FixedPointSin((&tmpVector.data[1]), &currentTopAngle);
+    memcpy(&(splinterBallPaddleNormals[topIndex]), &tmpVector,
+	   sizeof(tmpVector));
+
+    // Fill out the bottom vector
+    FixedPointSin((&tmpVector.data[1]), &currentBottomAngle);
+    memcpy(&(splinterBallPaddleNormals[bottomIndex]), &tmpVector,
+	   sizeof(tmpVector));
+
+    // Increment angles
+    FixedPointSub(&currentTopAngle, &currentTopAngle, &angleIncrement);
+    FixedPointAdd(&currentBottomAngle, &currentBottomAngle, &angleIncrement);
+  }
+
   SplinterBallReset();
 }
 
@@ -188,7 +224,7 @@ void SplinterBallTick() {
 	SplinterBallMiss();
 	return;
       }
-    } else {	
+    } else if (splinterBallIncrementVector.data[0].Whole < 0) {	
 	// Check collision with the paddle       
 	byte p1 = (splinterPaddlePosition < 7) ? 0 : (splinterPaddlePosition - 8);
 	byte b1 = (byte)splinterBallPosition.data[1].Whole - 1;
@@ -201,17 +237,16 @@ void SplinterBallTick() {
 	  SoundPlay(30, 1, 1, 64);
 	  int offset = (splinterBallPosition.data[1].Whole
 			- (int)splinterPaddlePosition
-			+ 3 - 19);
-	  if (offset < -6) {
-	    FixedPointNegate(&splinterBallIncrementVector.data[0],
-			     &splinterBallIncrementVector.data[0]);
-	  } else if (offset > 6) {
-	    FixedPointNegate(&splinterBallIncrementVector.data[0],
-			     &splinterBallIncrementVector.data[0]);
-	  } else {	
-	    FixedPointNegate(&splinterBallIncrementVector.data[0],
-			     &splinterBallIncrementVector.data[0]);
-	  }
+			+ 3);
+
+	  if (offset < 0) offset = 0;
+	  byte boffset = (byte)offset;
+	  char buffer[10];
+	  boffset = boffset >> 2;
+	  if (boffset > 7) boffset = 7;
+	  Vector2dReflectionVector(&splinterBallIncrementVector,
+				   &splinterBallIncrementVector,
+				   &(splinterBallPaddleNormals[boffset]));
 	} else {
 	  splinterBallWasMissed = 1;
 	}
