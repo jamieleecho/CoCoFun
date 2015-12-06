@@ -66,7 +66,7 @@ void SplinterBallInit() {
   FixedPointSet(&splinterBallLeftNormal.data[1], 0, 0);
 
   FixedPoint radius = FixedPointInit(1, 0);
-  FixedPoint angle =  FixedPointInit(30, 0); // in degrees
+  FixedPoint angle =  FixedPointInit(15, 0); // in degrees
   FixedPoint one80 = FixedPointInit(180, 0);
   FixedPoint degreesToRadians = FixedPointInitPi();
   FixedPointDiv(&degreesToRadians, &degreesToRadians, &one80);
@@ -244,10 +244,15 @@ void SplinterBallTick() {
 	  char buffer[10];
 	  boffset = boffset >> 2;
 	  if (boffset > 7) boffset = 7;
+
 	  Vector2dReflectionVector(&splinterBallIncrementVector,
 				   &splinterBallIncrementVector,
 				   &(splinterBallPaddleNormals[boffset]));
-	} else {
+	  
+	  if (splinterBallIncrementVector.data[0].Whole < 0)
+	    FixedPointNegate(&(splinterBallIncrementVector.data[0]),
+			     &(splinterBallIncrementVector.data[0]));
+ 	} else {
 	  splinterBallWasMissed = 1;
 	}
     }
