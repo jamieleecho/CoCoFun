@@ -39,34 +39,22 @@ FixedPoint splinterBallPoint5 = FixedPointInit(0, 0x8000);
 FixedPoint splinterBallPoint25 = FixedPointInit(0, 0x4000);
 
 
-/** Top normal */
-Vector2d splinterBallTopNormal;
-
-/** Bottom normal */
-Vector2d splinterBallBottomNormal;
-
 /** Right normal */
 Vector2d splinterBallRightNormal;
-
-/** Left normal */
-Vector2d splinterBallLeftNormal;
 
 /** Normals used to compute bounce off paddle */
 Vector2d splinterBallPaddleNormals[8];
 
+/** Normals used to compute bounce off bricks */
+Vector2d splinterBallBrickNormals[12];
+
 
 void SplinterBallInit() {
-  FixedPointSet(&splinterBallTopNormal.data[0], 0, 0);
-  FixedPointSet(&splinterBallTopNormal.data[1], 1, 0);
-  FixedPointSet(&splinterBallBottomNormal.data[0], 0, 0);
-  FixedPointSet(&splinterBallBottomNormal.data[1], -1, 0);
   FixedPointSet(&splinterBallRightNormal.data[0], -1, 0);
   FixedPointSet(&splinterBallRightNormal.data[1], 0, 0);
-  FixedPointSet(&splinterBallLeftNormal.data[0], -1, 0);
-  FixedPointSet(&splinterBallLeftNormal.data[1], 0, 0);
 
-  FixedPoint radius = FixedPointInit(1, 0);
-  FixedPoint angle =  FixedPointInit(15, 0); // in degrees
+  // Initialize paddle normals
+  FixedPoint angle =  FixedPointInit(10, 0); // in degrees
   FixedPoint one80 = FixedPointInit(180, 0);
   FixedPoint degreesToRadians = FixedPointInitPi();
   FixedPointDiv(&degreesToRadians, &degreesToRadians, &one80);
@@ -92,6 +80,34 @@ void SplinterBallInit() {
     memcpy(&(splinterBallPaddleNormals[bottomIndex]), &tmpVector,
 	   sizeof(tmpVector));
 
+    // Increment angles
+    FixedPointSub(&currentTopAngle, &currentTopAngle, &angleIncrement);
+    FixedPointAdd(&currentBottomAngle, &currentBottomAngle, &angleIncrement);
+  }
+
+  // Initialize brick normals
+  FixedPointSet(&angle, 10, 0);
+  FixedPointMul(&angle, &angle, &degreesToRadians);
+  FixedPointSet(&numIncrements,  5, 0);
+  FixedPointDiv(&angleIncrement, &angle, &numIncrements);
+  FixedPointSet(&currentTopAngle, 0, 0);
+  FixedPointSet(&currentBottomAngle, 0, 0);
+  for(byte ii=0; ii<6; ii++) {
+    byte topIndex = 5 - ii;
+    byte bottomIndex = 6 + ii;
+
+    // Fill out the top vector
+    Vector2d tmpVector;
+    FixedPointCos((&tmpVector.data[0]), &currentTopAngle);
+    FixedPointSin((&tmpVector.data[1]), &currentTopAngle);
+    memcpy(&(splinterBallBrickNormals[topIndex]), &tmpVector,
+	   sizeof(tmpVector));
+
+    // Fill out the bottom vector
+    FixedPointSin((&tmpVector.data[1]), &currentBottomAngle);
+    memcpy(&(splinterBallBrickNormals[bottomIndex]), &tmpVector,
+	   sizeof(tmpVector));
+    
     // Increment angles
     FixedPointSub(&currentTopAngle, &currentTopAngle, &angleIncrement);
     FixedPointAdd(&currentBottomAngle, &currentBottomAngle, &angleIncrement);
@@ -186,9 +202,11 @@ byte SplinterBallCheckBrickCollision(byte lineBrickXPos,
       lineBrickYPositions[ii] = 0xff;
 
       if (!alreadyHit) {
+	alreadyHit = TRUE;
+	p1 = p1 >> 4;
 	Vector2dReflectionVector(&splinterBallIncrementVector,
 				 &splinterBallIncrementVector,
-				 &splinterBallRightNormal);
+				 &(splinterBallBrickNormals[p1]));
       }
       numHit++;
       
