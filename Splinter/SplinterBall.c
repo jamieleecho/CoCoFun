@@ -38,6 +38,11 @@ FixedPoint splinterBallPoint5 = FixedPointInit(0, 0x8000);
 /** .25 */
 FixedPoint splinterBallPoint25 = FixedPointInit(0, 0x4000);
 
+/** .125 */
+FixedPoint splinterBallPoint125 = FixedPointInit(0, 0x2000);
+
+/** .0625 */
+FixedPoint splinterBallPoint0625 = FixedPointInit(0, 0x2000);
 
 /** Right normal */
 Vector2d splinterBallRightNormal;
@@ -184,6 +189,26 @@ void SplinterBallMiss() {
 }
 
 
+/** Make sure that the increment vector is not too low in the
+ *  horizontal direction */
+void SplinterBallFixIncrementVector() {
+  // If the slope is too low
+  if (FixedPointLessThan(&(splinterBallIncrementVector.data[0]),
+			 &splinterBallPoint0625)) {
+    memcpy(&(splinterBallIncrementVector.data[0]),
+	   &splinterBallPoint125, sizeof(splinterBallPoint125));
+    FixedPointSet(&(splinterBallIncrementVector.data[1]), 0, 65408);
+    if (&(splinterBallIncrementVector.data[0].Whole < 0)) 
+      FixedPointNegate(&(splinterBallIncrementVector.data[0]),
+		       &(splinterBallIncrementVector.data[0]));
+    Vector2dNormalize(&splinterBallIncrementVector,
+		      &splinterBallIncrementVector);
+    Vector2dMul(&splinterBallIncrementVector, &splinterBallVelocity,
+		&splinterBallIncrementVector);
+  }
+}
+
+
 byte SplinterBallCheckBrickCollision(byte lineBrickXPos,
 				     byte *lineBrickYPositions,
 				     byte alreadyHit) {
@@ -207,6 +232,7 @@ byte SplinterBallCheckBrickCollision(byte lineBrickXPos,
 	Vector2dReflectionVector(&splinterBallIncrementVector,
 				 &splinterBallIncrementVector,
 				 &(splinterBallBrickNormals[p1]));
+	SplinterBallFixIncrementVector();
       }
       numHit++;
       
@@ -253,6 +279,7 @@ void SplinterBallTick() {
 	if (((p1 <= b1) && (pend >= b1))
 	    || ((b1 <= p1) && (bend >= p1))) {
 	  SoundPlay(30, 1, 1, 64);
+	  splinterBallWasMissed = 0;
 	  int offset = (splinterBallPosition.data[1].Whole
 			- (int)splinterPaddlePosition
 			+ 3);
@@ -267,11 +294,14 @@ void SplinterBallTick() {
 				   &splinterBallIncrementVector,
 				   &(splinterBallPaddleNormals[boffset]));
 	  
+	  SplinterBallFixIncrementVector();
+
 	  if (splinterBallIncrementVector.data[0].Whole < 0)
 	    FixedPointNegate(&(splinterBallIncrementVector.data[0]),
 			     &(splinterBallIncrementVector.data[0]));
  	} else {
-	  splinterBallWasMissed = 1;
+	  if (splinterBallPosition.data[0].Whole < 6)
+	    splinterBallWasMissed = 1;
 	}
     }
   }
