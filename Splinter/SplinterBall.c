@@ -192,19 +192,37 @@ void SplinterBallMiss() {
 /** Make sure that the increment vector is not too low in the
  *  horizontal direction */
 void SplinterBallFixIncrementVector() {
-  // If the slope is too low
+  // Make sure the horizontal component is positive
+  byte mustNegate = FALSE;
+  if (splinterBallIncrementVector.data[0].Whole < 0) {
+    mustNegate = TRUE;
+    FixedPointNegate(&(splinterBallIncrementVector.data[0]),
+		     &(splinterBallIncrementVector.data[0]));
+  }
+    
+  // Check if the slope is too low
   if (FixedPointLessThan(&(splinterBallIncrementVector.data[0]),
 			 &splinterBallPoint0625)) {
     memcpy(&(splinterBallIncrementVector.data[0]),
-	   &splinterBallPoint125, sizeof(splinterBallPoint125));
-    FixedPointSet(&(splinterBallIncrementVector.data[1]), 0, 65408);
-    if (&(splinterBallIncrementVector.data[0].Whole < 0)) 
+	   &splinterBallPoint0625, sizeof(splinterBallPoint0625));
+    if (mustNegate)
       FixedPointNegate(&(splinterBallIncrementVector.data[0]),
 		       &(splinterBallIncrementVector.data[0]));
+
+    mustNegate = &(splinterBallIncrementVector.data[1].Whole) < 0;
+    FixedPointSet(&(splinterBallIncrementVector.data[1]), 0, 65408);
+    if (mustNegate)
+      FixedPointNegate(&(splinterBallIncrementVector.data[1]),
+		       &(splinterBallIncrementVector.data[1]));
+
     Vector2dNormalize(&splinterBallIncrementVector,
 		      &splinterBallIncrementVector);
     Vector2dMul(&splinterBallIncrementVector, &splinterBallVelocity,
 		&splinterBallIncrementVector);
+  } else {
+    if (mustNegate)
+      FixedPointNegate(&(splinterBallIncrementVector.data[0]),
+		       &(splinterBallIncrementVector.data[0]));
   }
 }
 
@@ -294,11 +312,12 @@ void SplinterBallTick() {
 				   &splinterBallIncrementVector,
 				   &(splinterBallPaddleNormals[boffset]));
 	  
-	  SplinterBallFixIncrementVector();
-
 	  if (splinterBallIncrementVector.data[0].Whole < 0)
 	    FixedPointNegate(&(splinterBallIncrementVector.data[0]),
 			     &(splinterBallIncrementVector.data[0]));
+
+	  SplinterBallFixIncrementVector();
+
  	} else {
 	  if (splinterBallPosition.data[0].Whole < 6)
 	    splinterBallWasMissed = 1;
