@@ -200,10 +200,6 @@ void SplinterBallMiss() {
 }
 
 
-void SplinterBallIncrementLevel() {
-}
-
-
 /** Make sure that the increment vector is not too low in the
  *  horizontal direction */
 void SplinterBallFixIncrementVector() {
