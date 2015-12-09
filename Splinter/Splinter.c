@@ -119,7 +119,7 @@ void SplinterPlayGame() {
   SplinterLastDirection = SplinterLastDirectionNone;
   SplinterFirstDirection = SplinterLastDirectionNone;
   SplinterScoreReset(&splinterScore);
-  SplinterBallReset();
+  SplinterBallReset(TRUE);
   BricksReset();
   splinterNumberOfBalls = 5;
   splinterPaddlePosition = 72;

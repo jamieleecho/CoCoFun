@@ -16,6 +16,9 @@
 #include "Blitter.h"
 
 
+/** Current splinter ball level */
+byte splinterBallLevel = 0;
+
 /** Flag - if 1, then the ball was missed, let it hit left side of screen */
 byte splinterBallWasMissed = 0;
 
@@ -123,18 +126,31 @@ void SplinterBallInit() {
     FixedPointAdd(&currentBottomAngle, &currentBottomAngle, &angleIncrement);
   }
 
-  SplinterBallReset();
+  SplinterBallReset(TRUE);
 }
 
 
-void SplinterBallReset() {
+void SplinterBallReset(byte fullReset) {
+  if (fullReset)
+    splinterBallLevel = 0;
+
+  // Random ball position
   byte initialPosition = (byte)random(150);
   FixedPointSet(&(splinterBallPosition.data[0]), 44, 0);  
   FixedPointSet(&(splinterBallPosition.data[1]), initialPosition, 0);
+
+  // Make the initial velocity slow
   FixedPoint splinterBallInitialVelocity;
   FixedPointCopy(&splinterBallInitialVelocity, &splinterBallPoint25);
-  FixedPointCopy(&splinterBallVelocity, &splinterBallPoint5);
 
+  // Velocity after the first hit
+  FixedPointSet(&splinterBallVelocity, splinterBallLevel, 0);
+  FixedPointMul(&splinterBallVelocity, &splinterBallVelocity,
+		&splinterBallPoint125);
+  FixedPointAdd(&splinterBallVelocity, &splinterBallVelocity,
+		&splinterBallPoint5);
+
+  // Initial ball slope
   FixedPoint splinterBallSlope;
   FixedPointCopy(&splinterBallSlope, &splinterBall2);
   FixedPointNegate(&(splinterBallIncrementVector.data[0]), &splinterBall1);
@@ -180,7 +196,11 @@ void SplinterBallMiss() {
 		       ? splinterBallPosition.data[1].Whole - 1 : 0, 12, 8, 0);
 
   // Reset the ball location
-  SplinterBallReset();
+  SplinterBallReset(FALSE);
+}
+
+
+void SplinterBallIncrementLevel() {
 }
 
 
@@ -388,12 +408,15 @@ void SplinterBallTick() {
 			   (byte)splinterBallPosition.data[1].Whole
 			   ? (byte)splinterBallPosition.data[1].Whole-1
 			   : 0, 12, 8, 0);
-      SplinterBallReset();	
+      SplinterBallReset(FALSE);	
       BricksRefresh();
       BlitterDrawGraphics(GrafxDataBallData,
 			  (byte)splinterBallPosition.data[0].Whole,
 			  (byte)splinterBallPosition.data[1].Whole);
-      
+
+      if (++splinterBallLevel > 4)
+	splinterBallLevel = 4;
+
       SoundPlayAndWait(600, 6, 6, 192);
       SoundPlayAndWait(900, 5, 5, 192);
       SoundPlayAndWait(1800, 4, 4, 192);

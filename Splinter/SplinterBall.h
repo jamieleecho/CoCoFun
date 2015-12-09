@@ -33,8 +33,11 @@ Vector2d splinterBallIncrementVector;
 /** Must be invoked before invoking other SplinterBallFunctions. */
 void SplinterBallInit();
 
-/** Resets the splinterBall position to the default */
-void SplinterBallReset();
+/** 
+ * Resets the splinterBall position to the default 
+ * @param fullReset[in] true to reset everything.
+ */
+void SplinterBallReset(byte fullReset);
 
 /** Initializes the splinterBall position to the default */
 void SplinterBallInit();
