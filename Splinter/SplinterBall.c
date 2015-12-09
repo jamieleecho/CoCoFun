@@ -59,7 +59,7 @@ void SplinterBallInit() {
   FixedPointSet(&splinterBallRightNormal.data[1], 0, 0);
 
   // Initialize paddle normals
-  FixedPoint angle =  FixedPointInit(10, 0); // in degrees
+  FixedPoint angle =  FixedPointInit(30, 0); // in degrees
   FixedPoint one80 = FixedPointInit(180, 0);
   FixedPoint degreesToRadians = FixedPointInitPi();
   FixedPointDiv(&degreesToRadians, &degreesToRadians, &one80);
@@ -91,7 +91,7 @@ void SplinterBallInit() {
   }
 
   // Initialize brick normals
-  FixedPointSet(&angle, 10, 0);
+  FixedPointSet(&angle, 30, 0);
   FixedPointMul(&angle, &angle, &degreesToRadians);
   FixedPointSet(&numIncrements,  5, 0);
   FixedPointDiv(&angleIncrement, &angle, &numIncrements);
@@ -122,39 +122,26 @@ void SplinterBallInit() {
 }
 
 
-/**
- * Updates splinterBallIncrementVector with the current slope and whether
- * or not we should be moving left and up.
- *
- * @param moveLeft[in] if true, ensure the ball will move left
- * @param moveUp[in] if true, ensure the ball will move up
- */
-void SplinterBallSetSlope(byte moveLeft, byte moveUp) {
-  if (moveLeft)
-    FixedPointNegate(&(splinterBallIncrementVector.data[0]), &splinterBall1);
-  else
-    FixedPointCopy(&(splinterBallIncrementVector.data[0]), &splinterBall1);
+void SplinterBallReset() {
+  byte initialPosition = (byte)random(150);
+  FixedPointSet(&(splinterBallPosition.data[0]), 40, 0);  
+  FixedPointSet(&(splinterBallPosition.data[1]), initialPosition, 0);
+  FixedPointCopy(&splinterBallVelocity, &splinterBallPoint5);
+  FixedPoint splinterBallSlope;
+  FixedPointCopy(&splinterBallSlope, &splinterBall2);
+  FixedPointNegate(&(splinterBallIncrementVector.data[0]), &splinterBall1);
 
-  if (moveUp)
+  if (initialPosition > 96)
     FixedPointNegate(&(splinterBallIncrementVector.data[1]), &splinterBallSlope);
   else
     FixedPointCopy(&(splinterBallIncrementVector.data[1]), &splinterBallSlope);
+  
   Vector2dNormalize(&splinterBallIncrementVector, &splinterBallIncrementVector);
-
+  
   FixedPointMul(&(splinterBallIncrementVector.data[0]),
 		&(splinterBallIncrementVector.data[0]), &splinterBallVelocity);
   FixedPointMul(&(splinterBallIncrementVector.data[1]),
 		&(splinterBallIncrementVector.data[1]), &splinterBallVelocity);
-}
-
-
-void SplinterBallReset() {
-  FixedPointSet(&(splinterBallPosition.data[0]), 40, 0);
-  FixedPointSet(&(splinterBallPosition.data[1]), 3, 0);
-  FixedPointCopy(&splinterBallVelocity, &splinterBallPoint75);
-  FixedPointCopy(&splinterBallSlope, &splinterBall2);
-
-  SplinterBallSetSlope(TRUE, FALSE);
   
   splinterBallWasMissed = 0;
 }
@@ -363,9 +350,14 @@ void SplinterBallTick() {
     BlitterFillRectangle(xx, oldY + offsetY, 8, 1, 0);
 
   // Draw the graphics
-  BlitterDrawGraphics(GrafxDataBallData,
-		      (byte)splinterBallPosition.data[0].Whole,
-		      (byte)splinterBallPosition.data[1].Whole);
+  if (splinterBallPosition.data[0].Fraction >= 0x8000)
+    BlitterDrawGraphics(GrafxDataBallData2,
+			(byte)splinterBallPosition.data[0].Whole,
+			(byte)splinterBallPosition.data[1].Whole);
+  else
+    BlitterDrawGraphics(GrafxDataBallData,
+			(byte)splinterBallPosition.data[0].Whole,
+			(byte)splinterBallPosition.data[1].Whole);
 
   // Play a sound if we hit any bricks
   if (numHit) {

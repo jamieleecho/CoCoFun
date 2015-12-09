@@ -20,9 +20,6 @@
 /** Ball position */
 Vector2d splinterBallPosition;
 
-/** Slope of the ball (x/y) on [0, 4] */
-FixedPoint splinterBallSlope = FixedPointInit(0, 0x2000);
-
 /** Speed of the ball on [.25, 1] */
 FixedPoint splinterBallVelocity = FixedPointInit(0, 0x4000);
 
