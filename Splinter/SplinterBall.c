@@ -267,6 +267,7 @@ byte SplinterBallCheckBrickCollision(byte lineBrickXPos,
 				 &(splinterBallBrickNormals[p1]));
 	SplinterBallFixIncrementVector();
       }
+      SplinterScoreIncrement(&splinterScore, 10);
       numHit++;
       
       // Remove the brick - if none left, reset the level
@@ -396,7 +397,7 @@ void SplinterBallTick() {
   // Play a sound if we hit any bricks
   if (numHit) {
     // Update the score, play a sound
-    SplinterDrawScore();      
+    SplinterDrawScore();
     SoundPlay(250, brickXSounds[lastHitX], brickXSounds[lastHitX], 128);
 
     // Do we have to reset the board?
