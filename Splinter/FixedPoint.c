@@ -773,6 +773,11 @@ FixedPoint *FixedPointCopy(FixedPoint *b, FixedPoint *a) {
 
 
 char *FixedPointToA(char *buffer, FixedPoint *a) {
+  // Note that this algorithm uses mod. It is probably more
+  // efficient to multiply by the reciprocal to get the digit
+  // and due a FixedPoint / integer multiply and subtract to
+  // get the remainder.
+
   FixedPoint quotient, remainder;
   byte powerIndex = 0;
   char *startBuffer = buffer;
