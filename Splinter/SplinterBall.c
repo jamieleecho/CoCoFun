@@ -19,6 +19,11 @@
 /** Flag - if 1, then the ball was missed, let it hit left side of screen */
 byte splinterBallWasMissed = 0;
 
+/** TRUE if the ball has been hit by the paddle */
+byte splinterBallHitByPaddle = FALSE;
+
+/** Amount to increase velocity by when the paddle is hit the first time */
+FixedPoint splinterBallMultiplyFactor;
 
 /** 2.0 */
 FixedPoint splinterBall2 = FixedPointInit(2, 0x0000);
@@ -124,9 +129,12 @@ void SplinterBallInit() {
 
 void SplinterBallReset() {
   byte initialPosition = (byte)random(150);
-  FixedPointSet(&(splinterBallPosition.data[0]), 40, 0);  
+  FixedPointSet(&(splinterBallPosition.data[0]), 44, 0);  
   FixedPointSet(&(splinterBallPosition.data[1]), initialPosition, 0);
+  FixedPoint splinterBallInitialVelocity;
+  FixedPointCopy(&splinterBallInitialVelocity, &splinterBallPoint25);
   FixedPointCopy(&splinterBallVelocity, &splinterBallPoint5);
+
   FixedPoint splinterBallSlope;
   FixedPointCopy(&splinterBallSlope, &splinterBall2);
   FixedPointNegate(&(splinterBallIncrementVector.data[0]), &splinterBall1);
@@ -138,12 +146,12 @@ void SplinterBallReset() {
   
   Vector2dNormalize(&splinterBallIncrementVector, &splinterBallIncrementVector);
   
-  FixedPointMul(&(splinterBallIncrementVector.data[0]),
-		&(splinterBallIncrementVector.data[0]), &splinterBallVelocity);
-  FixedPointMul(&(splinterBallIncrementVector.data[1]),
-		&(splinterBallIncrementVector.data[1]), &splinterBallVelocity);
+  Vector2dMul(&splinterBallIncrementVector, &splinterBallInitialVelocity,
+	      &splinterBallIncrementVector);
+  FixedPointDiv(&splinterBallMultiplyFactor, &splinterBallVelocity, &splinterBallInitialVelocity);
   
   splinterBallWasMissed = 0;
+  splinterBallHitByPaddle = FALSE;  
 }
 
 
@@ -285,6 +293,12 @@ void SplinterBallTick() {
 	    || ((b1 <= p1) && (bend >= p1))) {
 	  SoundPlay(30, 1, 1, 64);
 	  splinterBallWasMissed = 0;
+	  if (!splinterBallHitByPaddle) {
+	    splinterBallHitByPaddle = TRUE;
+	    Vector2dMul(&splinterBallIncrementVector,
+			&splinterBallMultiplyFactor,
+			&splinterBallIncrementVector);
+	  }
 	  int offset = (splinterBallPosition.data[1].Whole
 			- (int)splinterPaddlePosition
 			+ 3);
