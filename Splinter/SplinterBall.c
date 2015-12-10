@@ -213,15 +213,15 @@ void SplinterBallFixIncrementVector() {
     
   // Check if the slope is too low
   if (FixedPointLessThan(&(splinterBallIncrementVector.data[0]),
-			 &splinterBallPoint125)) {
+			 &splinterBallPoint25)) {
     memcpy(&(splinterBallIncrementVector.data[0]),
-	   &splinterBallPoint125, sizeof(splinterBallPoint125));
+	   &splinterBallPoint25, sizeof(splinterBallPoint25));
     if (mustNegate)
       FixedPointNegate(&(splinterBallIncrementVector.data[0]),
 		       &(splinterBallIncrementVector.data[0]));
 
     mustNegate = &(splinterBallIncrementVector.data[1].Whole) < 0;
-    FixedPointSet(&(splinterBallIncrementVector.data[1]), 0, 65021);
+    FixedPointSet(&(splinterBallIncrementVector.data[1]), 0, 63454);
     if (mustNegate)
       FixedPointNegate(&(splinterBallIncrementVector.data[1]),
 		       &(splinterBallIncrementVector.data[1]));
