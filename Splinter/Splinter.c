@@ -8,7 +8,7 @@
   back around 1989 or so.
 */
 
-#pragma org 0x3000
+#pragma org 0x2800
 #include <cmoc.h>
 #include <coco.h>
 
