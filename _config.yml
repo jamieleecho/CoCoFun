@@ -10,8 +10,8 @@ title: Splinter - A CoCo 3 Break-the-Bricks Game
 email: jamieleecho at gmail dot com
 description: > # this means to ignore newlines until "baseurl:"
   Splinter, a CoCo 3 break-the-bricks game.
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "http://CoCoFun.github.io" # the base hostname & protocol for your site
+baseurl: "/CoCoFun" # the subpath of your site, e.g. /blog
+url: "http://jamieleecho.github.io" # the base hostname & protocol for your site
 github_username:  jamieleecho
 
 # Build settings
