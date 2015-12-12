@@ -1,0 +1,18 @@
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely need to edit after that.
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'jekyll serve'. If you change this file, please restart the server process.
+
+# Site settings
+title: Splinter - A CoCo 3 Break-the-Bricks Game
+email: jamieleecho at gmail dot com
+description: > # this means to ignore newlines until "baseurl:"
+  Splinter, a CoCo 3 break-the-bricks game.
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "http://CoCoFun.github.io" # the base hostname & protocol for your site
+github_username:  jamieleecho
+
+# Build settings
+markdown: kramdown
