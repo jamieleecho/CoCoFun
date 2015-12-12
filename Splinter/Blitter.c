@@ -582,10 +582,10 @@ void BlitterFillRectangle(unsigned x, unsigned y, unsigned width, unsigned heigh
   byte startPixels = (byte)(x & 1); // num pixels before 16-bit blasting
   unsigned blastStartPixel = (x + 1) & 0xfffe; // pixel where 16-bit blasting starts
   byte wordStartX = (byte)(blastStartPixel >> 1); // byte where 16-bit blasting starts
-  byte numPixelsAfterBlastStartPixel = (byte)(endX - blastStartPixel);
-  byte endPixels = (numPixelsAfterBlastStartPixel & 0x3); // num pixels after blast
-  byte blastPixels = numPixelsAfterBlastStartPixel & 0xfc; // num pixels to blast
-  byte blastBytes = blastPixels >> 1; // num pixels to blast
+  unsigned numPixelsAfterBlastStartPixel = (endX - blastStartPixel);
+  byte endPixels = ((byte)numPixelsAfterBlastStartPixel & 0x3); // num pixels after blast
+  unsigned blastPixels = numPixelsAfterBlastStartPixel & 0xfffc; // num pixels to blast
+  byte blastBytes = (byte)(blastPixels >> 1); // num pixels to blast
   byte wordEndX = (byte)(wordStartX + blastBytes); // byte to stop blasting
   unsigned numLines = endY - y; // total number of lines
   unsigned wordColor = color | (color << 4);

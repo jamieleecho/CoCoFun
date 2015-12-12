@@ -136,7 +136,8 @@ void SplinterPlayGame() {
 
   // Play splinter until we run out of balls
   while(splinterNumberOfBalls > 0) {
-    SplinterControlPaddle();
+    if (SplinterControlPaddle())
+      break;
     SplinterBallTick();
   }
   BlitterDrawGraphics(GrafxDataPaddleData, 4, splinterPaddlePosition);
@@ -150,13 +151,19 @@ void SplinterPlayGame() {
 }
 
 
-void SplinterControlPaddle() {
+byte SplinterControlPaddle() {
   // Look for 'p' to pause the game
   *CoCoMiscKeyboardScanOutput = 0xfe;
   byte pausePressed = ((*CoCoMiscKeyboardScanInput & 0x4) == 0x0);
   if (pausePressed)
     SplinterPauseGame();
     
+  // Look for the 'break' to quit the game
+  *CoCoMiscKeyboardScanOutput = 0xfb;
+  byte breakPressed = ((*CoCoMiscKeyboardScanInput & 0x40) == 0x0);
+  if (breakPressed && SplinterQuitGame())
+    return TRUE;
+
   // Look for up arrow
   *CoCoMiscKeyboardScanOutput = 0xf7;
   byte upPressed = ((*CoCoMiscKeyboardScanInput & 0x8) == 0x0);
@@ -199,6 +206,8 @@ void SplinterControlPaddle() {
 
   // Draw the paddle
   BlitterDrawGraphics(GrafxDataPaddleData, 4, splinterPaddlePosition);
+
+  return FALSE;
 }
 
 
@@ -315,6 +324,42 @@ void SplinterPauseGame() {
 }
 
 
+byte SplinterQuitGame() {  
+  // Sizes in character coordinaes
+  unsigned ww = 34, hh = 5;
+  byte b = 0, f = 14;
+  SplinterDrawDialogBox(ww, hh, f, b);
+  
+  // Locations in pixel coordinates
+  unsigned xx = (40 - ww)/2, yy = (27 - hh)/2;
+  unsigned x = xx * 8, y = yy * 8;
+  
+  // Draw the quit message
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+		  f, b, 40, y - 6, 1, "Are you sure you want to stop?");
+  BlitterDrawText(FontDataFontIndex, FontDataFontData,
+		  f, b, 120, y + 6, 1, "Press Y or N");
+
+  // Wait for the user to response
+  byte shouldQuit = FALSE;
+  do {
+    byte c = inkey();
+    if ((c == 'n') || (c == 'N'))
+      break;
+    if ((c == 'y') || (c == 'Y')) {
+      shouldQuit = TRUE;
+      break;
+    }
+  } while(TRUE);
+
+  // Restore the screen
+  SplinterEraseDialogBox(ww, hh, b);
+  SplinterRefresh();
+
+  return shouldQuit;
+}
+
+
 void SplinterShowTitleScreen() {
   BlitterClearScreen(0);
   
@@ -325,9 +370,9 @@ void SplinterShowTitleScreen() {
   // Draw the title
   unsigned int x = 0, y = 0;
   BlitterDrawText2(FontDataFontIndex, FontDataFontData,
-		   15, x + 126, y + 11, 2, splinterTitle);
+		   15, x + 120, y + 11, 2, "Splinter 1");
   BlitterDrawText2(FontDataFontIndex, FontDataFontData,
-		   2, x + 125, y + 10, 2, splinterTitle);
+		   2, x + 119, y + 10, 2, "Splinter 1");
   
   y = 2;
   BlitterFillRectangle(60, y + 25, 200, 131, f);
@@ -406,14 +451,17 @@ void SplinterDrawDialogBox(unsigned ww, unsigned hh, byte f, byte b) {
 
 
 void SplinterEraseDialogBox(unsigned ww, unsigned hh, byte b) {
-  unsigned xx = (40 - ww)/2, yy = (24 - hh)/2;
+  unsigned xx = (40 - ww)/2;
+  unsigned yy = (24 - hh)/2;
 
   // Locations in pixel coordinates
-  unsigned x = xx * 8, y = yy * 8;
-  unsigned w = ww * 8 - 8, h = hh * 8 - 8;
+  unsigned x = xx * 8;
+  unsigned y = yy * 8;
+  unsigned w = ww * 8;
+  unsigned h = hh * 8;
 
   // White out the selected area
-  BlitterFillRectangle(x, y, w + 8, h + 8, b);
+  BlitterFillRectangle(x, y, w, h, b);
 }
 
 
@@ -441,6 +489,7 @@ void SplinterShowGameOver() {
 
 void SplinterRefresh() {
   SplinterBallRefresh();
+  SplinterBallDrawCount();
   BricksRefresh();
   BlitterDrawGraphics(GrafxDataPaddleData, 4, splinterPaddlePosition);  
 }

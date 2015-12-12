@@ -44,11 +44,21 @@ void SplinterPlay();
 /** Video game loop for one game of splinter */
 void SplinterPlayGame();
 
-/** Moves the paddle up and down based on the joystick */
-void SplinterControlPaddle();
+/** 
+ *  Moves the paddle up and down based on the joystick
+ *  @return TRUE if the game should be quit and FALSE otherwise.
+ */
+byte SplinterControlPaddle();
 
 /** Pause the game */
 void SplinterPauseGame();
+
+/**
+ * Show the quit game message.
+ * @return TRUE if the game should be quit and FALSE otherwise.
+ */
+byte SplinterQuitGame();
+
 
 /** 
  * Draws a bordered screen with the given.
