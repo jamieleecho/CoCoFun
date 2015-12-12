@@ -4,8 +4,8 @@ title:  "Splinter Manual"
 date:   2015-12-12 08:29:56 -0500
 categories: splinter manual breakout coco3
 ---
-## Splinter   [![Download]({{baseurl}}/assets/Images/Download.png)]({{baseurl}}/assets/2015-12-12/Splinter1.dsk)
-![Game Screen]({{baseurl}}/assets/2015-12-12/Images/GameAction.png)
+## Splinter   [![Download]({{site.url}}/{{site.baseurl}}/assets/Images/Download.png)]({{site.url}}/{{site.baseurl}}/assets/2015-12-12/Splinter1.dsk)
+![Game Screen]({{site.url}}/{{site.baseurl}}/assets/2015-12-12/Images/GameAction.png)
 Splinter is a [CoCo 3](http://tandycoco.com/coco3.shtml) [break-the-bricks](https://en.wikipedia.org/wiki/Breakout_(video_game)) video game. Splinter features colorful 320x192 graphics and smooth animation.
 
 
@@ -27,10 +27,10 @@ RUN "*"
 ~~~~~~
 
 Splinter will load and display an image of a rainbow. Press **\[Spacebar\]** until the rainbow colors look correct and then press the **\[Enter\]** key.
-![Rainbow Screen]({{baseurl}}/assets/2015-12-12/Images/GameRainbow.png)
+![Rainbow Screen]({{site.url}}/{{site.baseurl}}/assets/2015-12-12/Images/GameRainbow.png)
 
 Splinter will now show its title screen.
-![Title Screen]({{baseurl}}/assets/2015-12-12/Images/GameTitle.png)
+![Title Screen]({{site.url}}/{{site.baseurl}}/assets/2015-12-12/Images/GameTitle.png)
 
 
 ## Objective
@@ -38,14 +38,14 @@ The objective of Splinter is to break through bricks by hitting a ball towards t
 
 ## Game Play
 At the title screen, press any key to start playing Splinter. It will switch to the game screen. You will notice a pink and blue paddle on the left side of the screen. Aim the paddle by pressing the **\[Up\]** and **\[Down\]** arrow keys. The grey ball starts to the right of the paddle followed by rainbow colored bricks. The right side of the screen has the current score and number of remaining balls.
-![Game Start Screen]({{baseurl}}/assets/2015-12-12/Images/GameStart.png)
+![Game Start Screen]({{site.url}}/{{site.baseurl}}/assets/2015-12-12/Images/GameStart.png)
 
 The score will increase each time a brick is hit. When all bricks on the screen are destroyed, a screen with a new set of bricks will appear. The number of remaining balls will decrease each time you miss the ball. The game ends when no balls remain and a Game Over message will appear. Pressing any key will return to the title screen.
-![Game Over]({{baseurl}}/assets/2015-12-12/Images/GameOver.png)
+![Game Over]({{site.url}}/{{site.baseurl}}/assets/2015-12-12/Images/GameOver.png)
 
 You may pause an in-progress game at any time by pressing the **\[P\]** key. Press any key to resume.You may also quit an in-progress game by pressing the **\[Break\]** key. Press the **\[Y\]** key to quit the game and the **\[N\]** key to resume game play.
-![Game Pause]({{baseurl}}/assets/2015-12-12/Images/GamePaused.png)
-![Game Quit]({{baseurl}}/assets/2015-12-12/Images/GameQuit.png)
+![Game Pause]({{site.url}}/{{site.baseurl}}/assets/2015-12-12/Images/GamePaused.png)
+![Game Quit]({{site.url}}/{{site.baseurl}}/assets/2015-12-12/Images/GameQuit.png)
 
 
 ## Background
