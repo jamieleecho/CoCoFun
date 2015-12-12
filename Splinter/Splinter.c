@@ -112,7 +112,7 @@ void SplinterPlayGame() {
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
 		  3, 0, 247, 30, 2, "SCORE");
   BlitterDrawText(FontDataFontIndex, FontDataFontData,
-		  14, 0, 249, 60, 2, "LIVES");
+		  14, 0, 249, 60, 2, "BALLS");
 
   // Reset data structures
   memset(splinterLastDrawnScore, 0, sizeof(splinterLastDrawnScore));
