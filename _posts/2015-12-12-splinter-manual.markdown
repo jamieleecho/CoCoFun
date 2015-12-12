@@ -49,7 +49,7 @@ You may pause an in-progress game at any time by pressing the **\[P\]** key. Pre
 
 
 ## Background
-I developed the original version of Splinter in pure assembly language back in 1988. I revisited this code in 2015 not only to explore the CoCo 3 hardware in greater depth, but also explore how to implement various low-level math routines. The current version of Splinter is the result of these efforts. This code is available at:
+I developed the original version of Splinter in pure assembly language back in 1988. I revisited this code in 2015 not only to explore the CoCo 3 hardware in greater depth, but also explore how to implement various low-level math routines. The current version of Splinter is the result of these efforts. This source code is available at:
 [https://github.com/jamieleecho/CoCoFun](https://github.com/jamieleecho/CoCoFun)
 
 
