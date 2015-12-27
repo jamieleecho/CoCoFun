@@ -23,8 +23,8 @@ $(TARGET) : $(BALLOON_BAS) $(BALLOON_BIN)
 	decb copy Scene1.bin $@,SCENE1.BIN
 	decb attr $@,SCENE1.BIN -2 -b
 
-$(BALLOON_BIN) : Balloon.c 
-	cmoc $(CFLAGS) $< 
+$(BALLOON_BIN) : Balloon.c CoCoMisc.c
+	cmoc $(CFLAGS) $<
 
 %.bin : %.c
 	cmoc $(CFLAGS) $< 
