@@ -840,7 +840,7 @@ char *FixedPointToA(char *buffer, FixedPoint *a) {
   if (*ptr == '.') ptr--; // make sure we show 0.1 not .1
 
   // Copy the text to the beginning
-  byte numChars = (byte)(buffer - ptr) + 1;
+  byte numChars = (byte)(buffer - ptr);
   if (isNegative) {
     memcpy(startBuffer + 1, ptr, numChars);
     startBuffer[numChars + 1] = '\0';  
