@@ -50,8 +50,7 @@ struct BOUNCY_LEVEL
     word keysPresent;
     word maxTime;
     word bestScore;         //the best time for a challenge level, the best score for a regular level
-    unsigned char *data16_0;
-    unsigned char *data16_1;
+    unsigned char *dataColorLookup;
     unsigned char *data;
 };
 unsigned short playerTimer = 0;
@@ -89,7 +88,6 @@ struct BOUNCY_LEVEL level_test = {
     0,    //max time
     0,     //best score
     (byte *)NULL,
-    (byte *)NULL,
     testData
 };
 
@@ -101,23 +99,14 @@ byte blockColors[] = {
     BLOCK_MAGENTA,  //4
     BLOCK_YELLOW,   //5
     BLOCK_RED,      //6
-    BLOCK_CYAN    , //7
-    BLOCK_ORANGE,   //8
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
+    BLOCK_CYAN,     //7
+    BLOCK_ORANGE    //8
 };
 
-unsigned blockColors16[256];
-
 byte level_uncompressed_data[500*15];
-byte level_uncompressed_data16_0[251*15];
-byte level_uncompressed_data16_1[251*15];
-struct BOUNCY_LEVEL level_uncompressed = {"               ",0,0,0,0,0,0,0,level_uncompressed_data16_0,level_uncompressed_data16_1,level_uncompressed_data};
+byte level_uncompressed_data_color_lookup[500*15];
+
+struct BOUNCY_LEVEL level_uncompressed = {"               ",0,0,0,0,0,0,0,level_uncompressed_data_color_lookup,level_uncompressed_data};
 struct BOUNCY_LEVEL* level = &level_uncompressed;
 byte doubleBuffer[DISP_SIZE];
 char sbuffer[33];
@@ -283,34 +272,12 @@ void selectLevel(byte levelIndex)
     struct BOUNCY_LEVEL *level = levels[levelIndex];
     uncompress(level_uncompressed_data, level->data, level->compressedSize);
 
-    // Transcode level information into squished representation
+    // Pre-lookup color data
     for(int ii=0; ii<level->height; ii++) {
       byte *src = level_uncompressed_data + level->width*ii;
-      byte *dst = level_uncompressed_data16_0 + (level->width+1)/2*ii;
-      for(int jj=0; jj<level->width;) {
-        byte val = (*src++) << 4;
-        jj++;
-        if (jj < level->width) {
-          val = val | *src++;
-          jj++;
-        }
-        *dst++ = val;
-      }
-    }
-
-    // Transcode level information into squished representation shifted by
-    // one nibble
-    for(int ii=0; ii<level->height; ii++) {
-      byte *src = 1 + level_uncompressed_data + level->width*ii;
-      byte *dst = level_uncompressed_data16_1 + (level->width+1)/2*ii;
-      for(int jj=1; jj<level->width;) {
-        byte val = (*src++) << 4;
-        jj++;
-        if (jj < level->width) {
-          val = val | *src++;
-          jj++;
-        }
-        *dst++ = val;
+      byte *dst = level_uncompressed_data_color_lookup + level->width*ii;
+      for(int jj=0; jj<level->width; jj++) {
+        *dst++ = blockColors[*src++];
       }
     }
 
@@ -329,41 +296,30 @@ void selectLevel(byte levelIndex)
 void showLevelSection(int offset)
 {
     unsigned *pdisp = (unsigned *)doubleBuffer;
-    byte *plevel = ((offset & 1) ? level->data16_1 : level->data16_0) + offset/2;
-    unsigned offset2 = (level->width + 1)/2 - DISP_WIDTH/2;
+    unsigned *plevel = (unsigned *)(level->dataColorLookup + offset);
+    unsigned offset2 = level->width - DISP_WIDTH;
 
     for(byte y=15; y>0; y--)
     {
-        *pdisp++ = blockColors16[*plevel++];
-        *pdisp++ = blockColors16[*plevel++];
-        *pdisp++ = blockColors16[*plevel++];
-        *pdisp++ = blockColors16[*plevel++];
-        *pdisp++ = blockColors16[*plevel++];
-        *pdisp++ = blockColors16[*plevel++];
-        *pdisp++ = blockColors16[*plevel++];
-        *pdisp++ = blockColors16[*plevel++];
-        *pdisp++ = blockColors16[*plevel++];
-        *pdisp++ = blockColors16[*plevel++];
-        *pdisp++ = blockColors16[*plevel++];
-        *pdisp++ = blockColors16[*plevel++];
-        *pdisp++ = blockColors16[*plevel++];
-        *pdisp++ = blockColors16[*plevel++];
-        *pdisp++ = blockColors16[*plevel++];
-        *pdisp++ = blockColors16[*plevel++];
-        plevel += offset2;
+        *pdisp++ = *plevel++;
+        *pdisp++ = *plevel++;
+        *pdisp++ = *plevel++;
+        *pdisp++ = *plevel++;
+        *pdisp++ = *plevel++;
+        *pdisp++ = *plevel++;
+        *pdisp++ = *plevel++;
+        *pdisp++ = *plevel++;
+        *pdisp++ = *plevel++;
+        *pdisp++ = *plevel++;
+        *pdisp++ = *plevel++;
+        *pdisp++ = *plevel++;
+        *pdisp++ = *plevel++;
+        *pdisp++ = *plevel++;
+        *pdisp++ = *plevel++;
+        *pdisp++ = *plevel++;
+        plevel = (unsigned *)((byte *)plevel + offset2);
     }
 
-}
-
-
-void initGame() {
-  // Initialize blockColors16
-  unsigned *ptr = blockColors16;
-  for(byte ii=0; ii<sizeof(blockColors); ii++) {
-    for(byte jj=0; jj<sizeof(blockColors); jj++) {
-      *ptr++ = (((unsigned)blockColors[ii])<<8) | blockColors[jj];
-    }
-  }
 }
 
 
@@ -438,7 +394,6 @@ int main()
 #endif
     speedup();
 
-    initGame();
     gameLoop();
     exitGame();
     
