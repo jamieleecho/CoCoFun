@@ -74,6 +74,10 @@ void SplinterInit() {
   setHighSpeed(1);
   BlitterInit();
 
+  //while(1) {
+  //  printf("%d %d\n", CoCoMiscReadJoystick(0, 2), CoCoMiscReadJoystick(1, 2));
+  //}
+
   // Black out the screen
   CoCoMiscPaletteFade(splinterRGBColorPalette, splinterCMPColorPalette, 0, 0);
   hscreen(2);

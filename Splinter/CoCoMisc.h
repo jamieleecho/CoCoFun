@@ -144,4 +144,13 @@ void CoCoMiscSetRGBMode(byte mode);
 byte CoCoMiscGetRGBMode();
 
 
+/**
+ * Reads the given joystick axis. Assumes hi-speed mode is active.
+ * @param axis[in] 0 = Right X, 1 = Left Y, 2 = Left X, 3 = Left Y
+ * @param scale[in] Meaning depends on whether the X or Y axis is being read.
+ *                  For X: 1 = 256, 2 = 320, 3 = 640
+ *                  For Y: 1 = 192, 2 = 200, 3 = 225
+ */
+int CoCoMiscReadJoystick(byte axis, byte scale);
+
 #endif
