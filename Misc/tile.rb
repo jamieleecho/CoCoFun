@@ -39,7 +39,7 @@ def draw_tile(draw, tile, tile_width, tile_height, x, y)
   ii = 0
   (0...tile_height).each do |yy|
     (0...tile_width).each do |xx|
-      c = Pixel.from_hsla(tile[ii] * 360, tile[ii + 1] * 255, tile[ii + 2] * 255)
+      c = Pixel.from_hsla(tile[ii] * 45, tile[ii + 1] * 255, tile[ii + 2] * 32)
       ii = ii + 3
       draw.fill(c.to_color)
       draw.point(x + xx, y + yy)
@@ -69,9 +69,9 @@ def tile_from_image(sample, x, y, width, height)
   (y...y + height).each do |yy|
     (x... x + width).each do |xx|
       color = sample.pixel_color(xx, yy).to_hsla
-      tile << color[0] / 360.0
+      tile << color[0] / 45.0
       tile << color[1] / 255.0
-      tile << color[2] / 255.0
+      tile << color[2] / 32.0
     end
   end
   return tile
@@ -82,11 +82,16 @@ class Array
   def hsv_distance(other)
     sum = 0
     ii = 0 
+    partial_sum = 0
     other.each do |x|
       delta = self[ii] - x
+      delta = ((ii % 3 == 0) and delta.abs > 4.0) ? 8.0 - delta.abs : delta 
+      partial_sum = partial_sum + delta * delta
+      if (ii % 3 == 2)
+        sum = sum + partial_sum
+        partial_sum = 0
+      end
       ii = ii + 1
-      delta = ((ii % 3 == 0) and delta.abs > 0.5) ? 1 - delta.abs : delta 
-      sum = sum + delta * delta
     end
     return Math.sqrt(sum)
   end
@@ -98,7 +103,7 @@ def save_tile(tile, width, height, filename)
   ii = 0
   (0...height).each do |yy|
     (0...width).each do |xx|
-      c = Pixel.from_hsla(tile[ii] * 360, tile[ii + 1] * 255, tile[ii + 2] * 255)
+      c = Pixel.from_hsla(tile[ii] * 45, tile[ii + 1] * 255, tile[ii + 2] * 32)
       ii = ii + 3
       draw.fill(c.to_color)
       draw.point(xx, yy)
