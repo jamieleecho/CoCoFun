@@ -1,4 +1,4 @@
-CFLAGS=
+CFLAGS=--wfo
 TARGET=Splinter.dsk
 SPLINTER_BAS=Splinter.bas
 SPLINTER_BIN=Splinter.bin
