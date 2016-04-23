@@ -58,5 +58,9 @@ class PixelColor
     Math.sqrt(((@hue - color.hue) ** 2) + (((@saturation - color.saturation)*200) ** 2) + (((@value - color.value)/512) ** 2))
   end
 
+  def to_s()
+    return "\##{red.to_s(16).rjust(4, '0')}#{green.to_s(16).rjust(4, '0')}#{blue.to_s(16).rjust(4, '0')}"
+  end
+
 end
 

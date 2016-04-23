@@ -1,4 +1,4 @@
-CFLAGS=-I../Breakout
+CFLAGS=-I../Splinter --wfo
 TARGET=Scratch.dsk
 SCRATCH_BIN=Scratch.bin
 MESS_DIR=~/Applications/MacSDLMESS/mame0163
