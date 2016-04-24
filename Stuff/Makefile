@@ -1,16 +1,19 @@
-CFLAGS=-O2
-TARGET=Bouncy.dsk
-RENDER_BIN=render1.bin
+CFLAGS=
+TARGET=Stuff.dsk
+STUFF_BAS=Stuff.bas
+STUFF_BIN=Stuff.bin
 MESS_DIR=~/Applications/MacSDLMESS/mame0163
 MESS=$(MESS_DIR)/mess64
 
-$(TARGET) : $(RENDER_BIN)
+$(TARGET) : $(STUFF_BIN)
 	rm -f $@
 	decb dskini $@
-	decb copy $(RENDER_BIN) $@,RENDER1.BIN
-	decb attr $@,RENDER1.BIN -2 -b
-	decb copy RENDER1.BAS $@,"*.BAS" -t
-	decb attr $@,"*.BAS" -0
+#	decb copy $(STUFF_BAS) $@,"*.BAS" -t
+#	decb attr $@,"*.BAS" -0
+#	decb copy $(STUFF_BAS) $@,"STUFF.BAS" -t
+#	decb attr $@,"STUFF.BAS" -0
+	decb copy $(STUFF_BIN) $@,STUFF.BIN
+	decb attr $@,STUFF.BIN -2 -b
 
 %.bin : %.c
 	cmoc $(CFLAGS) $< 
