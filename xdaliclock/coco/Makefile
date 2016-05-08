@@ -1,0 +1,55 @@
+CFLAGS=-I../font
+TARGET=dali.dsk
+XDALI_BAS=xdali.bas
+XDALI_BIN=xdali.bin
+MESS_DIR=~/Applications/MacSDLMESS/mame0163
+MESS=$(MESS_DIR)/mess64
+
+#$(TARGET) : $(XDALI_BAS) $(XDALI_BIN)
+#	rm -f $@
+#	decb dskini $@
+#	decb copy $(XDALI_BAS) $@,"*.BAS" -t
+#	decb attr $@,"*.BAS" -0
+#	decb copy $(XDALI_BAS) $@,XDALI.BAS -t
+#	decb attr $@,XDALI.BAS -0
+#	decb copy $(XDALI_BIN) $@,XDALI.BIN
+#	decb attr $@,XDALI.BIN -2 -b
+#	decb copy test.bin $@,TEST.BIN
+#	decb attr $@,TEST.BIN -2 -b
+
+$(TARGET) : test.bin testtstr.bin
+	rm -f $@
+	decb dskini $@
+	decb copy test.bin $@,TEST.BIN
+	decb attr $@,TEST.BIN -2 -b
+	decb copy testtstr.bin $@,TESTTSTR.BIN
+	decb attr $@,TESTTSTR.BIN -2 -b
+
+$(DALI_BIN) : xdali.c digital.c
+	cmoc $(CFLAGS) $< 
+
+test.bin: test.c c_stuff.c tester.c setjmp.c
+	cmoc $(CFLAGS) $<
+
+testtstr.bin: testtstr.c c_stuff.c tester.c setjmp.c
+	cmoc $(CFLAGS) $<
+
+%.bin : %.c
+	cmoc $(CFLAGS) $< 
+
+clean :
+	rm -rf $(TARGET) *.bin *.i *.lst *.asm *.hex
+
+run : $(TARGET)
+	$(MESS) coco3 -rompath $(MESS_DIR)/roms -window -flop1 $(TARGET) -cfg_directory ../cfgs/rgb
+
+run_cmp : $(TARGET)
+	$(MESS) coco3 -rompath $(MESS_DIR)/roms -window -flop1 $(TARGET) -cfg_directory ../cfgs/cmp
+
+debug : $(TARGET)
+	$(MESS) coco3 -rompath $(MESS_DIR)/roms -window -flop1 $(TARGET) -cfg_directory ../cfgs/rgb -debug
+
+debug_cmp : $(TARGET)
+	$(MESS) coco3 -rompath $(MESS_DIR)/roms -window -flop1 $(TARGET) -cfg_directory ../cfgs/cmp -debug
+
+
