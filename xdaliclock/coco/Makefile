@@ -5,7 +5,17 @@ XDALI_BIN=xdali.bin
 MESS_DIR=~/Applications/MacSDLMESS/mame0163
 MESS=$(MESS_DIR)/mess64
 
-#$(TARGET) : $(XDALI_BAS) $(XDALI_BIN)
+$(TARGET) : test.bin testmem.bin testtstr.bin
+	rm -f $@
+	decb dskini $@
+	decb copy test.bin $@,TEST.BIN
+	decb attr $@,TEST.BIN -2 -b
+	decb copy testmem.bin $@,TESTMEM.BIN
+	decb attr $@,TESTMEM.BIN -2 -b
+	decb copy testtstr.bin $@,TESTTSTR.BIN
+	decb attr $@,TESTTSTR.BIN -2 -b
+
+#$(TARGET) : $(XDALI_BAS) $(XDALI_BIN) test.bin testtstr.bin
 #	rm -f $@
 #	decb dskini $@
 #	decb copy $(XDALI_BAS) $@,"*.BAS" -t
@@ -16,16 +26,10 @@ MESS=$(MESS_DIR)/mess64
 #	decb attr $@,XDALI.BIN -2 -b
 #	decb copy test.bin $@,TEST.BIN
 #	decb attr $@,TEST.BIN -2 -b
+#	decb copy testtstr.bin $@,TESTTSTR.BIN
+#	decb attr $@,TESTTSTR.BIN -2 -b
 
-$(TARGET) : test.bin testtstr.bin
-	rm -f $@
-	decb dskini $@
-	decb copy test.bin $@,TEST.BIN
-	decb attr $@,TEST.BIN -2 -b
-	decb copy testtstr.bin $@,TESTTSTR.BIN
-	decb attr $@,TESTTSTR.BIN -2 -b
-
-$(DALI_BIN) : xdali.c digital.c
+$(DALI_BIN) : xdali.c digital.c c_stuff.c time.c
 	cmoc $(CFLAGS) $< 
 
 test.bin: test.c c_stuff.c tester.c setjmp.c

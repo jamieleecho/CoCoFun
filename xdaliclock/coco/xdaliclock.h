@@ -10,8 +10,8 @@
  * implied warranty.
  */
 
-#ifndef __DALICLOCK_H__
-#define __DALICLOCK_H__
+#ifndef _xdaliclock_h
+#define _xdaliclock_h
 
 #include "c_stuff.h"
 #include "time.h"

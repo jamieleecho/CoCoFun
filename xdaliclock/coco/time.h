@@ -1,5 +1,5 @@
-#ifndef _TIME_H
-#define _TIME_H
+#ifndef _time_h
+#define _time_h
 
 #include "c_stuff.h"
 
@@ -21,8 +21,9 @@ struct timezone {
 };
 
 struct timeval {
-  unsigned tv_sec;
-  unsigned tv_msec;
+  unsigned tv_sec_hi;
+  unsigned tv_sec_lo;
+  unsigned tv_xsec;
 };
 
 void gettimeofday(struct timeval *now, struct timezone *tzp);

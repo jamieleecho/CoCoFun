@@ -1,5 +1,5 @@
-#ifndef _TESTER_H
-#define _TESTER_H
+#ifndef _tester_h
+#define _tester_h
 
 #include <coco.h>
 #include <stdarg.h>

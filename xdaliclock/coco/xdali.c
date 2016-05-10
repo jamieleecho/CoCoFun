@@ -17,6 +17,7 @@
 /* CMOC does not support linking */
 #include "digital.c"
 #include "c_stuff.c"
+#include "time.c"
 
 int
 main ()

@@ -1,5 +1,5 @@
-#ifndef _C_STUFF_H
-#define _C_STUFF_H
+#ifndef _c_stuff_h
+#define _c_stuff_h
 
 #define long int
 

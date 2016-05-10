@@ -1,5 +1,5 @@
-#ifndef SETJMP_C
-#define SETJMP_C
+#ifndef setjmp_c
+#define setjmp_c
 
 #include "setjmp.h"
 

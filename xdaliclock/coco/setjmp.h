@@ -1,5 +1,5 @@
-#ifndef SETJMP_H
-#define SETJMP_H
+#ifndef _setjmp_h
+#define _setjmp_h
 
 #include <coco.h>
 

@@ -1,4 +1,4 @@
-#ifndef _C_STUFF_C
+#ifndef _c_stuff_c
 #include <coco.h>
 #include "c_stuff.h"
 
@@ -77,6 +77,11 @@ void walkHeap() {
   while(block < _heapEnd) {
     block = (struct HeapBlock *)((byte *)block + block->size);
   }
+}
+
+
+void abort() {
+  exit(1);
 }
 
 #endif

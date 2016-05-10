@@ -1,5 +1,5 @@
-#ifndef _TESTER_C
-#define _TESTER_C
+#ifndef _tester_c
+#define _tester_c
 
 #include "tester.h"
 
