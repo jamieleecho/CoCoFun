@@ -138,14 +138,6 @@ void UInt32Mul(UInt32 *c, UInt32 *a, UInt32 *b) {
     mul
     addd 4,u
     std 4,u
-    lbsr UInt32MulCarry3
-
-    lda ,x
-    ldb 3,y
-    mul
-    addd 3,u
-    std 3,u
-    lbsr UInt32MulCarry2
 
 * Multiply second byte of y
     lda 3,x
@@ -160,21 +152,6 @@ void UInt32Mul(UInt32 *c, UInt32 *a, UInt32 *b) {
     mul
     addd 4,u
     std 4,u
-    lbsr UInt32MulCarry3
-
-    lda 1,x
-    ldb 2,y
-    mul
-    addd 3,u
-    std 3,u
-    lbsr UInt32MulCarry2
-
-    lda ,x
-    ldb 2,y
-    mul
-    addd 2,u
-    std 2,u
-    lbsr UInt32MulCarry1
 
 * Multiply third byte of y
     lda 3,x
@@ -182,107 +159,17 @@ void UInt32Mul(UInt32 *c, UInt32 *a, UInt32 *b) {
     mul
     addd 4,u
     std 4,u
-    bsr UInt32MulCarry3
-
-    lda 2,x
-    ldb 1,y
-    mul
-    addd 3,u
-    std 3,u
-    bsr UInt32MulCarry2
-
-    lda 1,x
-    ldb 1,y
-    mul
-    addd 2,u
-    std 2,u
-    bsr UInt32MulCarry1
-
-    lda ,x
-    ldb 1,y
-    mul
-    addd 1,u
-    std 1,u
-    bsr UInt32MulCarry0
-
-* Multiply fourth byte of y
-    lda 3,x
-    ldb ,y
-    mul
-    addd 3,u
-    std 3,u
-    bsr UInt32MulCarry2
-
-    lda 2,x
-    ldb ,y
-    mul
-    addd 2,u
-    std 2,u
-    bsr UInt32MulCarry1
-
-    lda 1,x
-    ldb ,y
-    mul
-    addd 1,u
-    std 1,u
-    bsr UInt32MulCarry0
-
-    lda ,x
-    ldb ,y
-    mul
-    addd ,u
-    std ,u
 
     bra UInt32MulAsmDone
 
 *******************************************************************************
 * Routine for performing carry results on product
 *******************************************************************************
-UInt32MulCarry8:
-    bcc UInt32MulCarryDone
-    lda 8,u
-    adda #1
-    sta 8,u
-UInt32MulCarry7:
-    bcc UInt32MulCarryDone
-    lda 7,u
-    adda #1
-    sta 7,u
-UInt32MulCarry6:
-    bcc UInt32MulCarryDone
-    lda 6,u
-    adda #1
-    sta 6,u
-UInt32MulCarry5:
-    bcc UInt32MulCarryDone
-    lda 5,u
-    adda #1
-    sta 5,u
 UInt32MulCarry4:
     bcc UInt32MulCarryDone
     lda 4,u
     adda #1
     sta 4,u
-UInt32MulCarry3:
-    bcc UInt32MulCarryDone
-    lda 3,u
-    adda #1
-    sta 3,u
-UInt32MulCarry2:
-    bcc UInt32MulCarryDone
-    lda 2,u
-    adda #1
-    sta 2,u
-UInt32MulCarry1:
-    bcc UInt32MulCarryDone
-    lda 1,u
-    adda #1
-    sta 1,u
-UInt32MulCarry0:
-    bcc UInt32MulCarryDone
-    lda ,u
-    adda #1
-    sta ,u
 UInt32MulCarryDone:
     rts
 
@@ -292,6 +179,10 @@ UInt32MulCarryDone:
 UInt32MulAsmDone:
     puls u
   }
+
+  // Make result negative if needed
+  c->Hi = ((int)results[4] << 8) + results[5];
+  c->Lo = ((unsigned)results[6] << 8) + results[7];
 }
 
 
@@ -303,8 +194,8 @@ void UInt32Div(UInt32 *c, UInt32 *a, UInt32 *b) {
 
   // Can't divide by zero, set to big value
   if ((aa[1].Hi== 0) && (aa[1].Lo== 0)) {
-    c->Hi= 0xffff;
-    c->Lo= 0xffff;
+    c->Hi = 0xffff;
+    c->Lo = 0xffff;
     return;
   }
 

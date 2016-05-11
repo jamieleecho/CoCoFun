@@ -32,7 +32,7 @@ $(TARGET) : test.bin testmem.bin testtstr.bin
 $(DALI_BIN) : xdali.c digital.c c_stuff.c time.c
 	cmoc $(CFLAGS) $< 
 
-test.bin: test.c c_stuff.c tester.c setjmp.c
+test.bin: test.c c_stuff.c tester.c setjmp.c UInt32.c
 	cmoc $(CFLAGS) $<
 
 testtstr.bin: testtstr.c c_stuff.c tester.c setjmp.c
