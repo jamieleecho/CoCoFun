@@ -190,6 +190,8 @@ void UInt32Div(UInt32 *c, UInt32 *a, UInt32 *b) {
   // aa[0] = dividend, aa[1] = divisor, aa[2] = quotient
   UInt32 aa[3];
   char numDivisorShifts = 0, numDividendShifts = 0;
+  memcpy((byte *)(aa + 0), a, sizeof(aa[0]));
+  memcpy((byte *)(aa + 1), b, sizeof(aa[1]));
   memset((byte *)(aa + 2), 0, sizeof(aa[2]));
 
   // Can't divide by zero, set to big value
@@ -245,13 +247,12 @@ UInt32DivFixDividend:
 *          a. Shift the quotient left
 *          b. Shift the dividend left
 UInt32DivMainSetup:
-    ldb #16      * B = max number of loops
+    ldb #1      * B = max number of loops
     subb numDividendShifts
     addb numDivisorShifts    
 
     tstb
     ble UInt32DivMainLoopEnd
-    incb
 
 UInt32DivMainLoop:
 * Compare dividend to divisor

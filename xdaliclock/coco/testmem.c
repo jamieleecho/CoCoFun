@@ -10,6 +10,8 @@
 void testCallocReturnsNewMem() {
   char *mem1 = (char *)calloc(1, 12);
   char *mem2 = (char *)calloc(1, 12);
+  assertNotEqual(mem1, (char *)0);
+  assertNotEqual(mem2, (char *)0);
   assertNotEqual(mem1, mem2);
   strcpy(mem1, "Hello World");
   strcpy(mem2, "Hello World");
