@@ -8,11 +8,12 @@ uint16_t primes[NUM_PRIMES];
 
 
 bool primetest(uint16_t *primes, uint16_t nprimes, uint16_t candidate) {
-  for(uint16_t ii=0; ii<nprimes; ii++) {
-    uint16_t quot = candidate / primes[ii];
-    if (quot < primes[ii])
+  for(uint16_t ii=0; ii<nprimes; ++ii) {
+    uint16_t prime = primes[ii];
+    uint16_t quot = candidate / prime;
+    if (quot < prime)
       return TRUE; 
-    if (candidate % primes[ii] == 0)
+    if (quot * prime == candidate)
       return FALSE;
   }
   return FALSE; // Should not get here
@@ -26,7 +27,8 @@ void primecalc(uint16_t *primes, uint16_t num) {
 
   while(nprimes < num) {
     if (primetest(primes, nprimes, candidate)) {
-      primes[nprimes++] = candidate;
+      primes[nprimes] = candidate;
+      ++nprimes;
       if ((nprimes & 3) == 0) {
         printf("%u     %u     %u     %u     %u\n",
                primes[nprimes-4], primes[nprimes-3],
