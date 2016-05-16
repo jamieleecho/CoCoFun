@@ -197,6 +197,65 @@ void testUInt32Mod() {
 }
 
 
+void testUInt32Equals() {
+  UInt32 val1 = UInt32Init(0x1234, 0x0000);
+  UInt32 val2 = UInt32Init(0x0000, 0x1234);
+  assertTrue(UInt32Equals(&val1, &val1));
+  assertTrue(UInt32Equals(&val2, &val2));
+  assertFalse(UInt32Equals(&val1, &val2));
+  assertFalse(UInt32Equals(&val2, &val1));
+}
+
+
+void testUInt32GreaterThan() {
+  UInt32 val1 = UInt32Init(0x1234, 0x0000);
+  UInt32 val2 = UInt32Init(0x0000, 0x1234);
+  UInt32 val3 = UInt32Init(0x8000, 0x1234);
+  assertFalse(UInt32GreaterThan(&val1, &val1));
+  assertFalse(UInt32GreaterThan(&val2, &val2));
+  assertTrue(UInt32GreaterThan(&val1, &val2));
+  assertFalse(UInt32GreaterThan(&val2, &val1));
+  assertTrue(UInt32GreaterThan(&val3, &val1));
+}
+
+
+void testUInt32LessThan() {
+  UInt32 val1 = UInt32Init(0x1234, 0x0000);
+  UInt32 val2 = UInt32Init(0x0000, 0x1234);
+  UInt32 val3 = UInt32Init(0x8000, 0x1234);
+  assertFalse(UInt32LessThan(&val1, &val1));
+  assertFalse(UInt32LessThan(&val2, &val2));
+  assertFalse(UInt32LessThan(&val1, &val2));
+  assertTrue(UInt32LessThan(&val2, &val1));
+  assertFalse(UInt32LessThan(&val3, &val1));
+}
+
+
+void testUInt32GreaterThanOrEqualTo() {
+  UInt32 val1 = UInt32Init(0x1234, 0x0000);
+  UInt32 val2 = UInt32Init(0x0000, 0x1234);
+  UInt32 val3 = UInt32Init(0x8000, 0x1234);
+  assertTrue(UInt32GreaterThanOrEqualTo(&val1, &val1));
+  assertTrue(UInt32GreaterThanOrEqualTo(&val2, &val2));
+  assertTrue(UInt32GreaterThanOrEqualTo(&val1, &val2));
+  assertFalse(UInt32GreaterThanOrEqualTo(&val2, &val1));
+  assertTrue(UInt32GreaterThanOrEqualTo(&val3, &val1));
+}
+
+
+void testUInt32LessThanOrEqualTo() {
+  UInt32 val1 = UInt32Init(0x1234, 0x0000);
+  UInt32 val2 = UInt32Init(0x0000, 0x1234);
+  UInt32 val3 = UInt32Init(0x8000, 0x1234);
+  assertTrue(UInt32LessThanOrEqualTo(&val1, &val1));
+  assertTrue(UInt32LessThanOrEqualTo(&val2, &val2));
+  assertFalse(UInt32LessThanOrEqualTo(&val1, &val2));
+  assertTrue(UInt32LessThanOrEqualTo(&val2, &val1));
+  assertFalse(UInt32LessThanOrEqualTo(&val3, &val1));
+}
+
+
+
 void testFixedPointToA() {
   FixedPoint val1 = FixedPointInit(0x1234, 0x0000);
   FixedPoint val2 = FixedPointInit(0x0000, 0x1234);
@@ -225,6 +284,11 @@ int main() {
                 NF(testUInt32Mul),
                 NF(testUInt32Div),
                 NF(testUInt32Mod),
+                NF(testUInt32Equals),
+                NF(testUInt32GreaterThan),
+                NF(testUInt32LessThan),
+                NF(testUInt32GreaterThanOrEqualTo),
+                NF(testUInt32LessThanOrEqualTo),
                 NULL, NULL);
   
   return 0;
