@@ -81,10 +81,6 @@ void testUInt32Div() {
   assertEqual(val3.Hi, 0x0000);
   assertEqual(val3.Lo, 0x0001);
 
-  UInt32Div(&val3, &val1, &val1);
-  assertEqual(val3.Hi, 0x0000);
-  assertEqual(val3.Lo, 0x0001);
-
   UInt32Set(&val2, 0x0000, 0x8000);
   UInt32Div(&val3, &val1, &val2);
   assertEqual(val3.Hi, 0x0001);
@@ -115,6 +111,92 @@ void testUInt32Div() {
 }
 
 
+void testUInt32Mod() {
+  UInt32 val1 = UInt32Init(0x0000, 0x8822);
+  UInt32 val2 = UInt32Init(0x0000, 0x0000);
+  UInt32 val3, val4;
+  UInt32Mod(&val3, &val4, &val1, &val2);
+  assertEqual(val3.Hi, 0xffff);
+  assertEqual(val3.Lo, 0xffff);
+  assertEqual(val4.Hi, 0xffff);
+  assertEqual(val4.Lo, 0xffff);
+
+  UInt32Mod(&val3, &val4, &val2, &val1);
+  assertEqual(val3.Hi, 0x0000);
+  assertEqual(val3.Lo, 0x0000);
+  assertEqual(val4.Hi, 0x0000);
+  assertEqual(val4.Lo, 0x0000);
+
+  UInt32Set(&val1, 0x8000, 0x0000);
+  UInt32Mod(&val3, &val4, &val1, &val1);
+  assertEqual(val3.Hi, 0x0000);
+  assertEqual(val3.Lo, 0x0001);
+  assertEqual(val4.Hi, 0x0000);
+  assertEqual(val4.Lo, 0x0000);
+
+  UInt32Set(&val2, 0x0000, 0x8000);
+  UInt32Mod(&val3, &val4, &val1, &val2);
+  assertEqual(val3.Hi, 0x0001);
+  assertEqual(val3.Lo, 0x0000);
+  assertEqual(val4.Hi, 0x0000);
+  assertEqual(val4.Lo, 0x0000);
+
+  UInt32Set(&val1, 0x4996, 0x02d2);
+  UInt32Set(&val2, 0x0001, 0xe240);
+  UInt32Mod(&val3, &val4, &val1, &val2);
+  assertEqual(val3.Hi, 0x0000);
+  assertEqual(val3.Lo, 0x2710);
+  assertEqual(val4.Hi, 0x0000);
+  assertEqual(val4.Lo, 0x1ed2);
+
+  UInt32Set(&val1, 0x1234, 0x5678);
+  UInt32Set(&val2, 0x0000, 0x0001);
+  UInt32Mod(&val3, &val4, &val1, &val2);
+  assertEqual(val3.Hi, 0x1234);
+  assertEqual(val3.Lo, 0x5678);
+  assertEqual(val4.Hi, 0x0000);
+  assertEqual(val4.Lo, 0x0000);
+
+  UInt32Set(&val2, 0x0000, 0x0002);
+  UInt32Mod(&val3, &val4, &val1, &val2);
+  assertEqual(val3.Hi, 0x091a);
+  assertEqual(val3.Lo, 0x2b3c);
+  assertEqual(val4.Hi, 0x0000);
+  assertEqual(val4.Lo, 0x0000);
+
+  UInt32Set(&val1, 0x0000, 0x1234);
+  UInt32Set(&val2, 0x0000, 0x1235);
+  UInt32Mod(&val3, &val4, &val1, &val2);
+  assertEqual(val3.Hi, 0x0000);
+  assertEqual(val3.Lo, 0x0000);
+  assertEqual(val4.Hi, 0x0000);
+  assertEqual(val4.Lo, 0x1234);
+
+  UInt32Set(&val1, 0x0001, 0x2345);
+  UInt32Set(&val2, 0x0000, 0x0015);
+  UInt32Mod(&val3, &val4, &val1, &val2);
+  assertEqual(val3.Hi, 0x0000);
+  assertEqual(val3.Lo, 0x0dde);
+  assertEqual(val4.Hi, 0x0000);
+  assertEqual(val4.Lo, 0x000f);
+
+  UInt32Set(&val1, 0x0001, 0x236d);
+  UInt32Mod(&val3, &val4, &val1, &val2);
+  assertEqual(val3.Hi, 0x0000);
+  assertEqual(val3.Lo, 0x0de0);
+  assertEqual(val4.Hi, 0x0000);
+  assertEqual(val4.Lo, 0x000d);
+
+  UInt32Set(&val1, 0x7654, 0x3210);
+  UInt32Set(&val2, 0x0031, 0x2345);
+  UInt32Mod(&val3, &val4, &val1, &val2);
+  assertEqual(val3.Hi, 0x0000);
+  assertEqual(val3.Lo, 0x0268);
+  assertEqual(val4.Hi, 0x0017);
+  assertEqual(val4.Lo, 0x5408);
+}
+
+
 void testFixedPointToA() {
   FixedPoint val1 = FixedPointInit(0x1234, 0x0000);
   FixedPoint val2 = FixedPointInit(0x0000, 0x1234);
@@ -142,6 +224,7 @@ int main() {
                 NF(testUInt32Sub),
                 NF(testUInt32Mul),
                 NF(testUInt32Div),
+                NF(testUInt32Mod),
                 NULL, NULL);
   
   return 0;

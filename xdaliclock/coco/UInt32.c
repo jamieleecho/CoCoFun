@@ -373,12 +373,15 @@ void UInt32Mod(UInt32 *c, UInt32 *d, UInt32 *a, UInt32 *b) {
   if ((aa[1].Hi == 0) && (aa[1].Lo == 0)) {
     c->Hi = 0xffff;
     c->Lo = 0xffff;
+    d->Hi = 0xffff;
+    d->Lo = 0xffff;
     return;
   }
 
   // Result is zero, so return 0
   if ((aa[0].Hi == 0) && (aa[0].Lo == 0)) {
     memset(c, 0, sizeof(*c));
+    memset(d, 0, sizeof(*d));
     return;
   }
 
@@ -422,14 +425,12 @@ UInt32ModFixDividend:
 *          a. Shift the quotient left
 *          b. Shift the dividend left
 UInt32ModMainSetup:
-    ldb #16      * B = max number of loops
+    ldb #1      * B = max number of loops
     subb numDividendShifts
     addb numDivisorShifts    
     stb numTotalShifts    
-    subb #15
     
     lble UInt32ModMainLoopEnd
-    inc numTotalShifts
 
 UInt32ModMainLoop:
 * Compare dividend to divisor
@@ -478,7 +479,7 @@ UInt32ModMainLoopEnd2:
 
 * Shift the remainder into the proper place
 UInt32ModMainLoopEnd3:
-    ldb #16
+    clrb
     addb numDivisorShifts    
     subb numTotalShifts
     beq UInt32ModMainLoopEnd5
@@ -499,7 +500,6 @@ UInt32ModMainLoopEnd5:
   // Transfer data, making result negative if needed
   memcpy((byte *)c, (byte *)(aa + 2), sizeof(aa[2]));
   memcpy((byte *)d, (byte *)(aa), sizeof(aa[0]));
-
   return;
 
   // Force UInt32Div to not get optimized away

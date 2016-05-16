@@ -38,6 +38,9 @@ test.bin: test.c c_stuff.c tester.c setjmp.c UInt32.c
 testtstr.bin: testtstr.c c_stuff.c tester.c setjmp.c
 	cmoc $(CFLAGS) $<
 
+testmem.bin: testmem.c c_stuff.c tester.c setjmp.c
+	cmoc $(CFLAGS) $<
+
 %.bin : %.c
 	cmoc $(CFLAGS) $< 
 
