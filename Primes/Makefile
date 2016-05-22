@@ -1,4 +1,4 @@
-CFLAGS=
+CFLAGS=-O2
 TARGET=Primes.dsk
 MESS_DIR=~/Applications/MacSDLMESS/mame0163
 MESS=$(MESS_DIR)/mess64

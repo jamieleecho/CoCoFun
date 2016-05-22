@@ -26,7 +26,7 @@ bool primetest(uint16_t *primes, uint16_t *endprime, uint16_t candidate) {
     if (quot * prime == candidate)
       return FALSE;
   }
-  return FALSE; // Should not get here
+  return TRUE;
 }
 
 
@@ -38,11 +38,12 @@ void primecalc(uint16_t *primes, uint16_t num) {
   *primes = 2;
   uint16_t *maxprime = primes + num;
   uint16_t *current_prime = primes + 1;
+  uint16_t *primes_plus_1 = current_prime;
   uint16_t candidate = 3;
   uint16_t nprimes = 1;
 
   while(current_prime < maxprime) {
-    if (primetest(primes, current_prime, candidate)) {
+    if (primetest(primes_plus_1, current_prime, candidate)) {
       *current_prime = candidate;
       ++current_prime;
       ++nprimes;
