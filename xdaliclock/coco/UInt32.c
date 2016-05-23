@@ -425,12 +425,22 @@ UInt32ModFixDividend:
 *          a. Shift the quotient left
 *          b. Shift the dividend left
 UInt32ModMainSetup:
-    ldb #1      * B = max number of loops
+    ldb #1 * B = max number of loops
     subb numDividendShifts
     addb numDivisorShifts    
-    stb numTotalShifts    
-    
-    lble UInt32ModMainLoopEnd
+
+    bgt UInt32ModMainLoop
+    ldx c
+    ldd #0
+    std ,x
+    std 2,x
+    ldx d
+    ldy a
+    ldd ,y
+    std ,x
+    ldd 2,y
+    std 2,x
+    bra UInt32ModEnd
 
 UInt32ModMainLoop:
 * Compare dividend to divisor
@@ -441,7 +451,6 @@ UInt32ModMainLoop:
     bra UInt32ModPut1InQuotient
 
 UInt32ModDividendTooSmall:
-    dec numTotalShifts    
     decb
     beq UInt32ModMainLoopEnd
     lbsr UInt32DivShiftDividendLeft
@@ -460,7 +469,6 @@ UInt32ModMainLoopRepeat:
     lda ,x
     bmi UInt32ModMainLoop
 
-    dec numTotalShifts    
     decb
     beq UInt32ModMainLoopEnd
 
@@ -470,7 +478,7 @@ UInt32ModMainLoopRepeat:
 
 * Shift the quotient into the proper place
 UInt32ModMainLoopEnd:
-    ldb numTotalShifts
+    stb numTotalShifts
     beq UInt32ModMainLoopEnd3
 UInt32ModMainLoopEnd2:
     lbsr UInt32DivShiftQuotientLeft
@@ -500,6 +508,9 @@ UInt32ModMainLoopEnd5:
   // Transfer data, making result negative if needed
   memcpy((byte *)c, (byte *)(aa + 2), sizeof(aa[2]));
   memcpy((byte *)d, (byte *)(aa), sizeof(aa[0]));
+  asm {
+UInt32ModEnd:
+  }
   return;
 
   // Force UInt32Div to not get optimized away
@@ -547,69 +558,29 @@ UInt32 *UInt32Copy(UInt32 *b, UInt32 *a) {
 
 
 char *UInt32ToA(char *buffer, UInt32 *a) {
-  // Note that this algorithm uses mod. It is probably more
-  // efficient to multiply by the reciprocal to get the digit
-  // and due a UInt32 / integer multiply and subtract to
-  // get the remainder.
-
   UInt32 quotient, remainder;
-  byte powerIndex = 0;
-  char *startBuffer = buffer;
   UInt32Copy(&remainder, a);
+  byte powerIndex = 8;
+  byte leadingNonZero = FALSE;
+  char *start = buffer;
 
   // Output the whole part
-  for(byte ii=0; ii<5; ii++) {
+  for(byte ii=0; ii<9; ii++) {
     UInt32Mod(&quotient, &remainder, &remainder,
-		  UInt32PowersOf10 + powerIndex);
-    *buffer++ = '0' + (byte)quotient.Hi;
-    powerIndex++;
-  }
-
-  // Deal with the fractional part
-  if (remainder.Lo != 0) {
-    *buffer++ = '.';
-    for(byte ii=0; ii<4; ii++) {
-      UInt32Mod(&quotient, &remainder, &remainder,
-		    UInt32PowersOf10 + powerIndex);
-      
-      // Deal with round off error.
-      if (quotient.Hi > 9) {
-	// This becomes 0 and we carry 1 all the way up
-	quotient.Hi = 0;
-	for(char *ptr = buffer - 1; ptr >= startBuffer; ptr--) {
-	  char c = *ptr;
-	  if ((c == '.') || (c == '-')) continue;
-	  c = c + 1;
-	  if (c <= '9') {
-	    *ptr = c;
-	    break;
-	  }
-	  
-	  c = '0';
-	  *ptr = c;
-	}
-      }
-      
-      *buffer++ = '0' + (byte)quotient.Hi;
-      powerIndex++;
+	      UInt32PowersOf10 + powerIndex);
+    if (leadingNonZero || quotient.Lo) {
+      leadingNonZero = TRUE;
+      *buffer++ = '0' + (byte)quotient.Lo;
     }
-
-    // Rewind buffer to the point to the last non-zero char
-    for(buffer--; (buffer > startBuffer) && (*buffer == '0'); buffer--);
-    buffer += (*buffer == '.') ? 0 : 1;
+    powerIndex--;
   }
-  
-  // Find the first non-zero char
-  char *ptr = startBuffer;
-  char *ptr2 = buffer - 1;
-  for(; (ptr < ptr2) && (*ptr == '0' || *ptr == '-'); ptr++);
-  if (*ptr == '.') ptr--; // make sure we show 0.1 not .1
 
-  // Copy the text to the beginning
-  byte numChars = (byte)(buffer - ptr);
-  memcpy(startBuffer, ptr, numChars);
-  startBuffer[numChars] = '\0';
-  return startBuffer + numChars - 1;
+  if (!leadingNonZero) {
+    *buffer++ = '0';
+  }
+  *buffer = '\0';
+
+  return buffer;
 }
 
 

@@ -194,6 +194,22 @@ void testUInt32Mod() {
   assertEqual(val3.Lo, 0x0268);
   assertEqual(val4.Hi, 0x0017);
   assertEqual(val4.Lo, 0x5408);
+
+  UInt32Set(&val1, 0x0000, 0x1234);
+  UInt32Set(&val2, 0x0098, 0x9680);
+  UInt32Mod(&val3, &val4, &val1, &val2);
+  assertEqual(val3.Hi, 0x0000);
+  assertEqual(val3.Lo, 0x0000);
+  assertEqual(val4.Hi, 0x0000);
+  assertEqual(val4.Lo, 0x1234);
+
+  UInt32Set(&val1, 0x0000, 0x1234);
+  UInt32Set(&val2, 0x0001, 0x86a0);
+  UInt32Mod(&val3, &val4, &val1, &val2);
+  assertEqual(val3.Hi, 0x0000);
+  assertEqual(val3.Lo, 0x0000);
+  assertEqual(val4.Hi, 0x0000);
+  assertEqual(val4.Lo, 0x1234);
 }
 
 
@@ -255,6 +271,19 @@ void testUInt32LessThanOrEqualTo() {
 }
 
 
+void testUInt32ToA() {
+  UInt32 val1 = UInt32Init(0x0000, 0x1234);
+  UInt32 val2 = UInt32Init(0x1234, 0x0000);
+  UInt32 val3 = UInt32Init(0x1234, 0x1234);
+  char b1[15], b2[15], b3[15];
+  assertEqual(b1 + 4, UInt32ToA(b1, &val1));
+  assertEqualString("4660", b1);
+  assertEqual(b2 + 9, UInt32ToA(b2, &val2));
+  assertEqualString("305397760", b2);
+  assertEqual(b3 + 9, UInt32ToA(b3, &val3));
+  assertEqualString("305402420", b3);
+}
+
 
 void testFixedPointToA() {
   FixedPoint val1 = FixedPointInit(0x1234, 0x0000);
@@ -264,6 +293,18 @@ void testFixedPointToA() {
   FixedPointToA(b2, &val2);
   assertEqualString("4660", b1)
   assertEqualString("0.0711", b2)
+}
+
+
+void testFixedPointMod() {
+  FixedPoint val1 = FixedPointInit(0x7fff, 0x0000);
+  FixedPoint val2 = FixedPointInit(0x1234, 0x5678);
+  FixedPoint val3, val4;
+  FixedPointMod(&val3, &val4, &val2, &val1);
+  assertEqual(val3.Whole, 0);
+  assertEqual(val3.Fraction, 0);
+  assertEqual(val4.Whole, 0x1234);
+  assertEqual(val4.Fraction, 0x5678);
 }
 
 
@@ -289,6 +330,8 @@ int main() {
                 NF(testUInt32LessThan),
                 NF(testUInt32GreaterThanOrEqualTo),
                 NF(testUInt32LessThanOrEqualTo),
+                NF(testUInt32ToA),
+                NF(testFixedPointMod),
                 NULL, NULL);
   
   return 0;
