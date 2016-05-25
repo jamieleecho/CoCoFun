@@ -139,6 +139,12 @@ void UInt32Mul(UInt32 *c, UInt32 *a, UInt32 *b) {
     addd 4,u
     std 4,u
 
+    lda ,x
+    ldb 3,y
+    mul
+    addd 3,u
+    std 3,u
+
 * Multiply second byte of y
     lda 3,x
     ldb 2,y
@@ -153,6 +159,12 @@ void UInt32Mul(UInt32 *c, UInt32 *a, UInt32 *b) {
     addd 4,u
     std 4,u
 
+    lda 1,x
+    ldb 2,y
+    mul
+    addd 3,u
+    std 3,u
+
 * Multiply third byte of y
     lda 3,x
     ldb 1,y
@@ -160,11 +172,29 @@ void UInt32Mul(UInt32 *c, UInt32 *a, UInt32 *b) {
     addd 4,u
     std 4,u
 
+    lda 2,x
+    ldb 1,y
+    mul
+    addd 3,u
+    std 3,u
+
+* Multiply fourth byte of y
+    lda 3,x
+    ldb ,y
+    mul
+    addd 3,u
+    std 3,u
+
     bra UInt32MulAsmDone
 
 *******************************************************************************
 * Routine for performing carry results on product
 *******************************************************************************
+UInt32MulCarry5:
+    bcc UInt32MulCarryDone
+    lda 5,u
+    adda #1
+    sta 5,u
 UInt32MulCarry4:
     bcc UInt32MulCarryDone
     lda 4,u
@@ -181,7 +211,7 @@ UInt32MulAsmDone:
   }
 
   // Make result negative if needed
-  c->Hi = ((int)results[4] << 8) + results[5];
+  c->Hi = ((unsigned)results[4] << 8) + results[5];
   c->Lo = ((unsigned)results[6] << 8) + results[7];
 }
 
@@ -593,11 +623,8 @@ void UInt32Parse(UInt32 *a, char *buffer) {
   for(c = *buffer++; (c == ' ' || c == '\t' || c=='\0'); c = *buffer++);
   if (c == '\0') return;
 
-  // First char may be + or -
-  byte resultIsNegative = FALSE;
-  if (c == '-') {
-    resultIsNegative = TRUE;
-  } else if (c == '+') {
+  // First char may be +
+  if (c == '+') {
   } else if (c == '\0') {
     return;
   } else {
@@ -605,31 +632,12 @@ void UInt32Parse(UInt32 *a, char *buffer) {
   }
 
   // Go through each character adding the digits
-  byte sawDecimalPoint = FALSE;
-  int powerIndex = 5;
   UInt32 tmp;
-  for(c = *buffer++; ((c >= '0' && c <= '9') || (c == '.')) ; c = *buffer++) {
-    if (c == '.') {
-      if (sawDecimalPoint) break;
-      sawDecimalPoint = TRUE;
-      continue;
-    }
-
-    UInt32Set(&tmp, c - '0', 0);
-    if (sawDecimalPoint) {
-      UInt32Mul(&tmp, &tmp, UInt32PowersOf10 + powerIndex);
-      UInt32Add(a, a, &tmp);
-      powerIndex++;
-      if (powerIndex >= sizeof(UInt32PowersOf10)/sizeof(UInt32PowersOf10[0]))
-	break;
-    } else {
-      UInt32Mul(a, a, UInt32PowersOf10 + 3);
-      UInt32Add(a, a, &tmp);
-    }    
+  for(c = *buffer++; (c >= '0' && c <= '9'); c = *buffer++) {
+    UInt32Set(&tmp, 0, c - '0');
+    UInt32Mul(a, a, UInt32PowersOf10 + 1);
+    UInt32Add(a, a, &tmp);
   }  
-
-  if (resultIsNegative)
-    UInt32Negate(a, a);
 }
 
 #endif

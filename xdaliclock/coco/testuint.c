@@ -2,11 +2,9 @@
 #include "tester.h"
 
 #include "c_stuff.h"
-#include "FixedPoint.h"
 #include "UInt32.h"
 
 #include "c_stuff.c"
-#include "FixedPoint.c"
 #include "UInt32.c"
 #include "tester.c"
 
@@ -55,12 +53,24 @@ void testUInt32Sub() {
 
 
 void testUInt32Mul() {
-  UInt32 val1 = UInt32Init(0x1234, 0x5678);
-  UInt32 val2 = UInt32Init(0x8345, 0xf123);
+  UInt32 val1 = UInt32Init(0x1234, 0x5677);
+  UInt32 val2 = UInt32Init(0x0000, 0x0002);
   UInt32 val3;
   UInt32Mul(&val3, &val1, &val2);
-  assertEqual(val3.Hi, 0x78e6);
+  assertEqual(val3.Lo, 0xacee);
+  assertEqual(val3.Hi, 0x2468);
+
+  UInt32Set(&val1, 0x1234, 0x5678);
+  UInt32Set(&val2, 0x8345, 0xf123);
+  UInt32Mul(&val3, &val1, &val2);
   assertEqual(val3.Lo, 0xca68);
+  assertEqual(val3.Hi, 0x78e6);
+
+  UInt32Set(&val1, 0x0123, 0x4567);
+  UInt32Set(&val2, 0x0000, 0x0010);
+  UInt32Mul(&val3, &val1, &val2);
+  assertEqual(val3.Hi, 0x1234);
+  assertEqual(val3.Lo, 0x5670);
 }
 
 
@@ -285,26 +295,23 @@ void testUInt32ToA() {
 }
 
 
-void testFixedPointToA() {
-  FixedPoint val1 = FixedPointInit(0x1234, 0x0000);
-  FixedPoint val2 = FixedPointInit(0x0000, 0x1234);
-  char b1[15], b2[15];
-  FixedPointToA(b1, &val1);
-  FixedPointToA(b2, &val2);
-  assertEqualString("4660", b1)
-  assertEqualString("0.0711", b2)
-}
+void testUInt32Parse() {
+  UInt32 a;
+  UInt32Parse(&a, "4660");
+  assertEqual(0, a.Hi);
+  assertEqual(0x1234, a.Lo);
 
+  UInt32Parse(&a, "  \t+4660asdasd");
+  assertEqual(0, a.Hi);
+  assertEqual(0x1234, a.Lo);
 
-void testFixedPointMod() {
-  FixedPoint val1 = FixedPointInit(0x7fff, 0x0000);
-  FixedPoint val2 = FixedPointInit(0x1234, 0x5678);
-  FixedPoint val3, val4;
-  FixedPointMod(&val3, &val4, &val2, &val1);
-  assertEqual(val3.Whole, 0);
-  assertEqual(val3.Fraction, 0);
-  assertEqual(val4.Whole, 0x1234);
-  assertEqual(val4.Fraction, 0x5678);
+  UInt32Parse(&a, "  \t+305402420.999");
+  assertEqual(0x1234, a.Hi);
+  assertEqual(0x1234, a.Lo);
+
+  UInt32Parse(&a, "  \t+4294967295.999");
+  assertEqual(0xffff, a.Hi);
+  assertEqual(0xffff, a.Lo);
 }
 
 
@@ -312,11 +319,7 @@ int main() {
   initCoCoSupport();
   width(80);
 
-  // Test FixedPoint routines
-  testFunctions(NF(testFixedPointToA),
-                NULL, NULL);
-
-  // Test UInt32 routines
+  // test UInt32 functions
   testFunctions(NF(testUInt32Init),
                 NF(testUInt32Set),
                 NF(testUInt32Add),
@@ -331,7 +334,7 @@ int main() {
                 NF(testUInt32GreaterThanOrEqualTo),
                 NF(testUInt32LessThanOrEqualTo),
                 NF(testUInt32ToA),
-                NF(testFixedPointMod),
+                NF(testUInt32Parse),
                 NULL, NULL);
   
   return 0;

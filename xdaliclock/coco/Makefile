@@ -5,11 +5,13 @@ XDALI_BIN=xdali.bin
 MESS_DIR=~/Applications/MacSDLMESS/mame0163
 MESS=$(MESS_DIR)/mess64
 
-$(TARGET) : test.bin testmem.bin testtstr.bin
+$(TARGET) : testuint.bin testfp.bin testmem.bin testtstr.bin
 	rm -f $@
 	decb dskini $@
-	decb copy test.bin $@,TEST.BIN
-	decb attr $@,TEST.BIN -2 -b
+	decb copy testuint.bin $@,TESTUINT.BIN
+	decb attr $@,TESTUINT.BIN -2 -b
+	decb copy testfp.bin $@,TESTFP.BIN
+	decb attr $@,TESTFP.BIN -2 -b
 	decb copy testmem.bin $@,TESTMEM.BIN
 	decb attr $@,TESTMEM.BIN -2 -b
 	decb copy testtstr.bin $@,TESTTSTR.BIN
@@ -32,8 +34,12 @@ $(TARGET) : test.bin testmem.bin testtstr.bin
 $(DALI_BIN) : xdali.c digital.c c_stuff.c time.c
 	cmoc $(CFLAGS) $< 
 
-test.bin: test.c c_stuff.c tester.c setjmp.c UInt32.c
+testuint.bin: testuint.c c_stuff.c tester.c setjmp.c UInt32.c
 	cmoc $(CFLAGS) $<
+
+testfp.bin: testfp.c c_stuff.c tester.c setjmp.c FixedPoint.c
+	cmoc $(CFLAGS) $<
+
 
 testtstr.bin: testtstr.c c_stuff.c tester.c setjmp.c
 	cmoc $(CFLAGS) $<
