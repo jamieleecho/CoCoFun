@@ -18,9 +18,20 @@
 #include "digital.c"
 #include "c_stuff.c"
 #include "time.c"
+#include "UInt32.c"
 
-int
-main ()
-{
+
+struct dali_config daliConfig;
+
+
+int main () {
+  daliConfig.width = 256;
+  daliConfig.height = 192;
+  daliConfig.bitmap = 0;
+  daliConfig.max_fps = 30; 
+  daliConfig.max_cps = 30; 
+
+  render_init(&daliConfig);
+
   return 0;
 }

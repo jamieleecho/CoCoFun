@@ -5,14 +5,15 @@
 #include "coco.h"
 
 struct tm _lastLocalTime;
-unsigned _timeHigh, _timeLow;
+UInt32 _lastTime;
 
 
 void timeTick() {
   unsigned timeLow = getTimer();
-  if (timeLow < _timeLow) {
-    _timeHigh++;
+  if (timeLow < _lastTime.Lo) {
+    _lastTime.Hi++;
   }
+  _lastTime.Lo = timeLow;
 }
 
 

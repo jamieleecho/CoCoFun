@@ -2,8 +2,9 @@
 #define _time_h
 
 #include "c_stuff.h"
+#include "UInt32.h"
 
-typedef unsigned long time_t;
+typedef UInt32 time_t;
 
 struct tm {
   int tm_sec;
@@ -21,8 +22,7 @@ struct timezone {
 };
 
 struct timeval {
-  unsigned tv_sec_hi;
-  unsigned tv_sec_lo;
+  UInt32 tv_sec;
   unsigned tv_xsec;
 };
 

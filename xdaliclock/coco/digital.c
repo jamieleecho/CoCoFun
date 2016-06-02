@@ -110,8 +110,7 @@ struct frame {
 /* The runtime settings (some initialized from system prefs, but changable.)
  */
 struct render_state {
-  unsigned long last_secs_hi;
-  unsigned long last_secs_lo;
+  UInt32 last_secs;
   unsigned int current_xsecs;
   int char_width, char_height, colon_width;
   struct frame *base_frames [12];	/* all digits */
@@ -345,13 +344,11 @@ sub32Done:
 }
               
 
-
 void
-fill_target_digits (struct dali_config *c, unsigned long time_hi,
-                    unsigned long time_lo)
+fill_target_digits (struct dali_config *c, UInt32 *time)
 {
   struct render_state *state = c->render_state;
-  struct tm *tm = localtime (time_hi, time_lo);
+  struct tm *tm = localtime (time);
 
   int i;
   int h = tm->tm_hour;
@@ -363,13 +360,22 @@ fill_target_digits (struct dali_config *c, unsigned long time_hi,
 
   int twelve_p = c->twelve_hour_p;
 
-  if (c->countdown_hi || c->countdown_lo)
+  if (!(c->countdown.Hi || c->countdown.Lo))
     {
-      long delta = ((unsigned long) c->countdown) - time;
-      if (delta < 0) delta = -delta;
-      s = delta % 60;
-      m = (delta / 60) % 60;
-      h = (delta / (60 * 60)) % 100;
+      UInt32 delta, div, ss;
+      UInt32 zero = UInt32Init(0, 0);
+      UInt32 sixty = UInt32Init(0, 60);
+      UInt32 hundred = UInt32Init(0, 100);
+      UInt32 thirtysixhundred = UInt32Init(0, 60 * 60);
+      UInt32 mm, hh, tt;
+      UInt32Sub(&delta, &(c->countdown), time);
+      if (UInt32LessThan(&delta, &zero)) UInt32Sub(&delta, &zero,  &delta);
+      UInt32Mod(&div, &ss, &delta, &sixty);
+      UInt32Div(&mm, &delta, &sixty);
+      UInt32Mod(&hh, &mm, &mm, &sixty);
+
+      UInt32Div(&hh, &delta, &thirtysixhundred);
+      UInt32Mod(&tt, &hh, &hh, &hundred);
       twelve_p = 0;
     }
 
@@ -601,8 +607,7 @@ draw_frame (struct dali_config *c, struct frame *frame, int x, int y, int coloni
 void draw_clock (struct dali_config *c);
 
 void
-start_sequence (struct dali_config *c, unsigned long time_hi,
-                unsigned long time_lo)
+start_sequence (struct dali_config *c, UInt32 *time)
 {
   struct render_state *state = c->render_state;
   int i;
@@ -623,7 +628,7 @@ start_sequence (struct dali_config *c, unsigned long time_hi,
     }
 
   /* generate new target_digits */
-  fill_target_digits (c, time_hi, time_lo);
+  fill_target_digits (c, time);
 
   /* Fill the (new) target_frames from the (new) target_digits. */
   for (i = 0; i < countof (state->target_frames); i++)
@@ -683,21 +688,19 @@ tick_sequence (struct dali_config *c)
   struct timeval now;
   struct timezone tzp;
   gettimeofday (&now, &tzp);
-  unsigned long secs_hi = now.tv_sec_hi;
-  unsigned long secs_lo = now.tv_sec_lo;
+  UInt32 secs;
+  memcpy(&secs, &(now.tv_sec), sizeof(secs));
   unsigned long xsecs = now.tv_xsec;
 
-  if (!state->last_secs_hi) {
-    state->last_secs_hi = secs_hi;
-    state->last_secs_lo = secs_lo;
+  if (!state->last_secs) {
+    memcpy(&(state->last_secs), &secs, sizeof(&(state->last_secs)));
   }
-  else if ((secs_hi != state->last_secs_hi) && (secs_lo != state->last_secs_lo))
+  else if (UInt32Equals(&secs, &(state->last_secs)))
     {
       /* End of the animation sequence; fill target_frames with the
          digits of the current time. */
-      start_sequence (c, secs_hi, secs_lo);
-      state->last_secs_hi = secs_hi;
-      state->last_secs_lo = secs_lo;
+      start_sequence (c, &secs);
+      memcpy(&(state->last_secs), &secs, sizeof(&(state->last_secs)));
     }
 
   /* Linger for about 1/10th second at the end of each cycle. */
