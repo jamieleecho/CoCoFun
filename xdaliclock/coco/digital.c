@@ -11,6 +11,8 @@
  * implied warranty.
  */
 
+#pragma org 0x2800
+
 #include <cmoc.h>
 #include "c_stuff.h"
 #include "time.h"
@@ -22,7 +24,7 @@
 #define DO_TEXTURE	/* Create LUMINANCE_ALPHA data instead of a bitmap */
 #define BIGENDIAN	/* Bit ordering if creating a single-bit bitmap */
 
-typedef unsigned short POS;
+typedef unsigned byte POS;
 typedef unsigned char BOOL;
 
 /* static int use_builtin_font; */
@@ -50,20 +52,6 @@ struct raw_number {
 
 #define static
 
-# include "zeroE.xbm"
-# include "oneE.xbm"
-# include "twoE.xbm"
-# include "threeE.xbm"
-# include "fourE.xbm"
-# include "fiveE.xbm"
-# include "sixE.xbm"
-# include "sevenE.xbm"
-# include "eightE.xbm"
-# include "nineE.xbm"
-# include "colonE.xbm"
-# include "slashE.xbm"
-FONT(E);
-
 # include "zeroF.xbm"
 # include "oneF.xbm"
 # include "twoF.xbm"
@@ -81,7 +69,6 @@ FONT(F);
 #undef static
 
 struct raw_number * all_numbers[] = {
- numbers_E,
  numbers_F,
 };
 
@@ -95,7 +82,7 @@ struct raw_number * all_numbers[] = {
    really feel like hacking on this code enough to clean it up.
  */
 #ifndef MAX_SEGS_PER_LINE
-# define MAX_SEGS_PER_LINE 5
+# define MAX_SEGS_PER_LINE 3
 #endif
 
 struct scanline {
@@ -132,9 +119,13 @@ make_empty_frame (int width, int height)
   int x, y;
 
   frame = (struct frame *) calloc (size, 1);
+  if (!frame) {
+    printf("out of mem!\n");
+    abort();
+  }
   for (y = 0; y < height; y++)
     for (x = 0; x < MAX_SEGS_PER_LINE; x++)
-      frame->scanlines[y].left [x] = frame->scanlines[y].right [x] = width / 2;
+      frame->scanlines[y].left [x] = frame->scanlines[y].right [x] = (POS)(width / 2);
   return frame;
 }
 
@@ -174,17 +165,17 @@ number_to_frame (unsigned char *bits, int width, int height)
       right = frame->scanlines[y].right;
 
       for (seg = 0; seg < MAX_SEGS_PER_LINE; seg++)
-        left [seg] = right [seg] = width / 2;
+        left [seg] = right [seg] = (POS)(width / 2);
 
       for (seg = 0; seg < MAX_SEGS_PER_LINE; seg++)
         {
           for (; x < width; x++)
             if (GETBIT (bits, x, y)) break;
           if (x == width) break;
-          left [seg] = x;
+          left [seg] = (POS)x;
           for (; x < width; x++)
             if (! GETBIT (bits, x, y)) break;
-          right [seg] = x;
+          right [seg] = (POS)x;
         }
 
       for (; x < width; x++)
@@ -662,7 +653,7 @@ one_step (struct dali_config *c,
   for (i = 0; i < state->char_height; i++)
     {
 # define STEP(field) \
-         (curr->field = (orig->field \
+         (curr->field = (POS)(orig->field \
                          + (((int) (target->field - orig->field)) \
                             * (int) xsecs / 60)))
 

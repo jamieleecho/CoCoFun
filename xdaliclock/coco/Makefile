@@ -24,7 +24,11 @@ $(TARGET) : $(XDALI_BAS) $(XDALI_BIN) testuint.bin testfp.bin testmem.bin \
 	decb copy testtstr.bin $@,TESTTSTR.BIN
 	decb attr $@,TESTTSTR.BIN -2 -b
 
-$(DALI_BIN) : xdali.c digital.c c_stuff.c time.c
+%.bin : %.c
+	cmoc $(CFLAGS) $< 
+
+
+$(XDALI_BIN) : xdali.c digital.c c_stuff.c time.c
 	cmoc $(CFLAGS) $< 
 
 testuint.bin: testuint.c c_stuff.c tester.c setjmp.c UInt32.c
@@ -39,9 +43,6 @@ testtstr.bin: testtstr.c c_stuff.c tester.c setjmp.c
 
 testmem.bin: testmem.c c_stuff.c tester.c setjmp.c
 	cmoc $(CFLAGS) $<
-
-%.bin : %.c
-	cmoc $(CFLAGS) $< 
 
 clean :
 	rm -rf $(TARGET) *.bin *.i *.lst *.asm *.hex

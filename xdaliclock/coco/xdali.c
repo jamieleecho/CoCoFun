@@ -27,11 +27,19 @@ struct dali_config daliConfig;
 int main () {
   daliConfig.width = 256;
   daliConfig.height = 192;
-  daliConfig.bitmap = 0;
+  daliConfig.bitmap = 0xe00;
   daliConfig.max_fps = 30; 
   daliConfig.max_cps = 30; 
+  daliConfig.render_state = 0;
+  daliConfig.time_mode = HHMMSS;
 
   render_init(&daliConfig);
+  memset(daliConfig.bitmap, 170, 6144);
+  showGraphicsAddress(7);
+  showPmode4(1);
+  start_sequence(&daliConfig, 0);
+  while(1);
+
 
   return 0;
 }
