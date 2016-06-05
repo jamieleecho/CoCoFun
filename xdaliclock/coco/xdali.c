@@ -32,14 +32,14 @@ int main () {
   daliConfig.max_cps = 30; 
   daliConfig.render_state = 0;
   daliConfig.time_mode = HHMMSS;
+  daliConfig.date_mode = MMDDYY;
 
   render_init(&daliConfig);
   memset(daliConfig.bitmap, 170, 6144);
   showGraphicsAddress(7);
   showPmode4(1);
-  start_sequence(&daliConfig, 0);
-  while(1);
-
+  while(1)
+    render_once(&daliConfig); 
 
   return 0;
 }

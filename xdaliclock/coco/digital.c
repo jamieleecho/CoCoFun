@@ -138,8 +138,9 @@ copy_frame (struct dali_config *c, struct frame *from)
   int size = sizeof (struct frame) + (sizeof (struct scanline) * height);
   struct frame *to = (struct frame *) calloc (size, 1);
   int y;
-  for (y = 0; y < height; y++)
-    copy_struct(to->scanlines[y], from->scanlines[y]);  /* copies the whole struct */
+  for (y = 0; y < height; y++) {
+    memcpy(&(to->scanlines[y]), &(from->scanlines[y]), sizeof(to->scanlines[y]));  /* copies the whole struct */
+  }
   return to;
 }
 
@@ -219,7 +220,10 @@ pick_font_size (struct dali_config *c, unsigned int *w_ret, unsigned int *h_ret)
     case SS:     nn = 2; cc = 0; break;
     case HHMM:   nn = 4; cc = 1; break;
     case HHMMSS: nn = 6; cc = 2; break;
-    default:   abort(); break;
+    default:   
+      printf("Bad time mode\n");
+      abort();
+      break;
     }
 
   for (f = 0; f < countof(all_numbers); f++)
@@ -251,7 +255,10 @@ init_numbers (struct dali_config *c)
   struct raw_number *raw;
 
   int size = pick_font_size (c, (unsigned int *)NULL, (unsigned int *)NULL);
-  if (size >= countof(all_numbers)) abort();
+  if (size >= countof(all_numbers)) {
+    printf("bad size\n");
+    abort();
+  }
   raw = all_numbers[size];
 
   state->char_width  = raw[0].width;
@@ -284,7 +291,10 @@ init_numbers (struct dali_config *c)
   if (! c->bitmap)
     c->bitmap = (unsigned char *)calloc (1, c->height * (c->width << 3));
 
-  if (! c->bitmap) abort();
+  if (! c->bitmap) {
+    printf("Out of memory\n");
+    abort();
+  }
 }
 
 
@@ -424,6 +434,7 @@ fill_target_digits (struct dali_config *c, UInt32 *time)
             state->target_digits[0] = -1;
           break;
         default: 
+          printf("Bad format\n");
           abort();
         }
     }
@@ -455,6 +466,7 @@ fill_target_digits (struct dali_config *c, UInt32 *time)
             state->target_digits[7] = (Y % 10);
             break;
           default:
+            printf("Bad format\n");
             abort();
           }
           break;
@@ -482,6 +494,7 @@ fill_target_digits (struct dali_config *c, UInt32 *time)
             state->target_digits[7] = (Y % 10);
             break;
           default:
+            printf("Bad format\n");
             abort();
           }
           break;
@@ -509,10 +522,12 @@ fill_target_digits (struct dali_config *c, UInt32 *time)
             state->target_digits[7] = (D % 10);
             break;
           default:
+            printf("Bad format\n");
             abort();
           }
           break;
         default:
+          printf("Bad format\n");
           abort();
         }
     }
@@ -624,6 +639,7 @@ start_sequence (struct dali_config *c, UInt32 *time)
   /* Fill the (new) target_frames from the (new) target_digits. */
   for (i = 0; i < countof (state->target_frames); i++)
     {
+      state->target_digits[i] = 1;
       int colonic_p = (i == 2 || i == 5);
       state->target_frames[i] =
         copy_frame (c,
@@ -649,7 +665,6 @@ one_step (struct dali_config *c,
   struct scanline *curr   = &current_frame->scanlines [0];
   struct scanline *target =  &target_frame->scanlines [0];
   int i = 0, x;
-
   for (i = 0; i < state->char_height; i++)
     {
 # define STEP(field) \
@@ -661,6 +676,8 @@ one_step (struct dali_config *c,
         {
           STEP (left [x]);
           STEP (right[x]);
+          curr->left[x] = target->left[x];
+          curr->right[x] = target->right[x];
         }
       orig++;
       curr++;
@@ -683,10 +700,10 @@ tick_sequence (struct dali_config *c)
   memcpy(&secs, &(now.tv_sec), sizeof(secs));
   unsigned long xsecs = now.tv_xsec;
 
-  if (!state->last_secs) {
+  if (!state->last_secs.Hi || !state->last_secs.Lo) {
     memcpy(&(state->last_secs), &secs, sizeof(&(state->last_secs)));
   }
-  else if (UInt32Equals(&secs, &(state->last_secs)))
+  else // xxxx if (UInt32Equals(&secs, &(state->last_secs)))
     {
       /* End of the animation sequence; fill target_frames with the
          digits of the current time. */
@@ -759,14 +776,17 @@ draw_clock (struct dali_config *c)
     case SS:     nn = 2; cc = 0; break;
     case HHMM:   nn = 4; cc = 1; break;
     case HHMMSS: nn = 6; cc = 2; break;
-    default:     abort(); break;
+    default: 
+      printf("Bad format\n");
+      abort();
+      break;
     }
 
   x = y = 0;
   for (i = 0; i < nn+cc; i++) 
     {
       int colonic_p = (i == 2 || i == 5);
-      x += draw_frame (c, state->current_frames[i], x, y, colonic_p);
+      x += 4 + draw_frame (c, state->current_frames[i], x, y, colonic_p); // xxxx 
     }
 }
 
@@ -774,7 +794,10 @@ draw_clock (struct dali_config *c)
 void
 render_init (struct dali_config *c)
 {
-  if (c->render_state) abort();
+  if (c->render_state) {
+    printf("bad render state\n");
+    abort();
+  }
   c->render_state = (struct render_state *)
     calloc (1, sizeof (struct render_state));
   init_numbers (c);
@@ -793,8 +816,14 @@ render_free (struct dali_config *c)
 void
 render_once (struct dali_config *c)
 {
-  if (! c->render_state) abort();
-  if (! c->bitmap) abort();
+  if (! c->render_state) {
+    printf("bad render_state\n");
+    abort();
+  }
+  if (! c->bitmap) {
+    printf("bad bitmap\n");
+    abort();
+  }
   tick_sequence (c);
   draw_clock (c);
 }

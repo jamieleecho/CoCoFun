@@ -1,4 +1,4 @@
-CFLAGS=-I../font
+CFLAGS=-I../font --verbose
 TARGET=dali.dsk
 XDALI_BAS=xdali.bas
 XDALI_BIN=xdali.bin
