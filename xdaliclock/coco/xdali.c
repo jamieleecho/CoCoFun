@@ -35,7 +35,7 @@ int main () {
   daliConfig.date_mode = MMDDYY;
 
   render_init(&daliConfig);
-  memset(daliConfig.bitmap, 170, 6144);
+  memset(daliConfig.bitmap, 0, 6144);
   showGraphicsAddress(7);
   showPmode4(1);
   while(1)

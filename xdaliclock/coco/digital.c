@@ -139,7 +139,7 @@ copy_frame (struct dali_config *c, struct frame *from)
   struct frame *to = (struct frame *) calloc (size, 1);
   int y;
   for (y = 0; y < height; y++) {
-    memcpy(&(to->scanlines[y]), &(from->scanlines[y]), sizeof(&(to->scanlines[y])));  /* copies the whole struct */
+    memcpy(&(to->scanlines[y]), &(from->scanlines[y]), sizeof((to->scanlines[y])));  /* copies the whole struct */
    // for (int seg = 0; seg < MAX_SEGS_PER_LINE; seg++)
      // printf("(%d %d) ", from->scanlines[y].left[seg], from->scanlines[y].right[seg]);
   }
@@ -178,11 +178,10 @@ number_to_frame (unsigned char *bits, int width, int height)
           }
           if (x == width) break;
           left [seg] = (POS)x;
-          // printf("%d/%d ", left[seg], x);
           for (; x < width; x++)
             if (! GETBIT (bits, x, y)) break;
           right [seg] = (POS)x;
-          // printf("(%d %d) ", left[seg], right[seg]);
+          //printf("(%d %d) ", left[seg], right[seg]);
         }
         //printf("\n");
 
@@ -276,8 +275,10 @@ init_numbers (struct dali_config *c)
   state->empty_colon = make_empty_frame (raw[10].width, raw[10].height);
 
   for (i = 0; i < countof(state->base_frames); i++) {
+    // printf("*** %d ***\n", i);
     state->base_frames [i] =
       number_to_frame (raw[i].bits, raw[i].width, raw[i].height);
+    // waitkey(0);
   }
 
   memset (state->orig_frames,    0, sizeof(state->orig_frames));
@@ -597,7 +598,6 @@ draw_frame (struct dali_config *c, struct frame *frame, int x, int y, int coloni
 
           /* Draw the line of this segment.
            */
-          // printf("(%d %d) ", line->left [px], line->left [px]);
           draw_horizontal_line (c,
                                 x + line->left [px],
                                 x + line->right[px],
@@ -648,7 +648,7 @@ start_sequence (struct dali_config *c, UInt32 *time)
   /* Fill the (new) target_frames from the (new) target_digits. */
   for (i = 0; i < countof (state->target_frames); i++)
     {
-      state->target_digits[i] = 1;
+      state->target_digits[i] = (i == 2 || i == 5) ? 10 : i; // xxxxx
       int colonic_p = (i == 2 || i == 5);
       state->target_frames[i] =
         copy_frame (c,
@@ -795,7 +795,7 @@ draw_clock (struct dali_config *c)
   for (i = 0; i < nn+cc; i++) 
     {
       int colonic_p = (i == 2 || i == 5);
-      x += 4 + draw_frame (c, state->current_frames[i], x, y, colonic_p); // xxxx 
+      x += draw_frame (c, state->current_frames[i], x, y, colonic_p);
     }
 }
 
