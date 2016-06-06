@@ -139,8 +139,11 @@ copy_frame (struct dali_config *c, struct frame *from)
   struct frame *to = (struct frame *) calloc (size, 1);
   int y;
   for (y = 0; y < height; y++) {
-    memcpy(&(to->scanlines[y]), &(from->scanlines[y]), sizeof(to->scanlines[y]));  /* copies the whole struct */
+    memcpy(&(to->scanlines[y]), &(from->scanlines[y]), sizeof(&(to->scanlines[y])));  /* copies the whole struct */
+   // for (int seg = 0; seg < MAX_SEGS_PER_LINE; seg++)
+     // printf("(%d %d) ", from->scanlines[y].left[seg], from->scanlines[y].right[seg]);
   }
+  //printf("\n");
   return to;
 }
 
@@ -170,14 +173,18 @@ number_to_frame (unsigned char *bits, int width, int height)
 
       for (seg = 0; seg < MAX_SEGS_PER_LINE; seg++)
         {
-          for (; x < width; x++)
+          for (; x < width; x++) {
             if (GETBIT (bits, x, y)) break;
+          }
           if (x == width) break;
           left [seg] = (POS)x;
+          // printf("%d/%d ", left[seg], x);
           for (; x < width; x++)
             if (! GETBIT (bits, x, y)) break;
           right [seg] = (POS)x;
+          // printf("(%d %d) ", left[seg], right[seg]);
         }
+        //printf("\n");
 
       for (; x < width; x++)
         if (GETBIT (bits, x, y))
@@ -268,9 +275,10 @@ init_numbers (struct dali_config *c)
   state->empty_frame = make_empty_frame (raw[0].width,  raw[0].height);
   state->empty_colon = make_empty_frame (raw[10].width, raw[10].height);
 
-  for (i = 0; i < countof(state->base_frames); i++)
+  for (i = 0; i < countof(state->base_frames); i++) {
     state->base_frames [i] =
       number_to_frame (raw[i].bits, raw[i].width, raw[i].height);
+  }
 
   memset (state->orig_frames,    0, sizeof(state->orig_frames));
   memset (state->current_frames, 0, sizeof(state->current_frames));
@@ -589,6 +597,7 @@ draw_frame (struct dali_config *c, struct frame *frame, int x, int y, int coloni
 
           /* Draw the line of this segment.
            */
+          // printf("(%d %d) ", line->left [px], line->left [px]);
           draw_horizontal_line (c,
                                 x + line->left [px],
                                 x + line->right[px],
