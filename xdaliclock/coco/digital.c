@@ -544,21 +544,53 @@ fill_target_digits (struct dali_config *c, UInt32 *time)
 
 
 void
-draw_horizontal_line (struct dali_config *c, int x1, int x2, int y, BOOL black_p)
+draw_horizontal_line (struct dali_config *c, byte x1, byte x2, byte y, BOOL black_p)
 {
   unsigned char *scanline;
   if (x1 == x2) return;
   if (y > c->height) return;
-  if (x1 > c->width) x1 = c->width;
-  if (x2 > c->width) x2 = c->width;
+  if (x1 > c->width) x1 = (byte)c->width;
+  if (x2 > c->width) x2 = (byte)c->width;
   if (x1 > x2)
     {
-      int swap = x1;
+      byte swap = x1;
       x1 = x2;
       x2 = swap;
     }
 
   scanline = c->bitmap + (y * (c->width >> 3));
+  byte xx1 = x1 & 7;
+  if (xx1) {
+    if (black_p) {
+      byte val = scanline[x1>>3] | (byte)(0xff >> xx1);
+      scanline[x1>>3]  = val;
+    } else {
+      byte val = scanline[x1>>3] & ~(byte)(0xff >> xx1);
+      scanline[x1>>3]  = val;
+    }
+  }
+
+
+  byte xx2 = x2 & 0xf8;
+  x1 = x1 + (xx1 ? (8 - xx1) : 0);
+  if (black_p)
+    for (; x1 < xx2; x1++)
+      scanline[x1>>3] = 0xff;
+  else
+    for (; x1 < xx2; x1++)
+      scanline[x1>>3] = 0x0;
+
+  byte delta = (x2 - xx2) & 0x7;
+  if (delta) {
+    if (black_p) {
+      byte val = scanline[x1>>3] | (byte)(0xff << delta);
+      scanline[x1>>3] = val;
+    } else {
+      byte val = scanline[x1>>3] & ~(byte)(0xff << delta);
+      scanline[x1>>3] = val;
+    }
+  }
+
   if (black_p)
     for (; x1 < x2; x1++)
       scanline[x1>>3] |= (byte)(1 << (7 - (x1 & 7)));
@@ -568,17 +600,17 @@ draw_horizontal_line (struct dali_config *c, int x1, int x2, int y, BOOL black_p
 }
 
 
-int
-draw_frame (struct dali_config *c, struct frame *frame, int x, int y, int colonic_p)
+byte
+draw_frame (struct dali_config *c, struct frame *frame, byte x, byte y, int colonic_p)
 {
   struct render_state *state = c->render_state;
-  int px, py;
-  int cw = (colonic_p ? state->colon_width : state->char_width);
+  byte px, py;
+  byte cw = (byte)(colonic_p ? state->colon_width : state->char_width);
 
   for (py = 0; py < state->char_height; py++)
     {
       struct scanline *line = &frame->scanlines [py];
-      int last_right = 0;
+      byte last_right = 0;
 
       for (px = 0; px < MAX_SEGS_PER_LINE; px++)
         {
@@ -638,7 +670,6 @@ start_sequence (struct dali_config *c, UInt32 *time)
       state->orig_frames[i]    = state->current_frames[i];
       state->current_frames[i] = state->target_frames[i];
       state->target_frames[i]  = 0;
-
       state->orig_digits[i]    = state->target_digits[i];
     }
 
@@ -648,7 +679,6 @@ start_sequence (struct dali_config *c, UInt32 *time)
   /* Fill the (new) target_frames from the (new) target_digits. */
   for (i = 0; i < countof (state->target_frames); i++)
     {
-      state->target_digits[i] = (i == 2 || i == 5) ? 10 : i; // xxxxx
       int colonic_p = (i == 2 || i == 5);
       state->target_frames[i] =
         copy_frame (c,
@@ -685,8 +715,8 @@ one_step (struct dali_config *c,
         {
           STEP (left [x]);
           STEP (right[x]);
-          curr->left[x] = target->left[x];
-          curr->right[x] = target->right[x];
+          //curr->left[x] = target->left[x];
+          //curr->right[x] = target->right[x];
         }
       orig++;
       curr++;
@@ -712,7 +742,7 @@ tick_sequence (struct dali_config *c)
   if (!state->last_secs.Hi || !state->last_secs.Lo) {
     memcpy(&(state->last_secs), &secs, sizeof(&(state->last_secs)));
   }
-  else // xxxx if (UInt32Equals(&secs, &(state->last_secs)))
+  else //  if (UInt32Equals(&secs, &(state->last_secs))) xxx
     {
       /* End of the animation sequence; fill target_frames with the
          digits of the current time. */
@@ -721,6 +751,7 @@ tick_sequence (struct dali_config *c)
     }
 
   /* Linger for about 1/10th second at the end of each cycle. */
+  state->current_xsecs = xsecs;
   xsecs *= 12;
   xsecs /= 10;
   if (xsecs > 60) xsecs = 60;
@@ -733,7 +764,7 @@ tick_sequence (struct dali_config *c)
               state->current_frames[i],
               state->target_frames[i],
               (unsigned int) xsecs);
-  state->current_xsecs = (unsigned int) xsecs;
+  state->current_xsecs = (state->current_xsecs + 1) % 60; // (unsigned int) xsecs;
 }
 
 
@@ -776,7 +807,7 @@ void
 draw_clock (struct dali_config *c)
 {
   struct render_state *state = c->render_state;
-  int x, y, i, nn, cc;
+  byte x, y, i, nn, cc;
 
   compute_left_offset (c);
 
@@ -794,7 +825,7 @@ draw_clock (struct dali_config *c)
   x = y = 0;
   for (i = 0; i < nn+cc; i++) 
     {
-      int colonic_p = (i == 2 || i == 5);
+      byte colonic_p = (i == 2 || i == 5);
       x += draw_frame (c, state->current_frames[i], x, y, colonic_p);
     }
 }

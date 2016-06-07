@@ -33,6 +33,8 @@ int main () {
   daliConfig.render_state = 0;
   daliConfig.time_mode = HHMMSS;
   daliConfig.date_mode = MMDDYY;
+  daliConfig.display_date_p = 0;
+  daliConfig.test_hack = 0;
 
   render_init(&daliConfig);
   memset(daliConfig.bitmap, 0, 6144);
