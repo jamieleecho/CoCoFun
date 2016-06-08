@@ -40,6 +40,12 @@ int main () {
   memset(daliConfig.bitmap, 0, 6144);
   showGraphicsAddress(7);
   showPmode4(1);
+
+  for (byte ii=32; ii<96; ii++) {
+    draw_horizontal_line (&daliConfig, ii + 70 - 32, ii + 70, ii + 64, 1);
+    draw_horizontal_line (&daliConfig, ii + 70 - 32 + 1, ii + 70 - 1, ii + 64, 0);
+  }
+
   while(1)
     render_once(&daliConfig); 
 

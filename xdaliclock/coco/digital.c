@@ -542,11 +542,11 @@ fill_target_digits (struct dali_config *c, UInt32 *time)
     }
 }
 
-
 void
 draw_horizontal_line (struct dali_config *c, byte x1, byte x2, byte y, BOOL black_p)
 {
   unsigned char *scanline;
+
   if (x1 == x2) return;
   if (y > c->height) return;
   if (x1 > c->width) x1 = (byte)c->width;
@@ -560,43 +560,47 @@ draw_horizontal_line (struct dali_config *c, byte x1, byte x2, byte y, BOOL blac
 
   scanline = c->bitmap + (y * (c->width >> 3));
   byte xx1 = x1 & 7;
-  if (xx1) {
-    if (black_p) {
-      byte val = scanline[x1>>3] | (byte)(0xff >> xx1);
-      scanline[x1>>3]  = val;
-    } else {
-      byte val = scanline[x1>>3] & ~(byte)(0xff >> xx1);
-      scanline[x1>>3]  = val;
-    }
-  }
-
-
   byte xx2 = x2 & 0xf8;
-  x1 = x1 + (xx1 ? (8 - xx1) : 0);
-  if (black_p)
-    for (; x1 < xx2; x1++)
-      scanline[x1>>3] = 0xff;
-  else
-    for (; x1 < xx2; x1++)
-      scanline[x1>>3] = 0x0;
+  if ((x1 & 0xf8) + 8 <= x2) {
+    if (xx1) {
+      if (black_p) {
+        scanline[x1>>3] |= (byte)(0xff >> xx1);
+      } else {
+        scanline[x1>>3] &= ~(byte)(0xff >> xx1);
+      }
+    }
 
-  byte delta = (x2 - xx2) & 0x7;
-  if (delta) {
+    x1 = x1 + (xx1 ? (8 - xx1) : 0);
+    if (black_p)
+      for (; x1 < xx2; x1+=8) {
+        scanline[x1>>3] = 0xff;
+      }
+    else
+      for (; x1 < xx2; x1+=8) {
+        scanline[x1>>3] = 0x00;
+      }
+
+    byte delta = (8 - (x2 - xx2)) & 0x7;
+    byte xval = 0;
+    if (delta) {
+      if (black_p) {
+        scanline[x1>>3] |= (byte)(0xff << delta);
+      } else {
+        byte val = ~(byte)(0xff << delta);
+        scanline[x1>>3] &= val;
+      }
+    }
+  } else {
+    byte delta = (8 - (x2 - xx2)) & 0x7;
+    byte val; 
     if (black_p) {
-      byte val = scanline[x1>>3] | (byte)(0xff << delta);
-      scanline[x1>>3] = val;
+      val = scanline[x1>>3] | (byte)(0xff >> xx1);
+      scanline[x1>>3] = val & (byte)(0xff << delta);
     } else {
-      byte val = scanline[x1>>3] & ~(byte)(0xff << delta);
-      scanline[x1>>3] = val;
+      val = ~((byte)(0xff >> xx1) & (byte)(0xff << delta));
+      scanline[x1>>3] &= val;
     }
   }
-
-  if (black_p)
-    for (; x1 < x2; x1++)
-      scanline[x1>>3] |= (byte)(1 << (7 - (x1 & 7)));
-  else
-    for (; x1 < x2; x1++)
-      scanline[x1>>3] &= ~(byte)(1 << (7 - (x1 & 7)));
 }
 
 
