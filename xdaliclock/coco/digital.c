@@ -617,7 +617,7 @@ draw_frame (struct dali_config *c, struct frame *frame, byte x, byte y, int colo
 
       for (px = 0; px < MAX_SEGS_PER_LINE; px++)
         {
-          if (px > 0 &&
+          if (px &&
               (line->left[px] == line->right[px] ||
                (line->left [px] == line->left [px-1] &&
                 line->right[px] == line->right[px-1])))
