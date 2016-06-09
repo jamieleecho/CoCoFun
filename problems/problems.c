@@ -39,6 +39,16 @@ void test2() {
   }
 }
 
+void test3() {
+  byte zero = 0;
+  byte shift_amount = 1 + *(&zero);
+  byte val = ~((byte)(0xff >> shift_amount) & (byte)(0xff << shift_amount));
+
+  if (val != 0x81) {
+    printf("test3 failed!\n");
+  }
+}
+
 void crash_cmoc() {
   struct BigVect xx;
   if (!xx.x) {
@@ -49,6 +59,7 @@ void crash_cmoc() {
 int main() {
   test1();
   test2();
+  test3();
 #if 0
   crash_cmoc();
 #endif
