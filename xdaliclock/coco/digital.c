@@ -82,7 +82,7 @@ struct raw_number * all_numbers[] = {
    really feel like hacking on this code enough to clean it up.
  */
 #ifndef MAX_SEGS_PER_LINE
-# define MAX_SEGS_PER_LINE 3
+# define MAX_SEGS_PER_LINE 2
 #endif
 
 struct scanline {
@@ -98,25 +98,25 @@ struct frame {
  */
 struct render_state {
   UInt32 last_secs;
-  unsigned int current_xsecs;
+  byte current_xsecs;
   int char_width, char_height, colon_width;
   struct frame *base_frames [12];	/* all digits */
   struct frame *orig_frames [8];	/* what was there */
-  int           orig_digits [8];	/* what was there */
+  byte          orig_digits [8];	/* what was there */
   struct frame *current_frames [8];	/* current intermediate animation */
   struct frame *target_frames [8];	/* where we are going */
-  int           target_digits [8];	/* where we are going */
+  byte          target_digits [8];	/* where we are going */
   struct frame *empty_frame;
   struct frame *empty_colon;
 };
 
 
 struct frame *
-make_empty_frame (int width, int height)
+make_empty_frame (byte width, byte height)
 {
   int size = sizeof (struct frame) + (sizeof (struct scanline) * height);
   struct frame *frame;
-  int x, y;
+  byte x, y;
 
   frame = (struct frame *) calloc (size, 1);
   if (!frame) {
@@ -149,9 +149,9 @@ copy_frame (struct dali_config *c, struct frame *from)
 
 
 struct frame *
-number_to_frame (unsigned char *bits, int width, int height)
+number_to_frame (unsigned char *bits, byte width, byte height)
 {
-  int x, y;
+  byte x, y;
   struct frame *frame;
   POS *left, *right;
 
@@ -287,15 +287,15 @@ init_numbers (struct dali_config *c)
 
   for (i = 0; i < countof(state->current_frames); i++) {
     int colonic_p = (i == 2 || i == 5);
-    int cw = raw[colonic_p ? 10 : 0].width;
-    int ch = raw[0].height;
+    byte cw = (byte)raw[colonic_p ? 10 : 0].width;
+    byte ch = (byte)raw[0].height;
     state->orig_frames[i]    = make_empty_frame (cw, ch);
     state->current_frames[i] = make_empty_frame (cw, ch);
     state->target_frames[i]  = make_empty_frame (cw, ch);
   }
 
   for (i = 0; i < countof(state->target_digits); i++)
-    state->orig_digits[i] = state->target_digits[i] = -1;
+    state->orig_digits[i] = state->target_digits[i] = 0xff;
 
   if (! c->bitmap)
     c->bitmap = (unsigned char *)calloc (1, c->height * (c->width << 3));
@@ -352,7 +352,9 @@ sub32Done:
      
   }
 }
-              
+
+
+unsigned foo = 0;              
 
 void
 fill_target_digits (struct dali_config *c, UInt32 *time)
@@ -360,11 +362,13 @@ fill_target_digits (struct dali_config *c, UInt32 *time)
   struct render_state *state = c->render_state;
   struct tm *tm = localtime (time);
 
+  byte offset = (foo & 8) ? 1 : 0;
+
   int i;
-  int h = tm->tm_hour;
-  int m = tm->tm_min;
-  int s = tm->tm_sec;
-  int D = tm->tm_mday;
+  int h = tm->tm_hour + offset;
+  int m = tm->tm_min + offset;
+  int s = tm->tm_sec + offset;
+  int D = tm->tm_mday + offset;
   int M = tm->tm_mon + 1;
   int Y = tm->tm_year % 100;
 
@@ -396,13 +400,13 @@ fill_target_digits (struct dali_config *c, UInt32 *time)
     }
 
   for (i = 0; i < countof(state->target_digits); i++)
-    state->target_digits[i] = -1;
+    state->target_digits[i] = 0xff;
 
   if (c->test_hack)
     {
-      int a = (c->test_hack >= '0' && c->test_hack <= '9'
+      byte a = (c->test_hack >= '0' && c->test_hack <= '9'
                ? c->test_hack - '0'
-               : -1);
+               : 0xff);
       state->target_digits [0] = a;
       state->target_digits [1] = a;
       state->target_digits [2] = 10;
@@ -418,29 +422,29 @@ fill_target_digits (struct dali_config *c, UInt32 *time)
       switch (c->time_mode)
         {
         case SS:
-          state->target_digits[0] = (s / 10);
-          state->target_digits[1] = (s % 10);
+          state->target_digits[0] = (byte)(s / 10);
+          state->target_digits[1] = (byte)(s % 10);
           break;
         case HHMM:
-          state->target_digits[0] = (h / 10);
-          state->target_digits[1] = (h % 10);
+          state->target_digits[0] = (byte)(h / 10);
+          state->target_digits[1] = (byte)(h % 10);
           state->target_digits[2] = 10;		/* colon */
-          state->target_digits[3] = (m / 10);
-          state->target_digits[4] = (m % 10);
+          state->target_digits[3] = (byte)(m / 10);
+          state->target_digits[4] = (byte)(m % 10);
           if (twelve_p && state->target_digits[0] == 0)
-            state->target_digits[0] = -1;
+            state->target_digits[0] = 0xff;
           break;
         case HHMMSS:
-          state->target_digits[0] = (h / 10);
-          state->target_digits[1] = (h % 10);
+          state->target_digits[0] = (byte)(h / 10);
+          state->target_digits[1] = (byte)(h % 10);
           state->target_digits[2] = 10;		/* colon */
-          state->target_digits[3] = (m / 10);
-          state->target_digits[4] = (m % 10);
+          state->target_digits[3] = (byte)(m / 10);
+          state->target_digits[4] = (byte)(m % 10);
           state->target_digits[5] = 10;		/* colon */
-          state->target_digits[6] = (s / 10);
-          state->target_digits[7] = (s % 10);
+          state->target_digits[6] = (byte)(s / 10);
+          state->target_digits[7] = (byte)(s % 10);
           if (twelve_p && state->target_digits[0] == 0)
-            state->target_digits[0] = -1;
+            state->target_digits[0] = 0xff;
           break;
         default: 
           printf("Bad format\n");
@@ -454,25 +458,25 @@ fill_target_digits (struct dali_config *c, UInt32 *time)
         case MMDDYY:
           switch (c->time_mode) {
           case SS:
-            state->target_digits[0] = (D / 10);
-            state->target_digits[1] = (D % 10);
+            state->target_digits[0] = (byte)(D / 10);
+            state->target_digits[1] = (byte)(D % 10);
             break;
           case HHMM:
-            state->target_digits[0] = (M / 10);
-            state->target_digits[1] = (M % 10);
+            state->target_digits[0] = (byte)(M / 10);
+            state->target_digits[1] = (byte)(M % 10);
             state->target_digits[2] = 11;		/* dash */
-            state->target_digits[3] = (D / 10);
-            state->target_digits[4] = (D % 10);
+            state->target_digits[3] = (byte)(D / 10);
+            state->target_digits[4] = (byte)(D % 10);
             break;
           case HHMMSS:
-            state->target_digits[0] = (M / 10);
-            state->target_digits[1] = (M % 10);
+            state->target_digits[0] = (byte)(M / 10);
+            state->target_digits[1] = (byte)(M % 10);
             state->target_digits[2] = 11;		/* dash */
-            state->target_digits[3] = (D / 10);
-            state->target_digits[4] = (D % 10);
+            state->target_digits[3] = (byte)(D / 10);
+            state->target_digits[4] = (byte)(D % 10);
             state->target_digits[5] = 11;		/* dash */
-            state->target_digits[6] = (Y / 10);
-            state->target_digits[7] = (Y % 10);
+            state->target_digits[6] = (byte)(Y / 10);
+            state->target_digits[7] = (byte)(Y % 10);
             break;
           default:
             printf("Bad format\n");
@@ -482,25 +486,25 @@ fill_target_digits (struct dali_config *c, UInt32 *time)
         case DDMMYY:
           switch (c->time_mode) {
           case SS:
-            state->target_digits[0] = (D / 10);
-            state->target_digits[1] = (D % 10);
+            state->target_digits[0] = (byte)(D / 10);
+            state->target_digits[1] = (byte)(D % 10);
             break;
           case HHMM:
-            state->target_digits[0] = (D / 10);
-            state->target_digits[1] = (D % 10);
+            state->target_digits[0] = (byte)(D / 10);
+            state->target_digits[1] = (byte)(D % 10);
             state->target_digits[2] = 11;		/* dash */
-            state->target_digits[3] = (M / 10);
-            state->target_digits[4] = (M % 10);
+            state->target_digits[3] = (byte)(M / 10);
+            state->target_digits[4] = (byte)(M % 10);
             break;
           case HHMMSS:
-            state->target_digits[0] = (D / 10);
-            state->target_digits[1] = (D % 10);
+            state->target_digits[0] = (byte)(D / 10);
+            state->target_digits[1] = (byte)(D % 10);
             state->target_digits[2] = 11;		/* dash */
-            state->target_digits[3] = (M / 10);
-            state->target_digits[4] = (M % 10);
+            state->target_digits[3] = (byte)(M / 10);
+            state->target_digits[4] = (byte)(M % 10);
             state->target_digits[5] = 11;		/* dash */
-            state->target_digits[6] = (Y / 10);
-            state->target_digits[7] = (Y % 10);
+            state->target_digits[6] = (byte)(Y / 10);
+            state->target_digits[7] = (byte)(Y % 10);
             break;
           default:
             printf("Bad format\n");
@@ -510,25 +514,25 @@ fill_target_digits (struct dali_config *c, UInt32 *time)
         case YYMMDD:
           switch (c->time_mode) {
           case SS:
-            state->target_digits[0] = (D / 10);
-            state->target_digits[1] = (D % 10);
+            state->target_digits[0] = (byte)(D / 10);
+            state->target_digits[1] = (byte)(D % 10);
             break;
           case HHMM:
-            state->target_digits[0] = (M / 10);
-            state->target_digits[1] = (M % 10);
+            state->target_digits[0] = (byte)(M / 10);
+            state->target_digits[1] = (byte)(M % 10);
             state->target_digits[2] = 11;		/* dash */
-            state->target_digits[3] = (D / 10);
-            state->target_digits[4] = (D % 10);
+            state->target_digits[3] = (byte)(D / 10);
+            state->target_digits[4] = (byte)(D % 10);
             break;
           case HHMMSS:
-            state->target_digits[0] = (Y / 10);
-            state->target_digits[1] = (Y % 10);
+            state->target_digits[0] = (byte)(Y / 10);
+            state->target_digits[1] = (byte)(Y % 10);
             state->target_digits[2] = 11;		/* dash */
-            state->target_digits[3] = (M / 10);
-            state->target_digits[4] = (M % 10);
+            state->target_digits[3] = (byte)(M / 10);
+            state->target_digits[4] = (byte)(M % 10);
             state->target_digits[5] = 11;		/* dash */
-            state->target_digits[6] = (D / 10);
-            state->target_digits[7] = (D % 10);
+            state->target_digits[6] = (byte)(D / 10);
+            state->target_digits[7] = (byte)(D % 10);
             break;
           default:
             printf("Bad format\n");
@@ -678,6 +682,7 @@ start_sequence (struct dali_config *c, UInt32 *time)
 
   /* generate new target_digits */
   fill_target_digits (c, time);
+  *((byte *)(0xe00 + 3072)) = 255 - *((byte *)(0xe00 + 3072));
 
   /* Fill the (new) target_frames from the (new) target_digits. */
   for (i = 0; i < countof (state->target_frames); i++)
@@ -685,7 +690,7 @@ start_sequence (struct dali_config *c, UInt32 *time)
       int colonic_p = (i == 2 || i == 5);
       state->target_frames[i] =
         copy_frame (c,
-                    (state->target_digits[i] == -1
+                    (state->target_digits[i] == 0xff 
                      ? (colonic_p ? state->empty_colon : state->empty_frame)
                      : state->base_frames[state->target_digits[i]]));
     }
@@ -707,19 +712,18 @@ one_step (struct dali_config *c,
   struct scanline *curr   = &current_frame->scanlines [0];
   struct scanline *target =  &target_frame->scanlines [0];
   int i = 0, x;
+
   for (i = 0; i < state->char_height; i++)
     {
 # define STEP(field) \
          (curr->field = (POS)(orig->field \
-                         + (((int) (target->field - orig->field)) \
-                            * (int) xsecs / 60)))
+                         + ((((int)target->field - (int)orig->field) \
+                            * xsecs) / 60)))
 
       for (x = 0; x < MAX_SEGS_PER_LINE; x++)
         {
           STEP (left [x]);
           STEP (right[x]);
-          //curr->left[x] = target->left[x];
-          //curr->right[x] = target->right[x];
         }
       orig++;
       curr++;
@@ -733,7 +737,7 @@ void
 tick_sequence (struct dali_config *c)
 {
   struct render_state *state = c->render_state;
-  int i;
+  byte i;
 
   struct timeval now;
   struct timezone tzp;
@@ -742,9 +746,13 @@ tick_sequence (struct dali_config *c)
   memcpy(&secs, &(now.tv_sec), sizeof(secs));
   unsigned long xsecs = now.tv_xsec;
 
-  if (!state->last_secs.Hi || !state->last_secs.Lo) {
-    memcpy(&(state->last_secs), &secs, sizeof(&(state->last_secs)));
-  }
+  foo = foo + 1;
+
+  //if (!state->last_secs.Hi || !state->last_secs.Lo) {
+  if (foo & 7) 
+    {
+      memcpy(&(state->last_secs), &secs, sizeof(state->last_secs));
+    }
   else //  if (UInt32Equals(&secs, &(state->last_secs))) xxx
     {
       /* End of the animation sequence; fill target_frames with the
@@ -754,7 +762,7 @@ tick_sequence (struct dali_config *c)
     }
 
   /* Linger for about 1/10th second at the end of each cycle. */
-  state->current_xsecs = xsecs;
+  state->current_xsecs =(byte)xsecs;
   xsecs *= 12;
   xsecs /= 10;
   if (xsecs > 60) xsecs = 60;
@@ -766,7 +774,8 @@ tick_sequence (struct dali_config *c)
               state->orig_frames[i],
               state->current_frames[i],
               state->target_frames[i],
-              (unsigned int) xsecs);
+              (foo & 7) * 8
+              /* (unsigned int) xsecs */);
   state->current_xsecs = (state->current_xsecs + 1) % 60; // (unsigned int) xsecs;
 }
 
@@ -781,25 +790,25 @@ compute_left_offset (struct dali_config *c)
      is 1-9).  When the hour rolls over from 9 to 10, or from 12 to 1,
      we animate the transition to keep the digits centered.
    */
-  if (state->target_digits[0] == -1 &&		/* Fading in to no digit */
-      state->orig_digits[1] == -1)
+  if (state->target_digits[0] == 0xff &&	/* Fading in to no digit */
+      state->orig_digits[1] == 0xff)
     c->left_offset = state->char_width / 2;
-  else if (state->target_digits[0] != -1 &&	/* Fading in to a digit */
-           state->orig_digits[1] == -1)
+  else if (state->target_digits[0] !=0xff &&	/* Fading in to a digit */
+           state->orig_digits[1] == 0xff)
     c->left_offset = 0;
-  else if (state->orig_digits[0] != -1 &&	/* Fading out from digit */
-           state->target_digits[1] == -1)
+  else if (state->orig_digits[0] != 0xff &&	/* Fading out from digit */
+           state->target_digits[1] == 0xff)
     c->left_offset = 0;
-  else if (state->orig_digits[0] != -1 &&	/* Fading out from no digit */
-           state->target_digits[1] == -1)
+  else if (state->orig_digits[0] != 0xff &&	/* Fading out from no digit */
+           state->target_digits[1] == 0xff)
     c->left_offset = state->char_width / 2;
-  else if (state->orig_digits[0] == -1 &&	/* Anim no digit to digit. */
-           state->target_digits[0] != -1)
+  else if (state->orig_digits[0] == 0xff &&	/* Anim no digit to digit. */
+           state->target_digits[0] != 0xff)
     c->left_offset = state->char_width * (60 - state->current_xsecs) / 120;
-  else if (state->orig_digits[0] != -1 &&	/* Anim digit to no digit. */
-           state->target_digits[0] == -1)
+  else if (state->orig_digits[0] != 0xff &&	/* Anim digit to no digit. */
+           state->target_digits[0] == 0xff)
     c->left_offset = state->char_width * state->current_xsecs / 120;
-  else if (state->target_digits[0] == -1)	/* No anim, no digit. */
+  else if (state->target_digits[0] == 0xff)	/* No anim, no digit. */
     c->left_offset = state->char_width / 2;
   else						/* No anim, digit. */
     c->left_offset = 0;
