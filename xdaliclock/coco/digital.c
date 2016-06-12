@@ -72,6 +72,9 @@ struct raw_number * all_numbers[] = {
  numbers_F,
 };
 
+/* _step_cache(delta, timestep) */
+byte _step_cache[8][32];
+
 #undef countof
 #define countof(x) (sizeof((x))/sizeof(*(x)))
 
@@ -711,19 +714,24 @@ one_step (struct dali_config *c,
   struct scanline *orig   =    &orig_frame->scanlines [0];
   struct scanline *curr   = &current_frame->scanlines [0];
   struct scanline *target =  &target_frame->scanlines [0];
-  int i = 0, x;
+  byte i = 0, x;
+  byte *cache = _step_cache[xsecs];
 
   for (i = 0; i < state->char_height; i++)
     {
-# define STEP(field) \
-         (curr->field = (POS)(orig->field \
-                         + ((((int)target->field - (int)orig->field) \
-                            * xsecs) / 60)))
-
       for (x = 0; x < MAX_SEGS_PER_LINE; x++)
         {
-          STEP (left [x]);
-          STEP (right[x]);
+          char delta = (char)(target->left[x] - orig->left[x]);
+          if (delta >= 0)
+            curr->left[x] = orig->left[x] + cache[delta];
+          else
+            curr->left[x] = orig->left[x] - cache[-delta];
+
+          delta = (char)(target->right[x] - orig->right[x]);
+          if (delta >= 0)
+            curr->right[x] = orig->right[x] + cache[delta];
+          else
+            curr->right[x] = orig->right[x] - cache[-delta];
         }
       orig++;
       curr++;
@@ -774,7 +782,7 @@ tick_sequence (struct dali_config *c)
               state->orig_frames[i],
               state->current_frames[i],
               state->target_frames[i],
-              (foo & 7) * 8
+              (foo & 7)
               /* (unsigned int) xsecs */);
   state->current_xsecs = (state->current_xsecs + 1) % 60; // (unsigned int) xsecs;
 }
@@ -844,7 +852,8 @@ draw_clock (struct dali_config *c)
         }
       else
         {
-          x += (byte)(colonic_p ? state->colon_width : state->char_width);
+          // x += (byte)(colonic_p ? state->colon_width : state->char_width);
+          x += draw_frame (c, state->current_frames[i], x, y, colonic_p);
         }
     }
 }
@@ -857,6 +866,12 @@ render_init (struct dali_config *c)
     printf("bad render state\n");
     abort();
   }
+
+  // Store results to make step transitions faster
+  for(byte jj=0; jj<8; jj++)
+    for(byte ii=0; ii<32; ii++)
+      _step_cache[jj][ii] = (byte)((jj * (int)ii)/8);
+
   c->render_state = (struct render_state *)
     calloc (1, sizeof (struct render_state));
   init_numbers (c);
