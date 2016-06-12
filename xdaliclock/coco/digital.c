@@ -66,10 +66,24 @@ struct raw_number {
 # include "slashF.xbm"
 FONT(F);
 
+# include "zeroG.xbm"
+# include "oneG.xbm"
+# include "twoG.xbm"
+# include "threeG.xbm"
+# include "fourG.xbm"
+# include "fiveG.xbm"
+# include "sixG.xbm"
+# include "sevenG.xbm"
+# include "eightG.xbm"
+# include "nineG.xbm"
+# include "colonG.xbm"
+# include "slashG.xbm"
+FONT(G);
+
 #undef static
 
 struct raw_number * all_numbers[] = {
- numbers_F,
+ numbers_F, numbers_G,
 };
 
 /* _step_cache(delta, timestep) */
@@ -278,10 +292,8 @@ init_numbers (struct dali_config *c)
   state->empty_colon = make_empty_frame (raw[10].width, raw[10].height);
 
   for (i = 0; i < countof(state->base_frames); i++) {
-    // printf("*** %d ***\n", i);
     state->base_frames [i] =
       number_to_frame (raw[i].bits, raw[i].width, raw[i].height);
-    // waitkey(0);
   }
 
   memset (state->orig_frames,    0, sizeof(state->orig_frames));
@@ -553,7 +565,7 @@ byte _digital_ff_left_shifts[] = { 0xff, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x8
 byte _digital_ff_right_shifts[] = { 0xff, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03, 0x01, 0x00 };
 
 void
-draw_horizontal_line (struct dali_config *c, byte x1, byte x2, byte y, BOOL black_p)
+draw_horizontal_line (struct dali_config *c, byte x1, byte x2, byte *scanline, BOOL black_p)
 {
   if (x1 == x2) return;
   //if (y > c->height) return;
@@ -567,7 +579,7 @@ draw_horizontal_line (struct dali_config *c, byte x1, byte x2, byte y, BOOL blac
       x2 = swap;
     }
 
-  unsigned char *scanline = c->bitmap + (y * (width >> 3)) + (x1 >> 3) - 1;
+  scanline += (x1 >> 3) - 1;
   byte xx1 = x1 & 7;
   byte xx2 = x2 & 0xf8;
   if ((x1 & 0xf8) + 8 <= x2) {
@@ -622,6 +634,7 @@ draw_frame (struct dali_config *c, struct frame *frame, byte x, byte y, int colo
       struct scanline *line = &frame->scanlines [py];
       byte last_right = 0;
 
+      byte *scan = (byte *)c->bitmap + ((y + py) * (c->width >> 3));
       for (px = 0; px < MAX_SEGS_PER_LINE; px++)
         {
           if (px &&
@@ -635,7 +648,7 @@ draw_frame (struct dali_config *c, struct frame *frame, byte x, byte y, int colo
           draw_horizontal_line (c,
                                 x + last_right,
                                 x + line->left [px],
-                                y + py,
+                                scan,
                                 0);
 
           /* Draw the line of this segment.
@@ -643,7 +656,7 @@ draw_frame (struct dali_config *c, struct frame *frame, byte x, byte y, int colo
           draw_horizontal_line (c,
                                 x + line->left [px],
                                 x + line->right[px],
-                                y + py,
+                                scan,
                                 1);
 
           last_right = line->right[px];
@@ -654,7 +667,7 @@ draw_frame (struct dali_config *c, struct frame *frame, byte x, byte y, int colo
       draw_horizontal_line (c,
                             x + last_right,
                             x + cw,
-                            y + py,
+                            scan,
                             0);
     }
   return cw;
@@ -852,8 +865,8 @@ draw_clock (struct dali_config *c)
         }
       else
         {
-          // x += (byte)(colonic_p ? state->colon_width : state->char_width);
-          x += draw_frame (c, state->current_frames[i], x, y, colonic_p);
+          x += (byte)(colonic_p ? state->colon_width : state->char_width);
+          // x += draw_frame (c, state->current_frames[i], x, y, colonic_p);
         }
     }
 }
