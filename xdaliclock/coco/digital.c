@@ -553,7 +553,7 @@ void
 draw_horizontal_line (struct dali_config *c, byte x1, byte x2, byte y, BOOL black_p)
 {
   if (x1 == x2) return;
-  if (y > c->height) return;
+  //if (y > c->height) return;
   unsigned width = c->width;
   if (x1 > width) x1 = (byte)width;
   if (x2 > width) x2 = (byte)width;
@@ -564,7 +564,7 @@ draw_horizontal_line (struct dali_config *c, byte x1, byte x2, byte y, BOOL blac
       x2 = swap;
     }
 
-  unsigned char *scanline = c->bitmap + (y * (c->width >> 3)) + (x1 >> 3) - 1;
+  unsigned char *scanline = c->bitmap + (y * (width >> 3)) + (x1 >> 3) - 1;
   byte xx1 = x1 & 7;
   byte xx2 = x2 & 0xf8;
   if ((x1 & 0xf8) + 8 <= x2) {
@@ -838,7 +838,14 @@ draw_clock (struct dali_config *c)
   for (i = 0; i < nn+cc; i++) 
     {
       byte colonic_p = (i == 2 || i == 5);
-      x += draw_frame (c, state->current_frames[i], x, y, colonic_p);
+      if (state->orig_digits[i] != state->target_digits[i])
+        {
+          x += draw_frame (c, state->current_frames[i], x, y, colonic_p);
+        }
+      else
+        {
+          x += (byte)(colonic_p ? state->colon_width : state->char_width);
+        }
     }
 }
 
