@@ -564,58 +564,55 @@ fill_target_digits (struct dali_config *c, UInt32 *time)
 byte _digital_ff_left_shifts[] = { 0xff, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x80, 0x00 };
 byte _digital_ff_right_shifts[] = { 0xff, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03, 0x01, 0x00 };
 
+
 void
-draw_horizontal_line (struct dali_config *c, byte x1, byte x2, byte *scanline, BOOL black_p)
+draw_horizontal_line(struct dali_config *c, byte x1, byte x2, byte *scanline, BOOL black_p)
 {
   if (x1 == x2) return;
-  //if (y > c->height) return;
-  unsigned width = c->width;
-  if (x1 > width) x1 = (byte)width;
-  if (x2 > width) x2 = (byte)width;
-  if (x1 > x2)
-    {
-      byte swap = x1;
-      x1 = x2;
-      x2 = swap;
-    }
 
   scanline += (x1 >> 3) - 1;
   byte xx1 = x1 & 7;
   byte xx2 = x2 & 0xf8;
-  if ((x1 & 0xf8) + 8 <= x2) {
-    if (xx1) {
-      if (black_p) {
-        *++scanline |= _digital_ff_right_shifts[xx1];
-      } else {
-        *++scanline &= ~_digital_ff_right_shifts[xx1];
-      }
-    }
 
-    xx1 = (x1 + 7) & 0xf8;
-    byte *ptr = scanline + ((xx2 - xx1) >> 3);
-    if (black_p)
+  if (black_p) {
+    if ((x1 & 0xf8) + 8 <= x2) {
+      if (xx1) {
+        *++scanline |= _digital_ff_right_shifts[xx1];
+      }
+
+      xx1 = (x1 + 7) & 0xf8;
+      byte *ptr = scanline + ((xx2 - xx1) >> 3);
       for (; scanline < ptr; ) {
         *++scanline = 0xff;
       }
-    else
+
+      byte delta = (8 - (x2 - xx2)) & 0x7;
+      if (delta) {
+        *++scanline |= _digital_ff_left_shifts[delta];
+      }
+    } else {
+      byte delta = (8 - (x2 - xx2)) & 0x7;
+      ++scanline;
+      *scanline = *scanline |  _digital_ff_right_shifts[xx1] & _digital_ff_left_shifts[delta];
+    }
+  } else {
+    if ((x1 & 0xf8) + 8 <= x2) {
+      if (xx1) {
+        *++scanline &= ~_digital_ff_right_shifts[xx1];
+      }
+
+      xx1 = (x1 + 7) & 0xf8;
+      byte *ptr = scanline + ((xx2 - xx1) >> 3);
       for (; scanline < ptr; ) {
         *++scanline = 0x00;
       }
 
-    byte delta = (8 - (x2 - xx2)) & 0x7;
-    if (delta) {
-      if (black_p) {
-        *++scanline |= _digital_ff_left_shifts[delta];
-      } else {
+      byte delta = (8 - (x2 - xx2)) & 0x7;
+      if (delta) {
         *++scanline &= ~_digital_ff_left_shifts[delta];
       }
-    }
-  } else {
-    byte delta = (8 - (x2 - xx2)) & 0x7;
-    if (black_p) {
-      ++scanline;
-      *scanline = *scanline |  _digital_ff_right_shifts[xx1] & _digital_ff_left_shifts[delta];
     } else {
+      byte delta = (8 - (x2 - xx2)) & 0x7;
       *++scanline &= ~(_digital_ff_right_shifts[xx1] & _digital_ff_left_shifts[delta]);
     }
   }
