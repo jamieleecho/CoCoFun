@@ -766,35 +766,38 @@ draw_frame (struct dali_config *c, struct frame *frame, byte x, byte y, int colo
   byte px, py;
   byte cw = (byte)(colonic_p ? state->colon_width : state->char_width);
 
-  for (py = 0; py < state->char_height; py++)
+  byte *scan = (byte *)c->bitmap + (y * (c->width >> 3));
+  for (py = 0; py < state->char_height; py++, scan += (c->width >> 3))
     {
       struct scanline *line = &frame->scanlines [py];
-      byte last_right = 0;
+      byte last_right = 0, last_left = 0;
 
-      byte *scan = (byte *)c->bitmap + ((y + py) * (c->width >> 3));
       for (px = 0; px < MAX_SEGS_PER_LINE; px++)
         {
+          byte this_left = line->left[px];
+          byte this_right = line->right[px];
           if (px &&
-              (line->left[px] == line->right[px] ||
-               (line->left [px] == line->left [px-1] &&
-                line->right[px] == line->right[px-1])))
+              (this_left == this_right ||
+               (this_left == last_left &&
+                this_right == last_right)))
             continue;
 
           /* Erase the line between the last segment and this segment.
            */
           draw_horizontal_line_white (c,
                                 x + last_right,
-                                x + line->left [px],
+                                x + this_left,
                                 scan);
 
           /* Draw the line of this segment.
            */
           draw_horizontal_line_black (c,
-                                x + line->left [px],
-                                x + line->right[px],
+                                x + this_left,
+                                x + this_right,
                                 scan);
 
-          last_right = line->right[px];
+          last_right = this_right;
+          last_left = this_left;
         }
 
       /* Erase the line between the last segment and the right edge.
