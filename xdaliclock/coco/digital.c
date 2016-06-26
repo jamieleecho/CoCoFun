@@ -568,27 +568,77 @@ byte _digital_ff_right_shifts[] = { 0xff, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03, 0x
 void
 draw_horizontal_line(struct dali_config *c, byte x1, byte x2, byte *scanline, BOOL black_p)
 {
+  byte xx1, xx2, *ptr;
   if (x1 == x2) return;
 
-  scanline += (x1 >> 3) - 1;
-  byte xx1 = x1 & 7;
-  byte xx2 = x2 & 0xf8;
+  asm {
+* Point scanline to the byte of the start pixel
+        ldb        x1
+        lsrb
+        lsrb
+        lsrb
+        ldx        scanline
+        leax       -1,x
+        leax       b,x
+        stx        scanline
+
+* Compute the first pixel in the lasy byte
+        ldb        x2
+        andb       #$f8
+        stb        xx2
+
+* Compute the pixel offset in the first byte
+        ldb        x1
+        andb       #7
+        stb        xx1
+  }
 
   if (black_p) {
     if ((x1 & 0xf8) + 8 <= x2) {
-      if (xx1) {
-        *++scanline |= _digital_ff_right_shifts[xx1];
-      }
+      asm {
+        ldb        xx1
+        beq        draw_horizontal_line_00
+        leay       _digital_ff_right_shifts
+        ldb        b,y
+        ldx        scanline
+        leax       1,x
+        orb        ,x
+        stb        ,x
 
-      xx1 = (x1 + 7) & 0xf8;
-      byte *ptr = scanline + ((xx2 - xx1) >> 3);
-      for (; scanline < ptr; ) {
-        *++scanline = 0xff;
-      }
+draw_horizontal_line_00:
+        ldb        x1
+        addb       #7
+        andb       #$f8
+        stb        xx1
+        ldb        xx2
+        subb       xx1
+        lsrb
+        lsrb
+        lsrb
+        leay       b,x
+        sty        ptr
+        lda        #$ff
 
-      byte delta = (8 - (x2 - xx2)) & 0x7;
-      if (delta) {
-        *++scanline |= _digital_ff_left_shifts[delta];
+draw_horizontal_line_01:
+        cmpx       ptr
+        bhs        draw_horizontal_line_02
+        leax       1,x
+        sta        ,x
+        bra        draw_horizontal_line_01
+
+draw_horizontal_line_02:
+        ldb        xx2
+        subb       x2
+        addb       #8
+        andb       #7
+        beq        draw_horizontal_line_03
+        leay       _digital_ff_left_shifts
+        ldb        b,y
+        leax       1,x
+        orb        ,x
+        stb        ,x
+
+draw_horizontal_line_03:
       }
     } else {
       byte delta = (8 - (x2 - xx2)) & 0x7;
@@ -602,7 +652,7 @@ draw_horizontal_line(struct dali_config *c, byte x1, byte x2, byte *scanline, BO
       }
 
       xx1 = (x1 + 7) & 0xf8;
-      byte *ptr = scanline + ((xx2 - xx1) >> 3);
+      ptr = scanline + ((xx2 - xx1) >> 3);
       for (; scanline < ptr; ) {
         *++scanline = 0x00;
       }
