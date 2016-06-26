@@ -568,7 +568,7 @@ byte _digital_ff_right_shifts[] = { 0xff, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03, 0x
 void
 draw_horizontal_line(struct dali_config *c, byte x1, byte x2, byte *scanline, BOOL black_p)
 {
-  byte xx1, xx2, *ptr;
+  byte xx1, xx2, *ptr, delta;
   if (x1 == x2) return;
 
   asm {
@@ -594,17 +594,25 @@ draw_horizontal_line(struct dali_config *c, byte x1, byte x2, byte *scanline, BO
   }
 
   if (black_p) {
-    if ((x1 & 0xf8) + 8 <= x2) {
-      asm {
+    asm {
+* Is the line within a single byte?
+        ldx        scanline
+        leax       1,x
+        ldb        x1
+        andb       #$f8
+        addb       #8
+        cmpb       x2
+        bhi        draw_horizontal_line_03
+
+* No, write out the first part
         ldb        xx1
         beq        draw_horizontal_line_00
         leay       _digital_ff_right_shifts
         ldb        b,y
-        ldx        scanline
-        leax       1,x
         orb        ,x
-        stb        ,x
+        stb        ,x+
 
+* Draw out full bytes
 draw_horizontal_line_00:
         ldb        x1
         addb       #7
@@ -618,32 +626,41 @@ draw_horizontal_line_00:
         leay       b,x
         sty        ptr
         lda        #$ff
-
 draw_horizontal_line_01:
         cmpx       ptr
         bhs        draw_horizontal_line_02
-        leax       1,x
-        sta        ,x
+        sta        ,x+
         bra        draw_horizontal_line_01
 
+* Draw out the last byte in the line
 draw_horizontal_line_02:
         ldb        xx2
         subb       x2
         addb       #8
         andb       #7
-        beq        draw_horizontal_line_03
+        beq        draw_horizontal_line_04
         leay       _digital_ff_left_shifts
         ldb        b,y
-        leax       1,x
         orb        ,x
         stb        ,x
+        bra        draw_horizontal_line_04
 
+* Draw out the only byte that this line makes
 draw_horizontal_line_03:
-      }
-    } else {
-      byte delta = (8 - (x2 - xx2)) & 0x7;
-      ++scanline;
-      *scanline = *scanline |  _digital_ff_right_shifts[xx1] & _digital_ff_left_shifts[delta];
+        ldb        xx2
+        subb       x2
+        addb       #8
+        andb       #7
+        leay       _digital_ff_left_shifts
+        lda        b,y
+
+        ldb        xx1
+        leay       _digital_ff_right_shifts
+        anda       b,y
+
+        ora        ,x
+        sta        ,x
+draw_horizontal_line_04:
     }
   } else {
     if ((x1 & 0xf8) + 8 <= x2) {
@@ -662,7 +679,7 @@ draw_horizontal_line_03:
         *++scanline &= ~_digital_ff_left_shifts[delta];
       }
     } else {
-      byte delta = (8 - (x2 - xx2)) & 0x7;
+      delta = (8 - (x2 - xx2)) & 0x7;
       *++scanline &= ~(_digital_ff_right_shifts[xx1] & _digital_ff_left_shifts[delta]);
     }
   }
