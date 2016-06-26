@@ -566,14 +566,14 @@ byte _digital_ff_right_shifts[] = { 0xff, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03, 0x
 
 
 void
-draw_horizontal_line(struct dali_config *c, byte x1, byte x2, byte *scanline, BOOL black_p)
+draw_horizontal_line_black(struct dali_config *c, byte x1, byte x2, byte *scanline)
 {
-  byte xx1, xx2, *ptr, delta;
-  if (x1 == x2) return;
-
+  byte xx1, xx2, *ptr;
   asm {
 * Point scanline to the byte of the start pixel
         ldb        x1
+        cmpb       x2
+        lbeq        draw_horizontal_line_black_04
         lsrb
         lsrb
         lsrb
@@ -582,7 +582,7 @@ draw_horizontal_line(struct dali_config *c, byte x1, byte x2, byte *scanline, BO
         leax       b,x
         stx        scanline
 
-* Compute the first pixel in the lasy byte
+* Compute the first pixel in the last byte
         ldb        x2
         andb       #$f8
         stb        xx2
@@ -591,29 +591,25 @@ draw_horizontal_line(struct dali_config *c, byte x1, byte x2, byte *scanline, BO
         ldb        x1
         andb       #7
         stb        xx1
-  }
 
-  if (black_p) {
-    asm {
 * Is the line within a single byte?
-        ldx        scanline
         leax       1,x
         ldb        x1
         andb       #$f8
         addb       #8
         cmpb       x2
-        bhi        draw_horizontal_line_03
+        bhi        draw_horizontal_line_black_03
 
 * No, write out the first part
         ldb        xx1
-        beq        draw_horizontal_line_00
+        beq        draw_horizontal_line_black_00
         leay       _digital_ff_right_shifts
         ldb        b,y
         orb        ,x
         stb        ,x+
 
 * Draw out full bytes
-draw_horizontal_line_00:
+draw_horizontal_line_black_00:
         ldb        x1
         addb       #7
         andb       #$f8
@@ -626,27 +622,27 @@ draw_horizontal_line_00:
         leay       b,x
         sty        ptr
         lda        #$ff
-draw_horizontal_line_01:
+draw_horizontal_line_black_01:
         cmpx       ptr
-        bhs        draw_horizontal_line_02
+        bhs        draw_horizontal_line_black_02
         sta        ,x+
-        bra        draw_horizontal_line_01
+        bra        draw_horizontal_line_black_01
 
 * Draw out the last byte in the line
-draw_horizontal_line_02:
+draw_horizontal_line_black_02:
         ldb        xx2
         subb       x2
         addb       #8
         andb       #7
-        beq        draw_horizontal_line_04
+        beq        draw_horizontal_line_black_04
         leay       _digital_ff_left_shifts
         ldb        b,y
         orb        ,x
         stb        ,x
-        bra        draw_horizontal_line_04
+        bra        draw_horizontal_line_black_04
 
 * Draw out the only byte that this line makes
-draw_horizontal_line_03:
+draw_horizontal_line_black_03:
         ldb        xx2
         subb       x2
         addb       #8
@@ -660,28 +656,105 @@ draw_horizontal_line_03:
 
         ora        ,x
         sta        ,x
-draw_horizontal_line_04:
-    }
-  } else {
-    if ((x1 & 0xf8) + 8 <= x2) {
-      if (xx1) {
-        *++scanline &= ~_digital_ff_right_shifts[xx1];
-      }
+draw_horizontal_line_black_04:
+  }
+}
 
-      xx1 = (x1 + 7) & 0xf8;
-      ptr = scanline + ((xx2 - xx1) >> 3);
-      for (; scanline < ptr; ) {
-        *++scanline = 0x00;
-      }
 
-      byte delta = (8 - (x2 - xx2)) & 0x7;
-      if (delta) {
-        *++scanline &= ~_digital_ff_left_shifts[delta];
-      }
-    } else {
-      delta = (8 - (x2 - xx2)) & 0x7;
-      *++scanline &= ~(_digital_ff_right_shifts[xx1] & _digital_ff_left_shifts[delta]);
-    }
+void
+draw_horizontal_line_white(struct dali_config *c, byte x1, byte x2, byte *scanline)
+{
+  byte xx1, xx2, *ptr;
+  asm {
+* Point scanline to the byte of the start pixel
+        ldb        x1
+        cmpb       x2
+        lbeq        draw_horizontal_line_white_04
+        lsrb
+        lsrb
+        lsrb
+        ldx        scanline
+        leax       -1,x
+        leax       b,x
+        stx        scanline
+
+* Compute the first pixel in the last byte
+        ldb        x2
+        andb       #$f8
+        stb        xx2
+
+* Compute the pixel offset in the first byte
+        ldb        x1
+        andb       #7
+        stb        xx1
+
+* Is the line within a single byte?
+        leax       1,x
+        ldb        x1
+        andb       #$f8
+        addb       #8
+        cmpb       x2
+        bhi        draw_horizontal_line_white_03
+
+* No, write out the first part
+        ldb        xx1
+        beq        draw_horizontal_line_white_00
+        leay       _digital_ff_right_shifts
+        ldb        b,y
+        comb
+        andb       ,x
+        stb        ,x+
+
+* Draw out full bytes
+draw_horizontal_line_white_00:
+        ldb        x1
+        addb       #7
+        andb       #$f8
+        stb        xx1
+        ldb        xx2
+        subb       xx1
+        lsrb
+        lsrb
+        lsrb
+        leay       b,x
+        sty        ptr
+draw_horizontal_line_white_01:
+        cmpx       ptr
+        bhs        draw_horizontal_line_white_02
+        clr        ,x+
+        bra        draw_horizontal_line_white_01
+
+* Draw out the last byte in the line
+draw_horizontal_line_white_02:
+        ldb        xx2
+        subb       x2
+        addb       #8
+        andb       #7
+        beq        draw_horizontal_line_white_04
+        leay       _digital_ff_left_shifts
+        ldb        b,y
+        comb
+        andb       ,x
+        stb        ,x
+        bra        draw_horizontal_line_white_04
+
+* Draw out the only byte that this line makes
+draw_horizontal_line_white_03:
+        ldb        xx2
+        subb       x2
+        addb       #8
+        andb       #7
+        leay       _digital_ff_left_shifts
+        lda        b,y
+
+        ldb        xx1
+        leay       _digital_ff_right_shifts
+        anda       b,y
+        coma
+
+        anda       ,x
+        sta        ,x
+draw_horizontal_line_white_04:
   }
 }
 
@@ -709,30 +782,27 @@ draw_frame (struct dali_config *c, struct frame *frame, byte x, byte y, int colo
 
           /* Erase the line between the last segment and this segment.
            */
-          draw_horizontal_line (c,
+          draw_horizontal_line_white (c,
                                 x + last_right,
                                 x + line->left [px],
-                                scan,
-                                0);
+                                scan);
 
           /* Draw the line of this segment.
            */
-          draw_horizontal_line (c,
+          draw_horizontal_line_black (c,
                                 x + line->left [px],
                                 x + line->right[px],
-                                scan,
-                                1);
+                                scan);
 
           last_right = line->right[px];
         }
 
       /* Erase the line between the last segment and the right edge.
        */
-      draw_horizontal_line (c,
+      draw_horizontal_line_white (c,
                             x + last_right,
                             x + cw,
-                            scan,
-                            0);
+                            scan);
     }
   return cw;
 }
