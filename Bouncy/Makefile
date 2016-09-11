@@ -1,7 +1,7 @@
 CFLAGS=-O2
 TARGET=Bouncy.dsk
 RENDER_BIN=render1.bin
-MESS_DIR=~/Applications/MacSDLMESS/mame0163
+MESS_DIR=~/Applications/mame
 MESS=$(MESS_DIR)/mess64
 
 $(TARGET) : $(RENDER_BIN)

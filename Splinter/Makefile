@@ -2,7 +2,7 @@ CFLAGS=--wfo
 TARGET=Splinter.dsk
 SPLINTER_BAS=Splinter.bas
 SPLINTER_BIN=Splinter.bin
-MESS_DIR=~/Applications/MacSDLMESS/mame0163
+MESS_DIR=~/Applications/mame
 MESS=$(MESS_DIR)/mess64
 
 $(TARGET) : $(SPLINTER_BAS) $(SPLINTER_BIN)

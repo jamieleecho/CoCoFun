@@ -2,7 +2,7 @@ CFLAGS=
 TARGET=Balloon.dsk
 BALLOON_BAS=Balloon.bas
 BALLOON_BIN=Balloon.bin
-MESS_DIR=~/Applications/MacSDLMESS/mame0163
+MESS_DIR=~/Applications/mame
 MESS=$(MESS_DIR)/mess64
 
 $(TARGET) : $(BALLOON_BAS) $(BALLOON_BIN)

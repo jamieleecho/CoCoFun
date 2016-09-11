@@ -50,7 +50,7 @@ FixedPoint splinterBallPoint25 = FixedPointInit(0, 0x4000);
 FixedPoint splinterBallPoint125 = FixedPointInit(0, 0x2000);
 
 /** .0625 */
-FixedPoint splinterBallPoint0625 = FixedPointInit(0, 0x2000);
+FixedPoint splinterBallPoint0625 = FixedPointInit(0, 0x1000);
 
 /** Right normal */
 Vector2d splinterBallRightNormal;
@@ -322,7 +322,6 @@ void SplinterBallTick() {
 
 	  if (offset < 0) offset = 0;
 	  byte boffset = (byte)offset;
-	  char buffer[10];
 	  boffset = boffset >> 2;
 	  if (boffset > 7) boffset = 7;
 

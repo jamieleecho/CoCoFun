@@ -2,7 +2,7 @@ CFLAGS=
 TARGET=Rick.dsk
 RICK_BAS=Rick.bas
 RICK_BIN=Rick.bin
-MESS_DIR=~/Applications/MacSDLMESS/mame0163
+MESS_DIR=~/Applications/mame
 MESS=$(MESS_DIR)/mess64
 
 $(TARGET) : $(RICK_BAS) $(RICK_BIN)

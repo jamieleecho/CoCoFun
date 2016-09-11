@@ -1,7 +1,7 @@
 CFLAGS=-I../Splinter --wfo
 TARGET=Scratch.dsk
 SCRATCH_BIN=Scratch.bin
-MESS_DIR=~/Applications/MacSDLMESS/mame0163
+MESS_DIR=~/Applications/mame
 MESS=$(MESS_DIR)/mess64
 
 $(TARGET) : $(SCRATCH_BIN)

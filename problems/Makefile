@@ -1,7 +1,7 @@
 CFLAGS=-O2
 TARGET=problems.dsk
 PROBLEMS_BIN=problems.bin
-MESS_DIR=~/Applications/MacSDLMESS/mame0163
+MESS_DIR=~/Applications/mame
 MESS=$(MESS_DIR)/mess64
 
 $(TARGET) : $(PROBLEMS_BIN)

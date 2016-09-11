@@ -2,7 +2,7 @@ CFLAGS=
 TARGET=Demo.dsk
 DEMO_BAS=Demo.bas
 DEMO_BIN=Demo.bin
-MESS_DIR=~/Applications/MacSDLMESS/mame0163
+MESS_DIR=~/Applications/mame
 MESS=$(MESS_DIR)/mess64
 
 $(TARGET) : $(DEMO_BIN)
