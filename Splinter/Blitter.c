@@ -46,8 +46,8 @@ void BlitterDrawGraphics(byte *bitmap, byte x, byte y) {
   asm {
       ldx bitmap
       stx  MEMAR
-      lda  x
-      ldb  y
+      lda  :x
+      ldb  :y
       std  XAXIS
 
       pshs      u
@@ -123,7 +123,7 @@ void BlitterDrawNumericGlyph(byte *bitmap, byte x, byte y) {
   asm {
 
 * Load the destination
-      lda  y
+      lda  :y
       ldb  #160
       mul
       addd xx
