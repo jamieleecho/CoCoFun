@@ -464,8 +464,8 @@ UInt32ModMainSetup:
     ldd #0
     std ,x
     std 2,x
-    ldx d
-    ldy a
+    ldx :d
+    ldy :a
     ldd ,y
     std ,x
     ldd 2,y
