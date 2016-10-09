@@ -155,25 +155,25 @@ static void gc(void *root);
 
 #define DEFINE1(var1)                           \
     ADD_ROOT(1);                                \
-    Obj **var1 = (Obj **)(root_ADD_ROOT_ + 1)
+    Obj **var1 = (Obj **)((unsigned int)root_ADD_ROOT_ + 2)
 
 #define DEFINE2(var1, var2)                     \
     ADD_ROOT(2);                                \
-    Obj **var1 = (Obj **)(root_ADD_ROOT_ + 1);  \
-    Obj **var2 = (Obj **)(root_ADD_ROOT_ + 2)
+    Obj **var1 = (Obj **)((unsigned int)root_ADD_ROOT_ + 2); \
+    Obj **var2 = (Obj **)((unsigned int)root_ADD_ROOT_ + 4)
 
 #define DEFINE3(var1, var2, var3)               \
     ADD_ROOT(3);                                \
-    Obj **var1 = (Obj **)(root_ADD_ROOT_ + 1);  \
-    Obj **var2 = (Obj **)(root_ADD_ROOT_ + 2);  \
-    Obj **var3 = (Obj **)(root_ADD_ROOT_ + 3)
+    Obj **var1 = (Obj **)((unsigned int)root_ADD_ROOT_ + 2); \
+    Obj **var2 = (Obj **)((unsigned int)root_ADD_ROOT_ + 4); \
+    Obj **var3 = (Obj **)((unsigned int)root_ADD_ROOT_ + 6)
 
 #define DEFINE4(var1, var2, var3, var4)         \
     ADD_ROOT(4);                                \
-    Obj **var1 = (Obj **)(root_ADD_ROOT_ + 1);  \
-    Obj **var2 = (Obj **)(root_ADD_ROOT_ + 2);  \
-    Obj **var3 = (Obj **)(root_ADD_ROOT_ + 3);  \
-    Obj **var4 = (Obj **)(root_ADD_ROOT_ + 4)
+    Obj **var1 = (Obj **)((unsigned int)root_ADD_ROOT_ + 2); \
+    Obj **var2 = (Obj **)((unsigned int)root_ADD_ROOT_ + 4); \
+    Obj **var3 = (Obj **)((unsigned int)root_ADD_ROOT_ + 6); \
+    Obj **var4 = (Obj **)((unsigned int)root_ADD_ROOT_ + 8)
 
 // Round up the given value to a multiple of size. Size must be a power of 2. It adds size - 1
 // first, then zero-ing the least significant bits to make the result a multiple of size. I know

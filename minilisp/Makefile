@@ -1,4 +1,4 @@
-CFLAGS=--wfo
+CFLAGS=-O1
 TARGET=minilisp.dsk
 TARGET_BAS=$(TARGET:.dsk=.bas)
 TARGET_BIN=$(TARGET:.dsk=.bin)
