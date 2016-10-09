@@ -105,7 +105,7 @@ static Obj *Symbols;
 //======================================================================
 
 // The size of the heap in byte
-#define MEMORY_SIZE 8192
+#define MEMORY_SIZE 4096
 
 byte memory1[MEMORY_SIZE], memory2[MEMORY_SIZE];
 
@@ -399,6 +399,7 @@ char getchar() {
 
   int c;
   for(c = inkey(); c == 0; c = inkey());
+  printf("%c", c);
   return (char)c;
 }
 
@@ -965,26 +966,26 @@ static void define_constants(void *root, Obj **env) {
 }
 
 static void define_primitives(void *root, Obj **env) {
-    add_primitive(root, env, "quote", (void **)prim_quote);
-    add_primitive(root, env, "cons", (void **)prim_cons);
-    add_primitive(root, env, "car", (void **)prim_car);
-    add_primitive(root, env, "cdr", (void **)prim_cdr);
-    add_primitive(root, env, "setq", (void **)prim_setq);
-    add_primitive(root, env, "setcar", (void **)prim_setcar);
-    add_primitive(root, env, "while", (void **)prim_while);
-    add_primitive(root, env, "gensym", (void **)prim_gensym);
+    add_primitive(root, env, "QUOTE", (void **)prim_quote);
+    add_primitive(root, env, "CONS", (void **)prim_cons);
+    add_primitive(root, env, "CAR", (void **)prim_car);
+    add_primitive(root, env, "CDR", (void **)prim_cdr);
+    add_primitive(root, env, "SETQ", (void **)prim_setq);
+    add_primitive(root, env, "SETCHAR", (void **)prim_setcar);
+    add_primitive(root, env, "WHILE", (void **)prim_while);
+    add_primitive(root, env, "GENSYM", (void **)prim_gensym);
     add_primitive(root, env, "+", (void **)prim_plus);
     add_primitive(root, env, "-", (void **)prim_minus);
     add_primitive(root, env, "<", (void **)prim_lt);
-    add_primitive(root, env, "define", (void **)prim_define);
-    add_primitive(root, env, "defun", (void **)prim_defun);
-    add_primitive(root, env, "defmacro", (void **)prim_defmacro);
-    add_primitive(root, env, "macroexpand", (void **)prim_macroexpand);
-    add_primitive(root, env, "lambda", (void **)prim_lambda);
-    add_primitive(root, env, "if", (void **)prim_if);
+    add_primitive(root, env, "DEFINE", (void **)prim_define);
+    add_primitive(root, env, "DEFUN", (void **)prim_defun);
+    add_primitive(root, env, "DEFMACRO", (void **)prim_defmacro);
+    add_primitive(root, env, "MACROEXPAND", (void **)prim_macroexpand);
+    add_primitive(root, env, "LAMBDA", (void **)prim_lambda);
+    add_primitive(root, env, "ID", (void **)prim_if);
     add_primitive(root, env, "=", (void **)prim_num_eq);
-    add_primitive(root, env, "eq", (void **)prim_eq);
-    add_primitive(root, env, "println", (void **)prim_println);
+    add_primitive(root, env, "EQ", (void **)prim_eq);
+    add_primitive(root, env, "PRINTLN", (void **)prim_println);
 }
 
 //======================================================================
