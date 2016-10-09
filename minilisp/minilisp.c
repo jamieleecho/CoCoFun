@@ -1,4 +1,5 @@
 // This software is in the public domain.
+// Originally from: https://github.com/rui314/minilisp
 
 #include <cmoc.h>
 #include <stdarg.h>
