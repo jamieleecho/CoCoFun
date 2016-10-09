@@ -1,9 +1,14 @@
 // This software is in the public domain.
 // Originally from: https://github.com/rui314/minilisp
 
+#pragma org 0x2800
+
 #include <cmoc.h>
 #include <stdarg.h>
 #include <coco.h>
+
+#include "setjmp.h"
+#include "setjmp.c"
 
 #define bool byte
 #define inline
@@ -19,10 +24,13 @@
 #define true TRUE
 #define fprintf(x, y, ...) printf(y, __VA_ARGS__) 
 
-static __attribute((noreturn)) void error(char *fmt, ...) {
-    printf("Error: %s\n", fmt);
-    exit(1);
-}
+
+jmp_buf jmpbuf;
+
+#define error(...) {\
+    printf(__VA_ARGS__); \
+    longjmp(&jmpbuf, 0); \
+  }
 
 //======================================================================
 // Lisp objects
@@ -398,7 +406,7 @@ char getchar() {
   }
 
   int c;
-  for(c = inkey(); c == 0; c = inkey());
+  for(c = waitkey(true); c == 0; c = inkey());
   printf("%c", c);
   return (char)c;
 }
@@ -1026,6 +1034,7 @@ int main() {
 
     // The main loop
     for (;;) {
+        setjmp(&jmpbuf);
         *expr = read_expr(root);
         if (!*expr)
             return 0;
