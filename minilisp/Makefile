@@ -1,5 +1,5 @@
-CFLAGS=-O2
-TARGET=Splinter.dsk
+CFLAGS=--wfo
+TARGET=minilisp.dsk
 TARGET_BAS=$(TARGET:.dsk=.bas)
 TARGET_BIN=$(TARGET:.dsk=.bin)
 TARGET_C=$(TARGET:.dsk=.c)
@@ -17,7 +17,7 @@ $(TARGET) : $(TARGET_BAS) $(TARGET_BIN)
 	decb copy $(TARGET_BIN) $@,$(shell echo $(TARGET_BIN) | tr a-z A-Z)
 	decb attr $@,$(shell echo $(TARGET_BIN) | tr a-z A-Z) -2 -b
 
-$(TARGET_BIN) : $(TARGET_C) Splinter.c GrafxData.c SplinterScore.c SplinterBall.c Blitter.c Bricks.c FontData.c SplinterBall.c CoCoMisc.c Sound.c FixedPoint.c Vector2d.c
+$(TARGET_BIN) : $(TARGET_C)
 	cmoc $(CFLAGS) $< 
 
 %.bin : %.c
