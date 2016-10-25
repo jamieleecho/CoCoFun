@@ -10,7 +10,7 @@ MESS=$(MESS_DIR)/mess64
 $(TARGET) : $(TARGET_BAS) $(TARGET_BIN)
 	rm -f $@
 	decb dskini $@
-	decb copy $(TARGET_BAS) $@,"*.BAS" -t
+	decb copy $(TARGET_BAS) $@,"*.BAS"
 	decb attr $@,"*.BAS" -0
 	decb copy $(TARGET_BAS) $@,$(shell echo $(TARGET_BAS) | tr a-z A-Z) 
 	decb attr $@,$(shell echo $(TARGET_BAS) | tr a-z A-Z) -0
