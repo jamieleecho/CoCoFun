@@ -1,0 +1,63 @@
+FuncPlot - A mathematical function plotter for the Tandy CoCo.
+
+Copyright (C) 2016 Pierre Sarrazin <http://sarrazip.com/>
+
+Available on the CMOC Home Page: http://sarrazip.com/dev/cmoc.html
+
+
+LICENSE
+
+The main source file, funcplot.c, is distributed under the GNU
+General Public License, version 3 or later.  See the COPYING file
+for details.
+
+See the other source files for their own distribution terms.
+
+
+REQUIREMENTS
+
+Tandy Color Computer with at least 32 KB of RAM and the Disk Basic
+environment.
+
+
+HELP SCREEN
+
+Edit a mathematical function of x at the Function prompt.
+For example: 2*x+x^3-sin(x)/4.
+
+Supported functions: sin, cos, tan, atn, log, exp, sqr, int, fix.
+
+Use the left and right arrow keys to move the cursor.  Note that the
+left arrow key does not erase the character that precedes the cursor.
+To do that, use the Clear key. To erase the character at the cursor,
+use Shift-Clear.
+
+Press the Break key to see the main menu, which allows you to quit
+this program.
+
+
+BASIC LOADER
+
+The FUNCPLOT.BAS file contains this Basic loader program, which
+ensures that the first PMODE 4 graphics screen is available at
+$0E00 and that the binary file is loaded at normal speed:
+
+10 GOTO 70
+20 POKE 65496,0
+30 LOADM "FUNCPLOT"
+40 EXEC
+50 POKE 65496,0
+60 END
+70 PCLEAR 4:GOTO 20
+
+The FUNCPLOT.BIN loads at $2800. It uses the high-speed poke if
+running on a CoCo 3.
+
+
+COMPILING THE SOURCES
+
+Install the CMOC C-like compiler for the 6809 and give this command:
+
+    cmoc verbiste.c
+
+More details on CMOC on its home page.
