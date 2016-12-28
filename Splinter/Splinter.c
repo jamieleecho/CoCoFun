@@ -425,7 +425,8 @@ void SplinterDrawDialogBox(unsigned ww, unsigned hh, byte f, byte b) {
   // Locations in pixel coordinates
   unsigned x = xx * 8, y = yy * 8;
   unsigned w = ww * 8 - 8, h = hh * 8 - 8;
-  byte f = 14, b = 0;
+  f = 14;
+  b = 0;
 
   // White out the selected area
   BlitterFillRectangle(x, y, w + 8, h + 8, b);

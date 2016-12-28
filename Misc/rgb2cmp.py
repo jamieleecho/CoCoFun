@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import math
 
 from colormath.color_objects import LabColor, sRGBColor
@@ -111,10 +111,12 @@ def map_colors(original_colors, other_colors):
 
 
 def output_mappings():
+  cmp_colors = cmp_to_rgb8()
   cmp_rgb_colors = [sRGBColor(r / 255.0, g / 255.0, b / 255.0)
-                      for (r, g, b) in cmp_to_rgb8()]
+                      for (r, g, b) in cmp_colors]
+  rgb_colors = rgb_to_rgb8()
   rgb_rgb_colors = [sRGBColor(r / 255.0, g / 255.0, b / 255.0)
-                      for (r, g, b) in rgb_to_rgb8()]
+                      for (r, g, b) in rgb_colors]
   rgb_lab_colors = [convert_color(rgb_color, LabColor)
                       for rgb_color in rgb_rgb_colors]
   cmp_lab_colors = [convert_color(rgb_color, LabColor)
@@ -123,10 +125,23 @@ def output_mappings():
   c2r = map_colors(rgb_lab_colors, cmp_lab_colors)
   r2c = map_colors(cmp_lab_colors, rgb_lab_colors)
 
-  print 'ii\tr2c\tc2r'
-  print '--\t---\t---'
+  print('ii\tr2c\tc2r\trgb8\t\tcmp8')
+  print('--\t---\t---\t---\t\t---')
   for ii in xrange(0, len(r2c)):
-    print '{}\t{}\t{}'.format(ii, r2c[ii], c2r[ii])
+    print('{}\t{}\t{}\t{}\t{}'.format(ii, r2c[ii], c2r[ii], rgb_colors[ii], cmp_colors[ii]))
 
 output_mappings()
+
+print
+
+print
+
+print cmp_to_rgb8()
+
+print
+
+print
+
+print rgb_to_rgb8()
+
 
