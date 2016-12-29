@@ -397,23 +397,104 @@ static Obj *read_expr(void *root);
 #define stderr 1
 #define EOF 0
 
-static int char_buffer = -1;
+char screen2ascii(char c) {
+  if ((c >= 1) && (c <= 26)) {
+    return c + 96;
+  }
+  if ((c >= 96) && (c <= 127)) {
+    return c - 64;
+  }
+  return c;
+}
+
+
+char ascii2screen(char c) {
+  if ((c >= 97) && (c <= 122)) {
+    return c - 96;
+  }
+  if ((c >= 32) && (c <= 63)) {
+    return c + 64;
+  }
+  return c;
+}
+
+
+char buffer[512];
+byte has_data = false;
+char *start_pos = buffer;
+char *end_pos = buffer;
 char getchar() {
-  if (char_buffer >= 0) {
-    int c = char_buffer;
-    char_buffer = -1;
-    return (char)c;
+  // If we have data buffered already, simply return that data.
+  if (has_data) {
+    char c = *start_pos++;
+    if (start_pos >= end_pos) {
+      has_data = false;
+    }
+    return screen2ascii(c);
   }
 
-  int c;
-  for(c = waitkey(true); c == 0; c = inkey());
-  printf("%c", c);
-  return (char)c;
+  start_pos = end_pos = *(char **)0x88;
+  has_data = true;
+  while(true) {
+    char c;
+    for(c = waitkey(true); c == 0; c = inkey());
+
+    if ((c == 8) && (end_pos > start_pos)) {
+      end_pos--;
+      *end_pos = ascii2screen(' ');
+      *(char **)0x88 = end_pos;
+      continue;
+    }
+
+    // Don't go over a full screen minus last line
+    if (end_pos - start_pos > 512 - 33) {
+      continue;
+    }
+
+    // Process chars if we hit an ESC
+    if ((c == 3) || (c == '\r')) {
+      end_pos = *(char **)0x88;
+      if (end_pos >= 0x400 + 512 - 32) {
+        start_pos = start_pos - 32;
+      }
+      printf("\n");
+      end_pos = *(char **)0x88;
+
+      if (c == 3) {
+        memcpy(buffer, start_pos, end_pos - start_pos);
+        end_pos = buffer + (end_pos - start_pos);
+        start_pos = buffer;
+        c = *start_pos++;
+        if (start_pos >= end_pos) {
+          has_data = false;
+        }
+        return screen2ascii(c);
+      }
+      continue;
+    }
+
+    // Process a normal char
+    if (c >= 32) {
+      if (end_pos >= 0x400 + 512 - 1) {
+        start_pos = start_pos - 32;
+      }
+      printf("%c", c);
+      end_pos = *(char **)0x88;
+    }
+  }
 }
 
+
 void ungetc(char c, byte ignore) {
-  char_buffer = c;
+  if (start_pos <= buffer) { 
+    return;
+  }
+  has_data = true;
+  --start_pos;
+  *start_pos = ascii2screen(c);
+  return;
 }
+
 
 bool isdigit(char c) {
   return c >= '0' && c <= '9';
@@ -715,7 +796,7 @@ static Obj *eval(void *root, Obj **env, Obj **obj) {
         // Variable
         Obj *bind = find(env, *obj);
         if (!bind)
-            error("Undefined symbol: %s", (*obj)->val.name);
+            error("Undefined symbol: %s\n", (*obj)->val.name);
         return bind->val.cell.cdr;
     }
     case TCELL: {
@@ -1004,6 +1085,7 @@ static void define_primitives(void *root, Obj **env) {
 static bool getEnvFlag(char *name) {
     return false;
 }
+
 
 int main() {
     // Debug flags
