@@ -339,13 +339,13 @@ asm void __CoCoMiscJoystickRead() {
 *                                                   *
 *             256/320/640 x 192/200/225             *
 *                                                   *
-* ON ENTRY:                                         *
+* ON ENTRY                                          *
 * Y = 15 BIT SAMPLE POINTER (#DACX OR #DACY)        *
 * AXIS = JOYSTICK AXIS TO SCAN (0=X 1=Y)            *
 * XSCALE = 1(256) OR 2(320) OR 3(640)               *
 * YSCALE = 1(192) OR 2(200) OR 3(225)               *
 *                                                   *
-* ON EXIT:                                          *
+* ON EXIT                                           *
 * X = SCALED JOYSTICK READING                       *
 *                                                   *
 * * * * * * * * * * * * * * * * * * * * * * * * * * *

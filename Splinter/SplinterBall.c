@@ -16,6 +16,10 @@
 #include "Blitter.h"
 
 
+char splinterNumberOfBalls;
+byte splinterPaddlePosition;
+
+
 /** Current splinter ball level */
 byte splinterBallLevel = 0;
 

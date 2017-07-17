@@ -50,12 +50,6 @@ byte splinterCMPColorPalette[COCO_NUM_PALETTE_REGISTERS] = {
 /** Game title */
 char *splinterTitle = "Splinter";
 
-/** Position of the paddle */
-byte splinterPaddlePosition = 72;
-    
-/** current number of balls */
-char splinterNumberOfBalls;
-
 /** last score drawn by the splinter routine */
 char splinterLastDrawnScore[7];
 
