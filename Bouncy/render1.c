@@ -106,7 +106,7 @@ byte blockColors[] = {
 byte level_uncompressed_data[500*15];
 byte level_uncompressed_data_color_lookup[500*15];
 
-struct BOUNCY_LEVEL level_uncompressed = {"               ",0,0,0,0,0,0,0,level_uncompressed_data_color_lookup,level_uncompressed_data};
+struct BOUNCY_LEVEL level_uncompressed = {"              ",0,0,0,0,0,0,0,level_uncompressed_data_color_lookup,level_uncompressed_data};
 struct BOUNCY_LEVEL* level = &level_uncompressed;
 byte doubleBuffer[DISP_SIZE];
 char sbuffer[33];
