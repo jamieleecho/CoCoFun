@@ -1,4 +1,4 @@
-CFLAGS=-O2 
+CFLAGS=-O2
 LDFLAGS=--org=0x2800 --limit=0x7fff
 TARGET=Splinter.dsk
 TARGET_BAS=$(TARGET:.dsk=.bas)
@@ -22,13 +22,13 @@ $(TARGET) : $(TARGET_BAS) $(TARGET_BIN)
 	decb attr $@,$(shell echo $(TARGET_BIN) | tr a-z A-Z) -2 -b
 
 $(TARGET_BIN) : $(C_OBJS)
-	cmoc $(CFLAGS) $(LDFLAGS) -o $@ $^ 
+	cmoc $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 %.o : %.c
-	cmoc $(CFLAGS) -c $< 
+	cmoc $(CFLAGS) -c $<
 
 clean :
-	rm -rf $(TARGET) $(C_OBJS) *.bin *.i *.lst *.asm *.hex
+	rm -rf $(TARGET) $(C_OBJS) $(TARGET_BIN) *.i *.lst *.asm *.hex
 
 run : $(TARGET)
 	$(MESS) coco3 -rompath $(MESS_DIR)/roms -window -flop1 $(TARGET) -cfg_directory ../cfgs/rgb

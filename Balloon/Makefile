@@ -1,19 +1,25 @@
-CFLAGS=
+CFLAGS=-O2
+LDFLAGS=--org=0x3000 --limit=0x7fff
 TARGET=Balloon.dsk
-BALLOON_BAS=Balloon.bas
-BALLOON_BIN=Balloon.bin
-MESS_DIR=~/Applications/mame
-MESS=$(MESS_DIR)/mess64
+TARGET_BAS=$(TARGET:.dsk=.bas)
+TARGET_BIN=$(TARGET:.dsk=.bin)
+TARGET_C=$(TARGET:.dsk=.c)
 
-$(TARGET) : $(BALLOON_BAS) $(BALLOON_BIN)
+MESS_DIR=~/Applications/mame
+MESS=$(MESS_DIR)/mame64
+
+C_SOURCES=$(wildcard *.c)
+C_OBJS=$(patsubst %.c,%.o,$(C_SOURCES))
+
+$(TARGET) : $(TARGET_BAS) $(TARGET_BIN)
 	rm -f $@
 	decb dskini $@
-	decb copy $(BALLOON_BAS) $@,"*.BAS" -t
+	decb copy $(TARGET_BAS) $@,"*.BAS" -t
 	decb attr $@,"*.BAS" -0
-	decb copy $(BALLOON_BAS) $@,BALLOON.BAS -t
-	decb attr $@,BALLOON.BAS -0
-	decb copy $(BALLOON_BIN) $@,BALLOON.BIN
-	decb attr $@,BALLOON.BIN -2 -b
+	decb copy $(TARGET_BAS) $@,$(shell echo $(TARGET_BAS) | tr a-z A-Z) -t
+	decb attr $@,$(shell echo $(TARGET_BAS) | tr a-z A-Z) -0
+	decb copy $(TARGET_BIN) $@,$(shell echo $(TARGET_BIN) | tr a-z A-Z)
+	decb attr $@,$(shell echo $(TARGET_BIN) | tr a-z A-Z) -2 -b
 	decb copy Balloonr.bin $@,BALLOONR.BIN
 	decb attr $@,BALLOONR.BIN -2 -b
 	decb copy Ballon.bin $@,BALLON.BIN
@@ -23,14 +29,14 @@ $(TARGET) : $(BALLOON_BAS) $(BALLOON_BIN)
 	decb copy Scene1.bin $@,SCENE1.BIN
 	decb attr $@,SCENE1.BIN -2 -b
 
-$(BALLOON_BIN) : Balloon.c CoCoMisc.c
-	cmoc $(CFLAGS) $<
+$(TARGET_BIN) : $(C_OBJS)
+	cmoc $(CFLAGS) $(LDFLAGS) -o $@ $^
 
-%.bin : %.c
-	cmoc $(CFLAGS) $< 
+%.o : %.c
+	cmoc $(CFLAGS) -c $<
 
 clean :
-	rm -rf $(TARGET) $(BALLOON_BIN) *.i *.lst *.asm *.hex
+	rm -rf $(TARGET) $(C_OBJS) $(TARGET_BIN) *.i *.lst *.asm *.hex
 
 run : $(TARGET)
 	$(MESS) coco3 -rompath $(MESS_DIR)/roms -window -flop1 $(TARGET) -cfg_directory ../cfgs/rgb

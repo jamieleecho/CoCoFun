@@ -1,5 +1,3 @@
-#pragma org 0x5000
-
 void PlayRick();
 
 
@@ -19,7 +17,6 @@ BADGUY  EQU     $185C
 BULLET  EQU     $1A9C
 RICKNL  EQU     $1C6E
 RICKNR  EQU     $1AB7
-        SETDP   $50
 BLOCK   FCB     0
 XAXIS   FCB     $7F
 YAXIS   FCB     $75

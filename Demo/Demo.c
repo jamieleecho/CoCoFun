@@ -13,9 +13,8 @@
   the author.
 */
 
-#pragma org 0x4000
-#include <cmoc.h>
 #include <coco.h>
+#include <cmoc.h>
 
 #define qsort(b, s, e) qsort2(b, s, (int)((e) - 1))
 

@@ -2,7 +2,7 @@ CFLAGS=-O2
 TARGET=Bouncy.dsk
 RENDER_BIN=render1.bin
 MESS_DIR=~/Applications/mame
-MESS=$(MESS_DIR)/mess64
+MESS=$(MESS_DIR)/mame64
 
 $(TARGET) : $(RENDER_BIN)
 	rm -f $@
