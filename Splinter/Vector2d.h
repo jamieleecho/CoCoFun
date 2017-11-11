@@ -11,6 +11,7 @@
 
 #include "FixedPoint.h"
 
+
 /** Representation of a vector */
 typedef struct Vector2d {
   FixedPoint data[2];

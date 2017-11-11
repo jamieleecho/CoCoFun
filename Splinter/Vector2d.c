@@ -6,10 +6,8 @@
 */
 
 
-#ifndef _Vector2d_c
-#define _Vector2d_c
+#include <cmoc.h>
 
-#include "cmoc.h"
 #include "Vector2d.h"
 
 
@@ -84,6 +82,3 @@ char *Vector2dToA(char *buffer, Vector2d *a) {
   *buffer++ = '\0';
   return buffer;
 }
-
-
-#endif

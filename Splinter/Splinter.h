@@ -9,7 +9,10 @@
 #ifndef _Splinter_h
 #define _Splinter_h
 
+#include <coco.h>
+
 #include "SplinterScore.h"
+
 
 /** No motion */
 #define SplinterLastDirectionNone (0)
@@ -20,14 +23,16 @@
 /** Moving down */
 #define SplinterLastDirectionDown (2)
 
+
 /** Last direction of the paddle */
-byte SplinterLastDirection;
+extern byte SplinterLastDirection;
 
 /** First direction of the paddle when both keys are detected */
-byte SplinterFirstDirection;
+extern byte SplinterFirstDirection;
 
 /** Score during a splinter game */
-SplinterScore splinterScore;
+extern SplinterScore splinterScore;
+
 
 /** Initializes Splinter */
 void SplinterInit();

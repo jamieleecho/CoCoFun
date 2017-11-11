@@ -8,17 +8,34 @@
 */
 
 
-#ifndef _SplinterBall_c
-#define _SplinterBall_c
-
-
-#include "SplinterBall.h"
 #include "Blitter.h"
+#include "Bricks.h"
+#include "CoCoMisc.h"
+#include "FontData.h"
+#include "GrafxData.h"
+#include "Sound.h"
+#include "Splinter.h"
+#include "SplinterBall.h"
 
 
+/** Ball position */
+Vector2d splinterBallPosition;
+
+/** Speed of the ball on [.25, 1] */
+FixedPoint splinterBallVelocity = FixedPointInit(0, 0x4000);
+
+/** Number of balls */
 char splinterNumberOfBalls;
+
+/** Current paddle position */
 byte splinterPaddlePosition;
 
+/** 
+ * Amount to increment each iteration
+ * magnitude(splinterBallIncrementVector) * splinterBallVelocity
+ * == splinterBallVelocity
+ */
+Vector2d splinterBallIncrementVector;
 
 /** Current splinter ball level */
 byte splinterBallLevel = 0;
@@ -428,6 +445,3 @@ void SplinterBallRefresh() {
 			(byte)splinterBallPosition.data[0].Whole >> 1,
 			(byte)splinterBallPosition.data[1].Whole);
 }
-
-
-#endif

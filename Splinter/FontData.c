@@ -4,12 +4,11 @@
   This software is for demonstration purposes only. Use at your own
   risk.
 
-  Breakout font data.
+  Splinter font data.
 */
 
 
-#ifndef _FontData_c
-#define _FontData_c
+#include <coco.h>
 
 
 // Index into fontData. Maps chars 32->127 to offsets into fontData.
@@ -549,5 +548,3 @@ byte FontDataFontData[] = {
   ,0xe7 
 };
 
-
-#endif

@@ -16,6 +16,7 @@ cfg/*
 !Rick/Guy.bin
 .*.swp
 .DS_Store
+*.o
 
 
 

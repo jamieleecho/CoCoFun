@@ -8,8 +8,10 @@
 */
 
 
-#ifndef _Blitter_c
-#define _Blitter_c
+#include <coco.h>
+
+#include "FontData.h"
+#include "GrafxData.h"
 
 
 byte mmuBuffer[4];
@@ -712,6 +714,3 @@ void BlitterInitGrafxDataNumberData(byte *buffer) {
 
   BlitterUnmapScreen();
 }
-
-
-#endif

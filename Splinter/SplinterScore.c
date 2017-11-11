@@ -8,10 +8,7 @@
 */
 
 
-#ifndef _SplinterScore_c
-#define _SplinterScore_c
-
-
+#include "Splinter.h"
 #include "SplinterScore.h"
 
 
@@ -44,12 +41,9 @@ NextDigit lda  ,-x
 
 
 void SplinterScoreFormat(SplinterScore *score, char *dst) {
-  for(byte ii=1; ii<BREAKOUT_SCORE_NUM_BYTES; ii++) {
+  for(byte ii=1; ii<SPLINTER_SCORE_NUM_BYTES; ii++) {
     dst[2 * (ii - 1)] = ((score->score[ii] >> 4) & 0xf) + '0';
     dst[2 * (ii - 1) + 1] = (score->score[ii] & 0xf) + '0';
   }
-  dst[2 * (BREAKOUT_SCORE_NUM_BYTES - 1)] = 0;
+  dst[2 * (SPLINTER_SCORE_NUM_BYTES - 1)] = 0;
 }
-
-
-#endif

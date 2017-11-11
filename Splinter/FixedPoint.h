@@ -9,6 +9,8 @@
 #ifndef _FixedPoint_h
 #define _FixedPoint_h
 
+#include <coco.h>
+
 
 /** FixedPoint data structure */
 typedef struct FixedPoint {

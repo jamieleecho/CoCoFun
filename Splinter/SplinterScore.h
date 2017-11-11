@@ -11,6 +11,8 @@
 #ifndef _SplinterScore_h
 #define _SplinterScore_h
 
+#include <coco.h>
+
 
 #define SPLINTER_SCORE_NUM_BYTES 4
 

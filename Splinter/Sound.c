@@ -8,10 +8,7 @@
 */
 
 
-#ifndef _Sound_c
-#define _Sound_c
-
-
+#include "CoCoMisc.h"
 #include "Sound.h"
 
 
@@ -154,6 +151,3 @@ void SoundInit() {
   asm { andcc #$aF }
   return;
 }
-
-
-#endif

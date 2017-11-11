@@ -8,33 +8,34 @@
   back around 1989 or so.
 */
 
-#pragma org 0x2800
-#include <cmoc.h>
 #include <coco.h>
+#include <cmoc.h>
 
-#include "Splinter.h"
-#include "Bricks.h"
-#include "SplinterBall.h"
-#include "SplinterScore.h"
 #include "Blitter.h"
+#include "Bricks.h"
 #include "CoCoMisc.h"
 #include "Sound.h"
+#include "Splinter.h"
+#include "SplinterBall.h"
+#include "SplinterScore.h"
 #include "Vector2d.h"
 
-#include "GrafxData.c"
-#include "FontData.c"
-#include "Bricks.c"
-#include "SplinterBall.c"
-#include "SplinterScore.c"
-#include "Blitter.c"
-#include "CoCoMisc.c"
-#include "Sound.c"
-#include "FixedPoint.c"
-#include "Vector2d.c"
+#include "FontData.h"
+#include "GrafxData.h"
 
 
 /** Loop delay for performing screen fades */
 #define SPLINTER_FADE_DELAY 3000
+
+
+/** Last direction of the paddle */
+byte SplinterLastDirection;
+
+/** First direction of the paddle when both keys are detected */
+byte SplinterFirstDirection;
+
+/** Score during a splinter game */
+SplinterScore splinterScore;
 
 /** Splinter RGB palette colors */
 byte splinterRGBColorPalette[COCO_NUM_PALETTE_REGISTERS] = {
@@ -45,7 +46,6 @@ byte splinterRGBColorPalette[COCO_NUM_PALETTE_REGISTERS] = {
 byte splinterCMPColorPalette[COCO_NUM_PALETTE_REGISTERS] = {
   48, 23, 40, 37, 46, 18, 37, 32, 16, 52, 9, 5, 28, 26, 12, 0
 };
-
 
 /** Game title */
 char *splinterTitle = "Splinter";

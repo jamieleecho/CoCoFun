@@ -12,7 +12,7 @@
 #define _Blitter_h
 
 
-#define BREAKOUT_SCORE_NUM_BYTES 4
+#include <coco.h>
 
 
 /** Must be invoked before other Blitter routines */

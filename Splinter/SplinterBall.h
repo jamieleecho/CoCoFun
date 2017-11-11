@@ -13,22 +13,30 @@
 
 
 #include <coco.h>
+
 #include "FixedPoint.h"
 #include "Vector2d.h"
 
 
 /** Ball position */
-Vector2d splinterBallPosition;
+extern Vector2d splinterBallPosition;
 
 /** Speed of the ball on [.25, 1] */
-FixedPoint splinterBallVelocity = FixedPointInit(0, 0x4000);
+extern FixedPoint splinterBallVelocity = FixedPointInit(0, 0x4000);
+
+/** Number of balls */
+extern char splinterNumberOfBalls;
+
+/** Current paddle position */
+extern byte splinterPaddlePosition;
 
 /** 
  * Amount to increment each iteration
  * magnitude(splinterBallIncrementVector) * splinterBallVelocity
  * == splinterBallVelocity
  */
-Vector2d splinterBallIncrementVector;
+extern Vector2d splinterBallIncrementVector;
+
 
 /** Must be invoked before invoking other SplinterBallFunctions. */
 void SplinterBallInit();

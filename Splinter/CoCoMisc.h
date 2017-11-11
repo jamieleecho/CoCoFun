@@ -14,6 +14,9 @@
 #include <coco.h>
 
 
+/** Number of palette registers */
+#define COCO_NUM_PALETTE_REGISTERS 16
+
 /** CoCo base palette register */
 #define cocoPaletteBaseReg ((byte *)0xffb0)
 

@@ -6,9 +6,6 @@
 */
 
 
-#ifndef _FixedPoint_c
-#define _FixedPoint_c
-
 #include "FixedPoint.h"
 #include "cmoc.h"
 
@@ -1059,6 +1056,3 @@ void FixedPointCos(FixedPoint *a, FixedPoint *b) {
   if (negateAnswer)
     FixedPointNegate(a, a);
 }
-
-
-#endif
