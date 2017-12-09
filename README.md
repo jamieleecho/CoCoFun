@@ -8,11 +8,11 @@ used it to enhance CMOC's optimizer.
 
    
 The following are required to compile this code on your Mac OS X system.
-* [XCode](https://developer.apple.com/xcode/downloads/)
-* [CMOC](http://perso.b2b2c.ca/sarrazip/dev/cmoc.html)
+* [XCode](https://developer.apple.com/xcode/)
+* [CMOC](http://perso.b2b2c.ca/~sarrazip/dev/cmoc.html)
 * [lwtools](http://lwtools.projects.l-w.ca/)
 * [ToolShed](http://sourceforge.net/projects/toolshed/)
-* [Mess](http://sourceforge.net/projects/toolshed/)
+* [MAME](https://github.com/mamedev/mame/)
 * CoCo 3 ROMs
    
    
