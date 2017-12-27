@@ -28,7 +28,7 @@ $(TARGET_BIN) : $(C_OBJS)
 	cmoc $(CFLAGS) -c $<
 
 clean :
-	rm -rf $(TARGET) $(C_OBJS) $(TARGET_BIN) *.i *.lst *.asm *.hex
+	rm -rf $(TARGET) $(C_OBJS) $(TARGET_BIN) *.i *.lst *.asm *.hex *.s *.map *.link
 
 run : $(TARGET)
 	$(MESS) coco3 -rompath $(MESS_DIR)/roms -window -flop1 $(TARGET) -cfg_directory ../cfgs/rgb
