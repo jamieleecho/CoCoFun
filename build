@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+(cd Balloon && ./build "$@")
+(cd Bouncy && ./build "$@")
+(cd Demo && ./build "$@")
+(cd Primes && ./build "$@")
+(cd Rick && ./build "$@")
+(cd Splinter && ./build "$@")

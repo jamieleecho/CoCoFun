@@ -20,4 +20,4 @@ cfg/*
 *.s
 *.map
 *.link
-
+.bash*

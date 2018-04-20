@@ -6,16 +6,7 @@ revisit old Assembly and Basic programs that I wrote in the late 80s and early
 90s before I had any formal software development training. More recently,  I
 used it to enhance CMOC's optimizer.
 
-   
-The following are required to compile this code on your Mac OS X system.
-* [XCode](https://developer.apple.com/xcode/)
-* [CMOC](http://perso.b2b2c.ca/~sarrazip/dev/cmoc.html)
-* [lwtools](http://lwtools.projects.l-w.ca/)
-* [ToolShed](http://sourceforge.net/projects/toolshed/)
-* [MAME](https://github.com/mamedev/mame/)
-* CoCo 3 ROMs
-   
-   
+
 There are several folders which are described below.
 * Ancient - Very old (from the 80s) assembly language programs
 * Balloon - You are a ballon on a skateboard that must avoid a pin. This was my
@@ -39,3 +30,31 @@ graphics, background sounds and replaces joystick support with keyboard support.
 It still does not implement double buffering - this results in visual "tearing"
 that can be seen when the ball is in motion and artifacts when bitmaps are close
 to each other.
+
+
+## Requirements   
+The following are required to compile this code on your Mac OS X system.
+* [XCode](https://developer.apple.com/xcode/)
+* [Docker](http://www.docker.com)
+* [MAME](https://github.com/mamedev/mame/) installed in ~/Applications/mame
+* CoCo 3 ROMs installed in MAME
+   
+
+## Building and running
+To build DSK files for each folder, type the following from the root folder:
+```
+./build
+```
+
+To clean everything:
+```
+./build clean
+```
+
+To build and run an individual demo:
+```
+cd <folder>
+./build
+make run
+```
+

@@ -1,4 +1,4 @@
-CFLAGS=-O2
+CFLAGS=-O2 -I.
 LDFLAGS=--org=0x3000 --limit=0x7fff
 TARGET=Balloon.dsk
 TARGET_BAS=$(TARGET:.dsk=.bas)
