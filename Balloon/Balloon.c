@@ -826,7 +826,7 @@ ZLD	LDD	,X++
 	BNE	ZLD
 
 * RETURN NORMAL PAGE
-	LDA	#123
+	LDA	#$3B
 	STA	$FFA3
 	RTS
 
@@ -834,7 +834,7 @@ ZLD	LDD	,X++
 * RESTORE THE SCREEN FROM PAGE #$30
 *******************************************************************************
 RESTORE_SCREEN	
-        LDA	#$30
+  LDA	#$30
 	STA	$FFA3
 	LDX	#$E00
 	LDY	#$6000
@@ -843,7 +843,7 @@ ZLDR	LDD	,Y++
 	STD	,X++
 	CMPX	#$E00+(32*22*8)
 	BNE	ZLDR
-	LDA	#123
+	LDA	#$3B
 	STA	$FFA3
 	RTS
 
