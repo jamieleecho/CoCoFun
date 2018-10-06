@@ -34,7 +34,7 @@ void BlitterDrawGraphics(byte *bitmap, byte x, byte y);
  * @param x[input] x byte location
  * @param y[input] y pixel location
  */
-void BlitterDrawNumericText(char *text, byte x, byte y);
+void BlitterDrawNumericText(const char *text, byte x, byte y);
 
 
 /**
@@ -54,7 +54,7 @@ void BlitterDrawText(unsigned *fontIndex, byte *fontData,
 		     byte foreground, byte background,
 		     unsigned x, unsigned y,
 		     byte glyphSpacing,
-		     char *text);
+		     const char *text);
 
 /**
  * @param fontIndex[in] index that maps ASCII [32, 127] to offsets into fontData
@@ -70,7 +70,7 @@ void BlitterDrawText(unsigned *fontIndex, byte *fontData,
  */
 void BlitterDrawText2(unsigned *fontIndex, byte *fontData,
 		      byte foreground, unsigned x, unsigned y,
-		      byte glyphSpacing, char *text);
+		      byte glyphSpacing, const char *text);
 
 /**
  * Clears the screen to the given color

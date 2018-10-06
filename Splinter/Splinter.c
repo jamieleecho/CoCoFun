@@ -48,7 +48,7 @@ byte splinterCMPColorPalette[COCO_NUM_PALETTE_REGISTERS] = {
 };
 
 /** Game title */
-char *splinterTitle = "Splinter";
+const char *splinterTitle = "Splinter";
 
 /** last score drawn by the splinter routine */
 char splinterLastDrawnScore[7];

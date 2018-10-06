@@ -180,7 +180,7 @@ char *FixedPointToA(char *buffer, FixedPoint *a);
  * @param a[out] output parsed result
  * @param buffer[in] input
  */
-void FixedPointParse(FixedPoint *a, char *buffer);
+void FixedPointParse(FixedPoint *a, const char *buffer);
 
 
 /**

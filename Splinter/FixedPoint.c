@@ -850,7 +850,7 @@ char *FixedPointToA(char *buffer, FixedPoint *a) {
 }
 
 
-void FixedPointParse(FixedPoint *a, char *buffer) {
+void FixedPointParse(FixedPoint *a, const char *buffer) {
   // Zero out a by default
   FixedPointSet(a, 0, 0);
 

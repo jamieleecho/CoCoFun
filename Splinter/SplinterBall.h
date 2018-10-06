@@ -22,7 +22,7 @@
 extern Vector2d splinterBallPosition;
 
 /** Speed of the ball on [.25, 1] */
-extern FixedPoint splinterBallVelocity = FixedPointInit(0, 0x4000);
+extern FixedPoint splinterBallVelocity;
 
 /** Number of balls */
 extern char splinterNumberOfBalls;

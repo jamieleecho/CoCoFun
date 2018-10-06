@@ -396,6 +396,10 @@ int main()
 
     gameLoop();
     exitGame();
-    
-    return 0;
+
+    if (0)  {
+      return 1;
+    } else {
+      return 0;
+    }
 }

@@ -1,4 +1,4 @@
-CFLAGS=-O2
+CFLAGS=-O2 --intermediate --wfo
 LDFLAGS=--org=0x2800 --limit=0x7fff
 TARGET=Render1.dsk
 TARGET_BAS=$(TARGET:.dsk=.bas)

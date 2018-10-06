@@ -158,7 +158,7 @@ BlitterDrawNumericGlyphLoop
 }
 
 
-void BlitterDrawNumericText(char *text, byte x, byte y) {
+void BlitterDrawNumericText(const char *text, byte x, byte y) {
   for(char c = *text++; c != 0; c = *text++) {
     if (c < '0') c = '0';
     if (c > '9') c = '9';
@@ -173,7 +173,7 @@ void BlitterDrawText(unsigned *fontIndex, byte *fontData,
 		     byte foreground, byte background,
 		     unsigned x, unsigned y,
 		     byte glyphSpacing,
-		     char *text) {
+		     const char *text) {
   // Bounds check
   if ((x > 319) || (y > 191))
 	return;
@@ -475,7 +475,7 @@ void BlitterDrawText2(unsigned *fontIndex, byte *fontData,
 		      byte foreground,
 		      unsigned x, unsigned y,
 		      byte glyphSpacing,
-		      char *text) {
+		      const char *text) {
   // Bounds check
   if ((x > 319) || (y > 191))
 	return;
