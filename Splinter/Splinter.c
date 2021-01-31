@@ -8,7 +8,7 @@
   back around 1989 or so.
 */
 
-#define VERSION "Splinter 1.0"
+#define VERSION "Splinter 1.1"
 
 #include <coco.h>
 #include <cmoc.h>
