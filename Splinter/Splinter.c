@@ -8,6 +8,8 @@
   back around 1989 or so.
 */
 
+#define VERSION "Splinter 1.0"
+
 #include <coco.h>
 #include <cmoc.h>
 
@@ -368,9 +370,9 @@ void SplinterShowTitleScreen() {
   // Draw the title
   unsigned int x = 0, y = 0;
   BlitterDrawText2(FontDataFontIndex, FontDataFontData,
-		   15, x + 120, y + 11, 2, "Splinter 1");
+		   15, x + 112, y + 11, 2, VERSION);
   BlitterDrawText2(FontDataFontIndex, FontDataFontData,
-		   2, x + 119, y + 10, 2, "Splinter 1");
+		   2, x + 113, y + 10, 2, VERSION);
   
   y = 2;
   BlitterFillRectangle(60, y + 25, 200, 131, f);

@@ -87,7 +87,7 @@ struct BOUNCY_LEVEL level_test = {
     0,12,    //reqired keys, keys present
     0,    //max time
     0,     //best score
-    (byte *)NULL,
+    NULL,
     testData
 };
 

@@ -1,23 +1,54 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+*.c10
+
+# Compiler Detrius
+*.asm
+*.lst
 *.hex
 *.bin
-*.lst
-*.asm
-*.i
-cfg/*
 *.dsk
-!Ancient/*
-*~
-#*
-.#*
-!Balloon/Balloonr.bin
-!Balloon/Ballon.bin
-!Balloon/Scene1.bin
-!Rick/Pix.bin
-!Rick/Guy.bin
-.*.swp
-.DS_Store
-*.o
+*.i
 *.s
 *.map
 *.link
-.bash*
+
+# Editor stuff
+*.swp
+*~
+
+# Mac Junk
+.DS_Store
+
+# Executables
+minilisp

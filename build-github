@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+(cd Balloon && make "$@")
+(cd Bouncy && make "$@")
+(cd Demo && make "$@")
+(cd Primes && make "$@")
+(cd Rick && make "$@")
+(cd Splinter && make "$@")
