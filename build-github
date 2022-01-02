@@ -2,6 +2,7 @@
 
 (cd Balloon && make "$@")
 (cd Bouncy && make "$@")
+(cd Card && make "$@")
 (cd Demo && make "$@")
 (cd Primes && make "$@")
 (cd Rick && make "$@")

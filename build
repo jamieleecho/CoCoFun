@@ -2,6 +2,7 @@
 
 (cd Balloon && ./build "$@")
 (cd Bouncy && ./build "$@")
+(cd Card && ./build "$@")
 (cd Demo && ./build "$@")
 (cd Primes && ./build "$@")
 (cd Rick && ./build "$@")
