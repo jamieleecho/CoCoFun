@@ -49,3 +49,7 @@
 
 # Mac Junk
 .DS_Store
+
+# Allow some binaries
+!Card/snow.bin
+!Card/suprplay.bin
