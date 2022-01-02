@@ -13,17 +13,17 @@ Insert the Card.dsk into Drive 0 of a CoCo 3 disk drive.
 
 Enter:
 ```
-RUN \"\i*\"
+RUN "\*\"
 ```
 This will show a scenic winter view with animated snow. Pressing 1-8 will
 pause the snow and play 8 different Christmas songs.
 
 
 ## Credits
-* Suprplay.bin from "Synthesizer Sound-Off" in Rainbow Magazine June 1988,
+* `suprplay.bin` from "Synthesizer Sound-Off" in Rainbow Magazine June 1988,
   Pages 102-108
-* Snow.bin from "Winter Magic" in Rainbow Magazine December 1989, Pages 12-
+* `snow.bin` from "Winter Magic" in Rainbow Magazine December 1989, Pages 12-
   15
-* Winter.cm3 scene received heavy inspiration from "Mill" in Rainbow Magazine
+* `winter.cm3` scene received heavy inspiration from "Mill" in Rainbow Magazine
   December 1987, Page 18
 * Christmas music adapted from various Missalettes and music books
