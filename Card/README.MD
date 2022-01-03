@@ -13,7 +13,7 @@ Insert the Card.dsk into Drive 0 of a CoCo 3 disk drive.
 
 Enter:
 ```
-RUN "\*\"
+RUN "*"
 ```
 This will show a scenic winter view with animated snow. Pressing 1-8 will
 pause the snow and play 8 different Christmas songs.
