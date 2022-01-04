@@ -15,6 +15,7 @@ not use CoCo 3 graphic modes because I did not know how to access them. After
 writing this game I decided to work on something that actually used CoCo 3
 graphic modes and did not need double buffering.
 * Bouncy - Use C code posted by Lee Patterson to enhance CMOC compiler optimizer.
+* Card - A small CoCo 3 Christmas Card program that blends a scenic winter view with Christmas music
 * cfgs - Configuration directories for testing programs with mess
 * Demo - A cheesy little demo program to test CMOC
 * Misc - Folder containing scripts to help import graphic data
