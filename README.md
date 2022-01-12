@@ -23,6 +23,7 @@ graphic modes and did not need double buffering.
 * Rick - You are Rick Tracy and ... I never finished this game. The intent was
   to take advantage of CoCo 3 graphic modes, implement real sprites and double
 buffering.
+* Sound - Experiment with playing Sounds via variable IRQ timer
 * Splinter - A Breakout clone written in C and assembly language. This was
   originally written around 1989 in pure assembly language. The purpose was to
 learn how to use the CoCo 3 graphic modes and to write a game in such a way that
